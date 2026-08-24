@@ -36,16 +36,16 @@ function StaffFormModal({
 
   return (
     <Modal title="Yeni Çalışan" onClose={onClose}>
-      <form className="crud-form" onSubmit={handleSubmit}>
-        <label className="crud-form__field">
+      <form onSubmit={handleSubmit}>
+        <label className="form-field">
           <span>Ad Soyad *</span>
           <input name="fullName" value={form.fullName} onChange={handleChange} required />
         </label>
-        <label className="crud-form__field">
+        <label className="form-field">
           <span>E-posta *</span>
           <input type="email" name="email" value={form.email} onChange={handleChange} required />
         </label>
-        <label className="crud-form__field">
+        <label className="form-field">
           <span>Şifre (en az 8 karakter) *</span>
           <input
             type="password"
@@ -56,8 +56,8 @@ function StaffFormModal({
             minLength={8}
           />
         </label>
-        {error && <p className="crud-form__error">{error}</p>}
-        <div className="crud-form__actions">
+        {error && <p className="form-error">{error}</p>}
+        <div className="form-actions">
           <button type="button" className="btn" onClick={onClose}>
             İptal
           </button>

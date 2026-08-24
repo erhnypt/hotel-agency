@@ -58,15 +58,15 @@ export function SettingsPage() {
         <h2>Ayarlar</h2>
       </div>
 
-      <form className="crud-form" style={{ maxWidth: 480 }} onSubmit={handleSubmit}>
+      <form style={{ maxWidth: 480 }} onSubmit={handleSubmit}>
         <h3 style={{ marginBottom: '1rem', fontWeight: 600 }}>Profil Bilgileri</h3>
 
-        <label className="crud-form__field">
+        <label className="form-field">
           <span>E-posta</span>
           <input type="email" value={profile.data?.email ?? ''} disabled />
         </label>
 
-        <label className="crud-form__field">
+        <label className="form-field">
           <span>Ad Soyad *</span>
           <input
             type="text"
@@ -81,7 +81,7 @@ export function SettingsPage() {
           Şifrenizi değiştirmek istemiyorsanız bu alanları boş bırakın.
         </p>
 
-        <label className="crud-form__field">
+        <label className="form-field">
           <span>Mevcut Şifre</span>
           <input
             type="password"
@@ -90,7 +90,7 @@ export function SettingsPage() {
           />
         </label>
 
-        <label className="crud-form__field">
+        <label className="form-field">
           <span>Yeni Şifre (en az 8 karakter)</span>
           <input
             type="password"
@@ -100,7 +100,7 @@ export function SettingsPage() {
           />
         </label>
 
-        <label className="crud-form__field">
+        <label className="form-field">
           <span>Yeni Şifre (tekrar)</span>
           <input
             type="password"
@@ -109,14 +109,14 @@ export function SettingsPage() {
           />
         </label>
 
-        {errorMsg && <p className="crud-form__error">{errorMsg}</p>}
+        {errorMsg && <p className="form-error">{errorMsg}</p>}
         {successMsg && (
           <p style={{ color: 'var(--color-success, #22c55e)', marginBottom: '0.5rem' }}>
             {successMsg}
           </p>
         )}
 
-        <div className="crud-form__actions">
+        <div className="form-actions">
           <button type="submit" className="btn btn--primary" disabled={saving}>
             {saving ? 'Kaydediliyor...' : 'Kaydet'}
           </button>
