@@ -4,6 +4,7 @@ import com.hotelagency.dto.auth.AuthResponse;
 import com.hotelagency.dto.auth.LoginRequest;
 import com.hotelagency.dto.auth.RefreshRequest;
 import com.hotelagency.dto.auth.RegisterRequest;
+import com.hotelagency.dto.auth.UpdateProfileRequest;
 import com.hotelagency.dto.auth.UserSummary;
 import com.hotelagency.entity.Role;
 import com.hotelagency.entity.User;
@@ -71,6 +72,21 @@ public class AuthService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found: " + email));
 
         return buildAuthResponse(user);
+    }
+
+    @Transactional
+    public UserSummary updateProfile(User user, UpdateProfileRequest request) {
+        user.setFullName(request.fullName());
+
+        if (request.newPassword() != null && !request.newPassword().isBlank()) {
+            if (request.currentPassword() == null
+                    || !passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+                throw new IllegalArgumentException("Mevcut şifre hatalı");
+            }
+            user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        }
+
+        return UserSummary.from(userRepository.save(user));
     }
 
     private AuthResponse buildAuthResponse(User user) {

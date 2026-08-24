@@ -1,5 +1,24 @@
 export type HotelStatus = 'PENDING' | 'ACTIVE' | 'REJECTED'
 
+export interface StaffResponse {
+  id: number
+  fullName: string
+  email: string
+  createdAt: string
+}
+
+export interface StaffRequest {
+  fullName: string
+  email: string
+  password: string
+}
+
+export interface UpdateProfileRequest {
+  fullName: string
+  currentPassword?: string
+  newPassword?: string
+}
+
 export interface HotelResponse {
   id: number
   name: string
@@ -168,3 +187,4 @@ export interface ReservationResponse {
   createdAt: string
   updatedAt: string
 }
+

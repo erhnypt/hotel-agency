@@ -19,6 +19,7 @@ export const STAFF_MENU: MenuItem[] = [
   { label: 'Müşteriler', path: '/staff/customers' },
   { label: 'Rezervasyonlar', path: '/staff/reservations', end: true },
   { label: 'Yeni Rezervasyon', path: '/staff/reservations/new' },
+  { label: 'Ayarlar', path: '/staff/settings' },
 ]
 
 export const HOTEL_MENU: MenuItem[] = [
@@ -29,4 +30,5 @@ export const HOTEL_MENU: MenuItem[] = [
   { label: 'Fiyatlar', path: '/hotel/prices' },
   { label: 'Müsaitlik', path: '/hotel/availability' },
   { label: 'Rezervasyonlar', path: '/hotel/reservations' },
+  { label: 'Ayarlar', path: '/hotel/settings' },
 ]

@@ -110,4 +110,16 @@ Ayrıca küçük bir gezinme hatası düzeltildi: "Rezervasyonlar" ve "Yeni Reze
 
 Backend testleri **111/111**, frontend `tsc -b`, lint ve `vite build` temiz.
 
-Sıradaki: Phase 11 (testing & cleanup) — kalan küçük noktalar: Ayarlar ve Çalışanlar (Agency Admin) sayfaları hâlâ "yapım aşamasında" (spec'te bu ikisi için ayrı bir backend endpoint tanımlı değil).
+**Otel Self-Registration** tamamlandı: `/register` sayfasından otel adı, iletişim kişisi, email ve şifre girerek kayıt olunabiliyor. Kayıt sonrası HOTEL_ADMIN hesabı otomatik oluşturulup JWT token döndürülüyor (otomatik giriş). `EmailService` ile kayıt onayında "Başvurunuz İnceleniyor", admin onayında "Başvurunuz Onaylandı" HTML maili gönderiliyor; SMTP yapılandırılmamışsa konsola loglama yapıyor.
+
+**Çalışanlar (Agency Staff Yönetimi)** tamamlandı: `GET|POST|DELETE /api/staff` endpoint'leri (sadece AGENCY_ADMIN), frontend `/admin/staff` sayfası — tablo listeleme, yeni çalışan oluşturma (modal form), silme (onay isteği). Böylece AGENCY_STAFF kullanıcıları artık DataLoader'a gerek kalmadan admin panelinden oluşturulabiliyor.
+
+**Ayarlar** tamamlandı: `PUT /api/auth/me` endpoint'i ile ad soyad güncelleme ve şifre değiştirme, frontend `/admin/settings` sayfası — mevcut şifre doğrulama, yeni şifre tekrar kontrolü, başarı/hata mesajları.
+
+**Production Deployment** tamamlandı:
+- Frontend → Vercel (`VITE_API_URL` env var ile Render backend'e yönlendirme)
+- Backend → Render (Dockerfile ile Spring Boot JAR)
+- Database → Neon (PostgreSQL, `?sslmode=require` ile güvenli bağlantı)
+- CORS `CORS_ORIGINS` env var ile Vercel URL'sine göre yapılandırılıyor
+
+**Phase 11 — Tüm özellikler tamamlandı.** Backend testleri geçiyor, frontend `tsc -b && vite build` temiz.

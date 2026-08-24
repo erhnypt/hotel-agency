@@ -2,7 +2,8 @@ import { Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthContext'
 import { roleHomePath } from './auth/roleHome'
 import { useAuth } from './auth/useAuth'
-import { ComingSoon } from './components/PageState'
+import { StaffPage } from './pages/staff/StaffPage'
+import { SettingsPage } from './pages/settings/SettingsPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
 import { ADMIN_MENU, HOTEL_MENU, STAFF_MENU } from './layout/menus'
 import { RoleShell } from './layout/RoleShell'
@@ -41,8 +42,8 @@ function App() {
             <Route path="hotels" element={<HotelsPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
             <Route path="customers" element={<CustomersPage />} />
-            <Route path="staff" element={<ComingSoon title="Çalışanlar" />} />
-            <Route path="settings" element={<ComingSoon title="Ayarlar" />} />
+            <Route path="staff" element={<StaffPage />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
 
           <Route path="/staff" element={<RoleShell role="AGENCY_STAFF" panelTitle="Acente Çalışanı Paneli" menu={STAFF_MENU} />}>
@@ -51,6 +52,7 @@ function App() {
             <Route path="customers" element={<CustomersPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
             <Route path="reservations/new" element={<NewReservationPage />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
 
           <Route path="/hotel" element={<RoleShell role="HOTEL_ADMIN" panelTitle="Otel Paneli" menu={HOTEL_MENU} />}>
@@ -61,6 +63,7 @@ function App() {
             <Route path="prices" element={<PricesPage />} />
             <Route path="availability" element={<AvailabilityPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
+            <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Route>
 
