@@ -1,0 +1,15 @@
+.staff-dashboard__cta {
+  display: inline-block;
+  margin-bottom: 24px;
+  padding: 11px 20px;
+  border-radius: 8px;
+  background: var(--accent);
+  color: #fff;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.staff-dashboard__cta:hover {
+  filter: brightness(1.05);
+}

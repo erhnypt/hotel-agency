@@ -1,0 +1,84 @@
+.room-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  margin: 20px 0 28px;
+}
+
+.room-option {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--text-h);
+}
+
+.room-option:hover {
+  border-color: var(--accent-border);
+}
+
+.room-option--selected {
+  border-color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.room-option__name {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.room-option__meta {
+  font-size: 13px;
+  color: var(--text);
+}
+
+.room-option__price {
+  margin-top: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--accent);
+}
+
+.reservation-customer-form {
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+}
+
+.customer-mode-toggle {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.new-customer-fields {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 0 16px;
+}
+
+.reservation-success {
+  text-align: center;
+  padding: 48px 0;
+}
+
+.reservation-success h2 {
+  margin: 0 0 12px;
+  color: var(--text-h);
+}
+
+.reservation-success__number {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--accent);
+  margin: 0 0 24px;
+}
+
+.reservation-success .form-actions {
+  justify-content: center;
+}

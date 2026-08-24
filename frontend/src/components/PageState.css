@@ -1,0 +1,14 @@
+.page-state {
+  color: var(--text);
+  font-size: 15px;
+}
+
+.page-state--error {
+  color: #ef4444;
+}
+
+.page-state__title {
+  margin: 0 0 8px;
+  font-size: 18px;
+  color: var(--text-h);
+}

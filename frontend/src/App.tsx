@@ -1,0 +1,73 @@
+import { Navigate, Route, Routes } from 'react-router-dom'
+import { AuthProvider } from './auth/AuthContext'
+import { roleHomePath } from './auth/roleHome'
+import { useAuth } from './auth/useAuth'
+import { ComingSoon } from './components/PageState'
+import { ProtectedRoute } from './components/ProtectedRoute'
+import { ADMIN_MENU, HOTEL_MENU, STAFF_MENU } from './layout/menus'
+import { RoleShell } from './layout/RoleShell'
+import { AgencyAdminDashboard } from './pages/dashboard/AgencyAdminDashboard'
+import { AgencyStaffDashboard } from './pages/dashboard/AgencyStaffDashboard'
+import { HotelAdminDashboard } from './pages/dashboard/HotelAdminDashboard'
+import { AvailabilityPage } from './pages/availability/AvailabilityPage'
+import { CustomersPage } from './pages/customers/CustomersPage'
+import { HotelProfilePage } from './pages/hotelProfile/HotelProfilePage'
+import { HotelsPage } from './pages/hotels/HotelsPage'
+import { LoginPage } from './pages/LoginPage'
+import { HotelRegisterPage } from './pages/HotelRegisterPage'
+import { PricesPage } from './pages/prices/PricesPage'
+import { NewReservationPage } from './pages/reservations/NewReservationPage'
+import { ReservationsPage } from './pages/reservations/ReservationsPage'
+import { RoomTypesPage } from './pages/roomTypes/RoomTypesPage'
+import { ServicesPage } from './pages/services/ServicesPage'
+
+function RoleHomeRedirect() {
+  const { user } = useAuth()
+  return <Navigate to={user ? roleHomePath(user.role) : '/login'} replace />
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<HotelRegisterPage />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<RoleHomeRedirect />} />
+
+          <Route path="/admin" element={<RoleShell role="AGENCY_ADMIN" panelTitle="Acente Admin Paneli" menu={ADMIN_MENU} />}>
+            <Route index element={<AgencyAdminDashboard />} />
+            <Route path="hotels" element={<HotelsPage />} />
+            <Route path="reservations" element={<ReservationsPage />} />
+            <Route path="customers" element={<CustomersPage />} />
+            <Route path="staff" element={<ComingSoon title="Çalışanlar" />} />
+            <Route path="settings" element={<ComingSoon title="Ayarlar" />} />
+          </Route>
+
+          <Route path="/staff" element={<RoleShell role="AGENCY_STAFF" panelTitle="Acente Çalışanı Paneli" menu={STAFF_MENU} />}>
+            <Route index element={<AgencyStaffDashboard />} />
+            <Route path="hotels" element={<HotelsPage />} />
+            <Route path="customers" element={<CustomersPage />} />
+            <Route path="reservations" element={<ReservationsPage />} />
+            <Route path="reservations/new" element={<NewReservationPage />} />
+          </Route>
+
+          <Route path="/hotel" element={<RoleShell role="HOTEL_ADMIN" panelTitle="Otel Paneli" menu={HOTEL_MENU} />}>
+            <Route index element={<HotelAdminDashboard />} />
+            <Route path="profile" element={<HotelProfilePage />} />
+            <Route path="rooms" element={<RoomTypesPage />} />
+            <Route path="services" element={<ServicesPage />} />
+            <Route path="prices" element={<PricesPage />} />
+            <Route path="availability" element={<AvailabilityPage />} />
+            <Route path="reservations" element={<ReservationsPage />} />
+          </Route>
+        </Route>
+
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </AuthProvider>
+  )
+}
+
+export default App
