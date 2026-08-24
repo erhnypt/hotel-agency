@@ -5,6 +5,8 @@ import { listCustomers } from '../../api/customers'
 import { listHotels } from '../../api/hotels'
 import { createReservation, searchAvailableRooms } from '../../api/reservations'
 import type { ApiErrorResponse } from '../../auth/types'
+import { roleHomePath } from '../../auth/roleHome'
+import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
 import type { AvailableRoomResponse } from '../../api/types'
@@ -13,6 +15,7 @@ import './NewReservationPage.css'
 
 export function NewReservationPage() {
   const navigate = useNavigate()
+  const { user } = useAuth()
   const hotels = useAsync(listHotels, [])
   const customers = useAsync(listCustomers, [])
 
@@ -116,7 +119,11 @@ export function NewReservationPage() {
           <button type="button" className="btn btn--primary" onClick={resetForNewReservation}>
             Yeni Rezervasyon Oluştur
           </button>
-          <button type="button" className="btn" onClick={() => navigate('/staff/reservations')}>
+          <button
+            type="button"
+            className="btn"
+            onClick={() => navigate(`${roleHomePath(user!.role)}/reservations`)}
+          >
             Rezervasyonlara Git
           </button>
         </div>

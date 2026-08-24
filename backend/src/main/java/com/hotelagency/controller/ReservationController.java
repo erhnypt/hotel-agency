@@ -31,7 +31,7 @@ public class ReservationController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('AGENCY_STAFF')")
+    @PreAuthorize("hasAnyRole('AGENCY_STAFF', 'AGENCY_ADMIN')")
     public ResponseEntity<ReservationResponse> create(
             @Valid @RequestBody ReservationCreateRequest request, @AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.create(request, principal.getUser()));
@@ -58,7 +58,7 @@ public class ReservationController {
     }
 
     @PostMapping("/{id}/cancel")
-    @PreAuthorize("hasRole('AGENCY_STAFF')")
+    @PreAuthorize("hasAnyRole('AGENCY_STAFF', 'AGENCY_ADMIN')")
     public ResponseEntity<ReservationResponse> cancel(
             @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(reservationService.cancel(id, principal.getUser()));

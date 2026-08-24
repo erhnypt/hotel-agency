@@ -184,6 +184,7 @@ export interface ReservationResponse {
   totalPrice: number
   currency: string
   status: ReservationStatus
+  createdByUserId: number
   createdAt: string
   updatedAt: string
 }

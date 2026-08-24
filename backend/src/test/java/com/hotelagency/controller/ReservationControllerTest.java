@@ -53,7 +53,7 @@ class ReservationControllerTest {
                 null, null, null, Instant.now(), Instant.now());
         return new ReservationResponse(1L, "RES-100001", 1L, "Grand Hotel", 2L, "Deluxe Room", customer,
                 LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, new BigDecimal("600.00"), "EUR",
-                status, Instant.now(), Instant.now());
+                status, 99L, Instant.now(), Instant.now());
     }
 
     @Test

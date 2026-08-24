@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/hotels/{hotelId}/available-rooms")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('AGENCY_STAFF')")
+@PreAuthorize("hasAnyRole('AGENCY_STAFF', 'AGENCY_ADMIN')")
 public class AvailableRoomController {
 
     private final ReservationService reservationService;

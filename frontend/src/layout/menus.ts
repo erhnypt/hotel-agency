@@ -7,7 +7,8 @@ export interface MenuItem {
 export const ADMIN_MENU: MenuItem[] = [
   { label: 'Dashboard', path: '/admin', end: true },
   { label: 'Oteller', path: '/admin/hotels' },
-  { label: 'Rezervasyonlar', path: '/admin/reservations' },
+  { label: 'Rezervasyonlar', path: '/admin/reservations', end: true },
+  { label: 'Yeni Rezervasyon', path: '/admin/reservations/new' },
   { label: 'Müşteriler', path: '/admin/customers' },
   { label: 'Çalışanlar', path: '/admin/staff' },
   { label: 'Ayarlar', path: '/admin/settings' },

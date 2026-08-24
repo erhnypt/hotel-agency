@@ -133,7 +133,8 @@ export function ReservationsPage() {
                           </button>
                         </>
                       )}
-                      {user?.role === 'AGENCY_STAFF' &&
+                      {(user?.role === 'AGENCY_STAFF' || user?.role === 'AGENCY_ADMIN') &&
+                        r.createdByUserId === user?.id &&
                         (r.status === 'PENDING' || r.status === 'CONFIRMED') && (
                           <button
                             type="button"

@@ -41,6 +41,7 @@ function App() {
             <Route index element={<AgencyAdminDashboard />} />
             <Route path="hotels" element={<HotelsPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
+            <Route path="reservations/new" element={<NewReservationPage />} />
             <Route path="customers" element={<CustomersPage />} />
             <Route path="staff" element={<StaffPage />} />
             <Route path="settings" element={<SettingsPage />} />
