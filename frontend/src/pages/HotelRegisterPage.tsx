@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import { Navigate, useNavigate, Link } from 'react-router-dom'
+import { Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
 import { roleHomePath } from '../auth/roleHome'
 import { apiClient } from '../api/client'
@@ -7,7 +7,6 @@ import './LoginPage.css'
 
 export function HotelRegisterPage() {
   const { isAuthenticated, user } = useAuth()
-  const navigate = useNavigate()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -23,6 +22,7 @@ export function HotelRegisterPage() {
 
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [registered, setRegistered] = useState(false)
 
   if (isAuthenticated && user) {
     return <Navigate to={roleHomePath(user.role)} replace />
@@ -39,29 +39,36 @@ export function HotelRegisterPage() {
     setSubmitting(true)
 
     try {
-      const { data } = await apiClient.post<{ auth: { accessToken: string; refreshToken: string; user: { id: number; email: string; fullName: string; role: string } } }>('/hotels', formData)
-      const { auth } = data
-
-      // Store token and redirect
-      localStorage.setItem('authToken', auth.accessToken)
-      localStorage.setItem('refreshToken', auth.refreshToken)
-      localStorage.setItem(
-        'user',
-        JSON.stringify({
-          id: auth.user.id,
-          email: auth.user.email,
-          fullName: auth.user.fullName,
-          role: auth.user.role,
-        })
-      )
-
-      navigate('/hotel', { replace: true })
+      await apiClient.post('/hotels', formData)
+      setRegistered(true)
     } catch (err: unknown) {
       const axiosError = err as { response?: { data?: { message?: string } }; message?: string }
       setError(axiosError?.response?.data?.message ?? axiosError?.message ?? 'Bir hata oluştu.')
     } finally {
       setSubmitting(false)
     }
+  }
+
+  if (registered) {
+    return (
+      <div className="login-page">
+        <div className="login-card">
+          <h1 className="login-card__title">Kaydınız Alındı</h1>
+          <p className="login-card__subtitle">
+            <strong>{formData.name}</strong> için otel başvurunuz alınmıştır. Başvurunuz acente ekibimiz
+            tarafından incelenmektedir; onay durumu <strong>{formData.email}</strong> adresine e-posta ile
+            bildirilecektir.
+          </p>
+          <p style={{ textAlign: 'center', marginTop: '0.5rem', fontSize: '0.9rem' }}>
+            Onaylandıktan sonra belirlediğiniz şifre ile{' '}
+            <Link to="/login" style={{ color: '#a78bfa', textDecoration: 'none' }}>
+              giriş yapabilirsiniz
+            </Link>
+            .
+          </p>
+        </div>
+      </div>
+    )
   }
 
   return (

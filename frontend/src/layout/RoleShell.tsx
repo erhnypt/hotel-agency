@@ -3,6 +3,7 @@ import { useAuth } from '../auth/useAuth'
 import { roleHomePath } from '../auth/roleHome'
 import type { RoleName } from '../auth/types'
 import { AppShell } from './AppShell'
+import { HotelAccessGate } from './HotelAccessGate'
 import type { MenuItem } from './menus'
 
 export function RoleShell({
@@ -18,6 +19,10 @@ export function RoleShell({
 
   if (user?.role !== role) {
     return <Navigate to={user ? roleHomePath(user.role) : '/login'} replace />
+  }
+
+  if (role === 'HOTEL_ADMIN') {
+    return <HotelAccessGate panelTitle={panelTitle} menu={menu} />
   }
 
   return <AppShell panelTitle={panelTitle} menu={menu} />

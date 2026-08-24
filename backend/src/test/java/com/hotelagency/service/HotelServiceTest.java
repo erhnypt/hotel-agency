@@ -22,6 +22,7 @@ import com.hotelagency.repository.HotelUserRepository;
 import com.hotelagency.repository.RoleRepository;
 import com.hotelagency.repository.UserRepository;
 import com.hotelagency.security.JwtService;
+import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -101,6 +102,30 @@ class HotelServiceTest {
         assertThat(response.hotel().status()).isEqualTo(HotelStatus.PENDING);
         assertThat(response.auth().accessToken()).isNotBlank();
         assertThat(response.auth().user().role()).isEqualTo(RoleName.HOTEL_ADMIN);
+
+        verify(emailService).sendHotelRegistrationEmail("grand@example.com", "Grand Hotel");
+    }
+
+    @Test
+    void registerNotifiesAllAgencyAdminsOfNewApplication() {
+        HotelRegisterRequest request = sampleRequest();
+        when(hotelRepository.existsByEmail("grand@example.com")).thenReturn(false);
+        when(userRepository.existsByEmail("grand@example.com")).thenReturn(false);
+        when(roleRepository.findByName(RoleName.HOTEL_ADMIN)).thenReturn(Optional.of(hotelAdminRole));
+        when(passwordEncoder.encode("password123")).thenReturn("hashed-password");
+
+        User admin1 = new User();
+        admin1.setEmail("admin1@agency.test");
+        User admin2 = new User();
+        admin2.setEmail("admin2@agency.test");
+        when(userRepository.findByRole_Name(RoleName.AGENCY_ADMIN)).thenReturn(List.of(admin1, admin2));
+
+        hotelService.register(request);
+
+        verify(emailService).sendAdminNewHotelNotification(
+                "admin1@agency.test", "Grand Hotel", "Jane Doe", "grand@example.com", "+90 555 000");
+        verify(emailService).sendAdminNewHotelNotification(
+                "admin2@agency.test", "Grand Hotel", "Jane Doe", "grand@example.com", "+90 555 000");
     }
 
     @Test
@@ -244,5 +269,43 @@ class HotelServiceTest {
 
         assertThatThrownBy(() -> hotelService.update(2L, request, hotelAdmin))
                 .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void updateRejectsWhenHotelNotYetApproved() {
+        Hotel ownHotel = new Hotel();
+        ownHotel.setId(1L);
+        ownHotel.setStatus(HotelStatus.PENDING);
+
+        User hotelAdmin = new User();
+        hotelAdmin.setId(10L);
+        hotelAdmin.setRole(hotelAdminRole);
+
+        HotelUpdateRequest request = new HotelUpdateRequest(
+                "New Name", "desc", "addr", "city", "country", "phone", "email@example.com", null, "contact");
+
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(ownHotel));
+        when(hotelUserRepository.findByUserId(10L)).thenReturn(Optional.of(new HotelUser(ownHotel, hotelAdmin)));
+
+        assertThatThrownBy(() -> hotelService.update(1L, request, hotelAdmin))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void getOwnedHotelSucceedsOnceApproved() {
+        Hotel ownHotel = new Hotel();
+        ownHotel.setId(1L);
+        ownHotel.setStatus(HotelStatus.ACTIVE);
+
+        User hotelAdmin = new User();
+        hotelAdmin.setId(10L);
+        hotelAdmin.setRole(hotelAdminRole);
+
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(ownHotel));
+        when(hotelUserRepository.findByUserId(10L)).thenReturn(Optional.of(new HotelUser(ownHotel, hotelAdmin)));
+
+        Hotel result = hotelService.getOwnedHotel(1L, hotelAdmin);
+
+        assertThat(result.getId()).isEqualTo(1L);
     }
 }

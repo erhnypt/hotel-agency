@@ -76,8 +76,15 @@ public class HotelService {
         AuthResponse auth = new AuthResponse(accessToken, refreshToken, jwtService.getAccessExpirationMs(), UserSummary.from(user));
 
         emailService.sendHotelRegistrationEmail(hotel.getEmail(), hotel.getName());
+        notifyAdminsOfNewRegistration(hotel);
 
         return new HotelRegisterResponse(HotelResponse.from(hotel), auth);
+    }
+
+    private void notifyAdminsOfNewRegistration(Hotel hotel) {
+        userRepository.findByRole_Name(RoleName.AGENCY_ADMIN)
+                .forEach(admin -> emailService.sendAdminNewHotelNotification(
+                        admin.getEmail(), hotel.getName(), hotel.getContactPerson(), hotel.getEmail(), hotel.getPhone()));
     }
 
     public List<HotelResponse> findAll(User requester) {
@@ -118,6 +125,9 @@ public class HotelService {
     public Hotel getOwnedHotel(Long id, User requester) {
         Hotel hotel = getHotelOrThrow(id);
         assertOwnsHotel(hotel, requester);
+        if (hotel.getStatus() != HotelStatus.ACTIVE) {
+            throw new AccessDeniedException("Hotel is not yet approved by the agency");
+        }
         return hotel;
     }
 
