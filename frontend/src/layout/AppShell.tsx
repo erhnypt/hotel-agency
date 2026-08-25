@@ -9,7 +9,10 @@ export function AppShell({ panelTitle, menu }: { panelTitle: string; menu: MenuI
   return (
     <div className="app-shell">
       <aside className="app-shell__sidebar">
-        <div className="app-shell__brand">Hotel Agency</div>
+        <div className="app-shell__brand">
+          Santral
+          <small>Otel Acentesi Merkezi</small>
+        </div>
         <nav className="app-shell__nav">
           {menu.map((item) => (
             <NavLink

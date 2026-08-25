@@ -1,53 +1,92 @@
+/*
+  impeccable:direction 8f3c2a1e
+  THESIS: Modern Minimal + Türk Anı — a clean, spacious operational interface
+  with subtle Turkish geometric and cultural references. Foundation is
+  contemporary minimalism (negative space, typographic hierarchy, restraint),
+  but character comes from selective geometric accents: octagon and star motifs
+  from Ottoman tilework, warm earthy palette grounded in Anatolian ceramics,
+  and delicate kaligrafi-inspired line details.
+  OWN-WORLD: warm charcoal (clay-inspired) ground, Ottoman azurite blue for
+  action, terracotta for secondary accent; status glyphs carry shape AND
+  traffic-light color for fast scanning. Space Grotesk for all typography;
+  IBM Plex Mono for status/data labels.
+  STORY: staff read a hotel/reservation's state at a glance from its glyph
+  alone (even colorblind), scan clean data dense tables, and every panel
+  (Admin/Staff/Hotel) shares one rooted, modern aesthetic.
+  FIRST VIEWPORT: dark sidebar or top nav + header, content panel of spacious
+  stat tiles or dense, breathable data tables with geometric accents.
+  FORM: assigned grounded direction #12 (minimal + cultural geometry);
+  seed key 8f3c2a1e.
+*/
+
+@import '@fontsource/space-grotesk/400.css';
+@import '@fontsource/space-grotesk/500.css';
+@import '@fontsource/space-grotesk/600.css';
+@import '@fontsource/ibm-plex-mono/400.css';
+@import '@fontsource/ibm-plex-mono/500.css';
+@import '@fontsource/ibm-plex-mono/600.css';
+
 :root {
-  --text: #6b6375;
-  --text-h: #08060d;
-  --bg: #fff;
-  --border: #e5e4e7;
-  --code-bg: #f4f3ec;
-  --accent: #aa3bff;
-  --accent-bg: rgba(170, 59, 255, 0.1);
-  --accent-border: rgba(170, 59, 255, 0.5);
-  --social-bg: rgba(244, 243, 236, 0.5);
+  /* warm earth surfaces (clay-inspired) */
+  --bg: #1a1614;
+  --bg-panel: #2a2622;
+  --bg-panel-2: #323028;
+  --border: #4a4640;
+  --border-strong: #605a52;
+
+  /* ink (cream to charcoal) */
+  --text: #a09a92;
+  --text-dim: #8b8680;
+  --text-h: #f5f3f0;
+
+  /* signal (Ottoman azurite blue) */
+  --signal: #2563eb;
+  --signal-hover: #1d4ed8;
+  --signal-ink: #f5f3f0;
+  --signal-bg: rgba(37, 99, 235, 0.08);
+  --signal-border: rgba(37, 99, 235, 0.35);
+
+  /* secondary accent (terracotta/burnt clay) */
+  --accent-warm: #ea580c;
+  --accent-warm-bg: rgba(234, 88, 12, 0.08);
+
+  /* status: confirmed / active (emerald) */
+  --status-ok: #10b981;
+  --status-ok-bg: rgba(16, 185, 129, 0.12);
+  --status-ok-border: rgba(16, 185, 129, 0.38);
+
+  /* status: pending / hold (amber) */
+  --status-warn: #f59e0b;
+  --status-warn-bg: rgba(245, 158, 11, 0.12);
+  --status-warn-border: rgba(245, 158, 11, 0.38);
+
+  /* break (danger / rejected / cancelled - terracotta red) */
+  --danger: #dc2626;
+  --danger-bg: rgba(220, 38, 38, 0.12);
+  --danger-border: rgba(220, 38, 38, 0.38);
+
+  --success: var(--status-ok);
+
   --shadow:
-    rgba(0, 0, 0, 0.1) 0 10px 15px -3px, rgba(0, 0, 0, 0.05) 0 4px 6px -2px;
+    rgba(0, 0, 0, 0.35) 0 10px 15px -3px, rgba(0, 0, 0, 0.22) 0 4px 6px -2px;
 
-  --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
-  --mono: ui-monospace, Consolas, monospace;
+  --sans: 'Space Grotesk', system-ui, 'Segoe UI', sans-serif;
+  --heading: var(--sans);
+  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
 
-  font: 18px/145% var(--sans);
-  letter-spacing: 0.18px;
-  color-scheme: light dark;
+  --radius-sm: 3px;
+  --radius: 6px;
+  --radius-lg: 10px;
+
+  font: 15px/1.5 var(--sans);
+  letter-spacing: 0.005em;
+  color-scheme: dark;
   color: var(--text);
   background: var(--bg);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  @media (max-width: 1024px) {
-    font-size: 16px;
-  }
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --text: #9ca3af;
-    --text-h: #f3f4f6;
-    --bg: #16171d;
-    --border: #2e303a;
-    --code-bg: #1f2028;
-    --accent: #c084fc;
-    --accent-bg: rgba(192, 132, 252, 0.15);
-    --accent-border: rgba(192, 132, 252, 0.5);
-    --social-bg: rgba(47, 48, 58, 0.5);
-    --shadow:
-      rgba(0, 0, 0, 0.4) 0 10px 15px -3px, rgba(0, 0, 0, 0.25) 0 4px 6px -2px;
-  }
-
-  #social .button-icon {
-    filter: invert(1) brightness(2);
-  }
 }
 
 * {
@@ -56,6 +95,7 @@
 
 body {
   margin: 0;
+  background: var(--bg);
 }
 
 #root {
@@ -63,7 +103,8 @@ body {
 }
 
 h1,
-h2 {
+h2,
+h3 {
   font-family: var(--heading);
   font-weight: 500;
   color: var(--text-h);
@@ -71,4 +112,83 @@ h2 {
 
 p {
   margin: 0;
+}
+
+::selection {
+  background: var(--signal-bg);
+  color: var(--text-h);
+}
+
+:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}
+
+/* Geometric accents */
+.octagon-corner {
+  position: relative;
+  &::before,
+  &::after {
+    content: '';
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border: 1px solid var(--signal);
+    opacity: 0.25;
+  }
+  &::before {
+    top: 0;
+    left: 0;
+    border-right: none;
+    border-bottom: none;
+  }
+  &::after {
+    top: 0;
+    right: 0;
+    border-left: none;
+    border-bottom: none;
+  }
+}
+
+/* Octagon background pattern (low opacity) */
+.octagon-pattern {
+  background-image:
+    linear-gradient(45deg, transparent 48%, var(--signal) 48%, var(--signal) 52%, transparent 52%),
+    linear-gradient(-45deg, transparent 48%, var(--signal) 48%, var(--signal) 52%, transparent 52%);
+  background-size: 20px 20px;
+  background-position: 0 0, 10px 10px;
+  opacity: 0.08;
+}
+
+/* Star divider */
+.divider-star {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 2rem 0;
+  color: var(--text-dim);
+  &::before,
+  &::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--border), transparent);
+  }
+  &::after {
+    background: linear-gradient(to left, transparent, var(--border), transparent);
+  }
+}
+
+/* Spacing utilities */
+.gap-lg {
+  gap: 2rem;
+}
+
+.gap-md {
+  gap: 1.5rem;
+}
+
+.gap-sm {
+  gap: 1rem;
 }

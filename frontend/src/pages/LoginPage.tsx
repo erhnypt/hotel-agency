@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { Navigate, useNavigate, Link } from 'react-router-dom'
 import { roleHomePath } from '../auth/roleHome'
 import { useAuth } from '../auth/useAuth'
+import { BrandMark } from '../components/BrandMark'
 import './LoginPage.css'
 
 export function LoginPage() {
@@ -34,7 +35,8 @@ export function LoginPage() {
   return (
     <div className="login-page">
       <form className="login-card" onSubmit={handleSubmit}>
-        <h1 className="login-card__title">Hotel Reservation Agency</h1>
+        <BrandMark size={40} className="login-card__mark" />
+        <h1 className="login-card__brand">Santral</h1>
         <p className="login-card__subtitle">Hesabınıza giriş yapın</p>
 
         <label className="login-field">
@@ -70,11 +72,8 @@ export function LoginPage() {
           {submitting ? 'Giriş yapılıyor...' : 'Giriş Yap'}
         </button>
 
-        <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem' }}>
-          Yeni otel kaydı?{' '}
-          <Link to="/register" style={{ color: '#a78bfa', textDecoration: 'none' }}>
-            Kayıt Ol
-          </Link>
+        <p className="login-card__footer">
+          Yeni otel kaydı? <Link to="/register">Kayıt Ol</Link>
         </p>
       </form>
     </div>

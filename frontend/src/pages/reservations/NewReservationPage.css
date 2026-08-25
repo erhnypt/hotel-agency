@@ -10,9 +10,9 @@
   flex-direction: column;
   gap: 6px;
   padding: 16px;
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  background: transparent;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
   text-align: left;
   cursor: pointer;
   font-family: inherit;
@@ -20,12 +20,12 @@
 }
 
 .room-option:hover {
-  border-color: var(--accent-border);
+  border-color: var(--signal-border);
 }
 
 .room-option--selected {
-  border-color: var(--accent);
-  background: var(--accent-bg);
+  border-color: var(--signal);
+  background: var(--signal-bg);
 }
 
 .room-option__name {
@@ -40,9 +40,10 @@
 
 .room-option__price {
   margin-top: 6px;
+  font-family: var(--mono);
   font-size: 16px;
-  font-weight: 600;
-  color: var(--accent);
+  font-weight: 500;
+  color: var(--signal);
 }
 
 .reservation-customer-form {
@@ -73,9 +74,11 @@
 }
 
 .reservation-success__number {
-  font-size: 24px;
+  font-family: var(--mono);
+  font-size: 22px;
   font-weight: 600;
-  color: var(--accent);
+  letter-spacing: 0.02em;
+  color: var(--signal);
   margin: 0 0 24px;
 }
 

@@ -1,28 +1,61 @@
-.status-badge {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 13px;
+.status-line {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.status-line__glyph {
+  flex-shrink: 0;
+}
+
+.status-line__ring {
+  stroke: currentColor;
+  fill: currentColor;
+  fill-opacity: 0.14;
+}
+
+.status-line__mark {
+  stroke: currentColor;
+}
+
+.status-line__mark--draw {
+  stroke-dasharray: 10;
+  stroke-dashoffset: 10;
+  animation: status-line-draw 320ms 80ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes status-line-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-line__mark--draw {
+    animation: none;
+    stroke-dashoffset: 0;
+  }
+}
+
+.status-line__label {
+  font-family: var(--mono);
+  font-size: 11px;
   font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: inherit;
   white-space: nowrap;
 }
 
-.status-badge--pending {
-  color: #d97706;
-  background: rgba(217, 119, 6, 0.12);
-  border: 1px solid rgba(217, 119, 6, 0.35);
+.status-line--live {
+  color: var(--status-ok);
 }
 
-.status-badge--active,
-.status-badge--confirmed {
-  color: #16a34a;
-  background: rgba(22, 163, 74, 0.12);
-  border: 1px solid rgba(22, 163, 74, 0.35);
+.status-line--hold {
+  color: var(--status-warn);
 }
 
-.status-badge--rejected,
-.status-badge--cancelled {
-  color: #ef4444;
-  background: rgba(239, 68, 68, 0.12);
-  border: 1px solid rgba(239, 68, 68, 0.35);
+.status-line--break,
+.status-line--pulled {
+  color: var(--danger);
 }

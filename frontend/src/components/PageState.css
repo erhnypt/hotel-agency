@@ -1,14 +1,38 @@
 .page-state {
+  display: flex;
+  align-items: center;
+  gap: 10px;
   color: var(--text);
-  font-size: 15px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.page-state__pulse {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--signal);
+  animation: page-state-pulse 1.2s ease-in-out infinite;
+  flex-shrink: 0;
+}
+
+@keyframes page-state-pulse {
+  0%,
+  100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
 }
 
 .page-state--error {
-  color: #ef4444;
+  color: var(--danger);
 }
 
 .page-state__title {
-  margin: 0 0 8px;
+  margin: 0 0 10px;
   font-size: 18px;
+  font-weight: 600;
   color: var(--text-h);
 }

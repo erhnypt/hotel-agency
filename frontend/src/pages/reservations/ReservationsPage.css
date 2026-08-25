@@ -1,0 +1,35 @@
+.select-field--hotel {
+  max-width: 320px;
+  margin-bottom: 24px;
+}
+
+.reservation-group {
+  margin-bottom: 28px;
+}
+
+.reservation-group__title {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  margin: 0 0 10px;
+  font-family: var(--mono);
+  font-size: 12.5px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text);
+}
+
+.reservation-group__title::before {
+  content: '';
+  display: inline-block;
+  width: 3px;
+  height: 13px;
+  background: var(--border-strong);
+  border-radius: 1px;
+}
+
+.reservation-group__count {
+  font-weight: 400;
+  color: var(--text-dim);
+}

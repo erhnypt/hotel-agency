@@ -2,14 +2,14 @@
   display: inline-block;
   margin-bottom: 24px;
   padding: 11px 20px;
-  border-radius: 8px;
-  background: var(--accent);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 500;
+  border-radius: var(--radius);
+  background: var(--signal);
+  color: var(--signal-ink);
+  font-size: 14.5px;
+  font-weight: 600;
   text-decoration: none;
 }
 
 .staff-dashboard__cta:hover {
-  filter: brightness(1.05);
+  background: var(--signal-hover);
 }
