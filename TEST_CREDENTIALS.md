@@ -9,14 +9,22 @@ Kayıtlı test hesapları ve oluşturma talimatları.
 | `admin@example.com` | AGENCY_ADMIN | `admin123` | ✓ Aktif |
 | `staff@example.com` | AGENCY_STAFF | `staff123` | ✓ Aktif |
 
-## Kayıtlı Oteller
+## Kayıtlı Oteller (10 Test Otel)
 
-Sisteme kayıtlı olan otel admin hesapları:
+Sisteme kayıtlı olan otel admin hesapları (Password hepsi: `hotel123`):
 
-| Otel Adı | Admin Email | Password | Hotel Status | Created |
-|----------|-------------|----------|--------------|---------|
-| Test Otel 1 | `hotel1@example.com` | `hotel123` | PENDING / ACTIVE | Aug 25 |
-| Test Otel 2 | `hotel2@example.com` | `hotel123` | PENDING / ACTIVE | Aug 25 |
+| # | Otel Adı | Şehir | Admin Email | Status |
+|---|----------|-------|-------------|--------|
+| 1 | Istanbul Grand Hotel | İstanbul | `istanbul-grand@hotels.com` | ACTIVE |
+| 2 | Ankara Business Hotel | Ankara | `ankara-business@hotels.com` | ACTIVE |
+| 3 | Izmir Beach Resort | İzmir | `izmir-beach@hotels.com` | ACTIVE |
+| 4 | Antalya Luxury Inn | Antalya | `antalya-luxury@hotels.com` | ACTIVE |
+| 5 | Cappadocia Cave Hotel | Nevşehir | `cappadocia-cave@hotels.com` | ACTIVE |
+| 6 | Bodrum Marina Hotel | Bodrum | `bodrum-marina@hotels.com` | ACTIVE |
+| 7 | Ephesus Heritage Hotel | İzmir | `ephesus-heritage@hotels.com` | ACTIVE |
+| 8 | Gallipoli War Museum Hotel | Çanakkale | `gallipoli-museum@hotels.com` | ACTIVE |
+| 9 | Pamukkale Termal Resort | Denizli | `pamukkale-termal@hotels.com` | ACTIVE |
+| 10 | Safranbolu Ottoman House | Karabük | `safranbolu-ottoman@hotels.com` | ACTIVE |
 
 ## Yeni Test Hesabı Oluşturma
 
