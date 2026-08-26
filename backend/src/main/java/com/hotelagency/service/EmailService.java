@@ -11,7 +11,9 @@ import org.springframework.stereotype.Service;
 @Service
 public class EmailService {
 
-    private static final String BRAND_COLOR = "#7c3aed";
+    private static final String BRAND_BG = "#0a0b0d";
+    private static final String BRAND_SIGNAL = "#ffb238";
+    private static final String BRAND_SIGNAL_INK = "#1a1200";
 
     @Autowired(required = false)
     private JavaMailSender mailSender;
@@ -96,10 +98,10 @@ public class EmailService {
                 ? ""
                 : """
                 <div style="text-align:center;margin:28px 0 8px;">
-                  <a href="%s" style="background:%s;color:#ffffff;text-decoration:none;padding:12px 28px;
-                     border-radius:8px;font-weight:600;display:inline-block;">%s</a>
+                  <a href="%s" style="background:%s;color:%s;text-decoration:none;padding:12px 28px;
+                     border-radius:6px;font-weight:700;display:inline-block;">%s</a>
                 </div>
-                """.formatted(cta.url(), BRAND_COLOR, escape(cta.label()));
+                """.formatted(cta.url(), BRAND_SIGNAL, BRAND_SIGNAL_INK, escape(cta.label()));
 
         return """
                 <html>
@@ -110,7 +112,8 @@ public class EmailService {
                           <table role="presentation" width="480" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                             <tr>
                               <td style="background:%s;padding:24px 32px;">
-                                <span style="color:#ffffff;font-size:18px;font-weight:700;letter-spacing:-0.2px;">Hotel Reservation Agency</span>
+                                <span style="color:%s;font-size:15px;font-weight:700;letter-spacing:2px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;">SANTRAL</span>
+                                <div style="color:#8b929d;font-size:12px;margin-top:4px;">Otel Acentesi Merkezi</div>
                               </td>
                             </tr>
                             <tr>
@@ -122,7 +125,7 @@ public class EmailService {
                             </tr>
                             <tr>
                               <td style="padding:20px 32px;background:#f9fafb;border-top:1px solid #eef0f3;color:#9ca3af;font-size:12px;">
-                                Bu e-posta Hotel Reservation Agency sistemi tarafından otomatik olarak gönderilmiştir.
+                                Bu e-posta Santral sistemi tarafından otomatik olarak gönderilmiştir.
                               </td>
                             </tr>
                           </table>
@@ -131,7 +134,7 @@ public class EmailService {
                     </table>
                   </body>
                 </html>
-                """.formatted(BRAND_COLOR, escape(heading), bodyHtml, button);
+                """.formatted(BRAND_BG, BRAND_SIGNAL, escape(heading), bodyHtml, button);
     }
 
     private String escape(String value) {
