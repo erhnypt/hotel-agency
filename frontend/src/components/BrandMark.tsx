@@ -1,9 +1,14 @@
-export function BrandMark() {
+interface BrandMarkProps {
+  size?: number
+  className?: string
+}
+
+export function BrandMark({ size = 48, className = 'brand-mark' }: BrandMarkProps = {}) {
   return (
     <svg
-      className="brand-mark"
-      width="48"
-      height="48"
+      className={className}
+      width={size}
+      height={size}
       viewBox="0 0 48 48"
       xmlns="http://www.w3.org/2000/svg"
     >

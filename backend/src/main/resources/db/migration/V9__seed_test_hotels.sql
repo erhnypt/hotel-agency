@@ -1,6 +1,9 @@
 -- Test Hotels Seed — 10 çeşitli test oteli oluştur
 -- Password hepsi: hotel123 (bcrypt)
 
+-- Remove admin_user_id column if it exists (schema uses junction table instead)
+ALTER TABLE hotels DROP COLUMN IF EXISTS admin_user_id;
+
 INSERT INTO users (email, password_hash, full_name, role_id, enabled, created_at, updated_at) VALUES
 ('istanbul-grand@hotels.com', '$2a$10$6V4e.A8Jd.vKZXX3Jz.HmuwX1HZSqI5X2KLzJ2R9i.QnLJ0ZxIvyu', 'Istanbul Grand Admin', 3, TRUE, now(), now()),
 ('ankara-business@hotels.com', '$2a$10$6V4e.A8Jd.vKZXX3Jz.HmuwX1HZSqI5X2KLzJ2R9i.QnLJ0ZxIvyu', 'Ankara Business Admin', 3, TRUE, now(), now()),
