@@ -1,6 +1,5 @@
 package com.hotelagency.service;
 
-import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -88,7 +87,9 @@ public class EmailService {
 
             mailSender.send(message);
             System.out.println("Sent " + kind + " email to: " + toEmail);
-        } catch (MessagingException e) {
+        } catch (Exception e) {
+            // A misconfigured or unreachable SMTP server must not fail the request that
+            // triggered the email (e.g. hotel registration) — log and move on.
             System.err.println("Failed to send " + kind + " email: " + e.getMessage());
         }
     }
