@@ -1,18 +1,22 @@
 package com.hotelagency.service;
 
-import jakarta.mail.internet.MimeMessage;
 import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
+/**
+ * Sends mail through Resend's HTTP API rather than SMTP: Render blocks outbound
+ * SMTP ports (25/465/587) on every plan, so a plain JavaMailSender can never
+ * connect regardless of credentials.
+ */
 @Service
 public class EmailService {
 
@@ -25,9 +29,13 @@ public class EmailService {
     }
 
     private final Deque<EmailAttempt> recentAttempts = new ArrayDeque<>();
+    private final RestClient restClient = RestClient.create("https://api.resend.com");
 
-    @Autowired(required = false)
-    private JavaMailSender mailSender;
+    @Value("${app.mail.resend-api-key:}")
+    private String resendApiKey;
+
+    @Value("${app.mail.from:onboarding@resend.dev}")
+    private String fromAddress;
 
     @Value("${app.frontend-url:http://localhost:5173}")
     private String frontendUrl;
@@ -86,27 +94,34 @@ public class EmailService {
     private record CallToAction(String label, String url) {
     }
 
+    private record ResendEmailRequest(String from, List<String> to, String subject, String html) {
+    }
+
     private void send(String toEmail, String subject, String htmlBody, String kind) {
-        if (mailSender == null) {
+        if (resendApiKey == null || resendApiKey.isBlank()) {
             System.out.println("Email service not configured. Skipping " + kind + " email to: " + toEmail);
-            logAttempt(new EmailAttempt(Instant.now(), kind, toEmail, false, "mailSender bean is null"));
+            logAttempt(new EmailAttempt(Instant.now(), kind, toEmail, false, "RESEND_API_KEY is not set"));
             return;
         }
 
         try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+            restClient.post()
+                    .uri("/emails")
+                    .header("Authorization", "Bearer " + resendApiKey)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(new ResendEmailRequest(fromAddress, List.of(toEmail), subject, htmlBody))
+                    .retrieve()
+                    .toBodilessEntity();
 
-            helper.setTo(toEmail);
-            helper.setSubject(subject);
-            helper.setText(htmlBody, true);
-
-            mailSender.send(message);
             System.out.println("Sent " + kind + " email to: " + toEmail);
             logAttempt(new EmailAttempt(Instant.now(), kind, toEmail, true, null));
-        } catch (Exception e) {
-            // A misconfigured or unreachable SMTP server must not fail the request that
+        } catch (RestClientResponseException e) {
+            // A misconfigured provider or unreachable API must not fail the request that
             // triggered the email (e.g. hotel registration) — log and move on.
+            String error = e.getStatusCode() + ": " + e.getResponseBodyAsString();
+            System.err.println("Failed to send " + kind + " email: " + error);
+            logAttempt(new EmailAttempt(Instant.now(), kind, toEmail, false, error));
+        } catch (Exception e) {
             System.err.println("Failed to send " + kind + " email: " + e.getMessage());
             logAttempt(new EmailAttempt(Instant.now(), kind, toEmail, false, String.valueOf(e.getMessage())));
         }
