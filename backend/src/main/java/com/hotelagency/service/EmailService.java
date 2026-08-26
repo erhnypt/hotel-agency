@@ -1,6 +1,11 @@
 package com.hotelagency.service;
 
 import jakarta.mail.internet.MimeMessage;
+import java.time.Instant;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -14,6 +19,12 @@ public class EmailService {
     private static final String BRAND_BG = "#0a0b0d";
     private static final String BRAND_SIGNAL = "#ffb238";
     private static final String BRAND_SIGNAL_INK = "#1a1200";
+    private static final int MAX_LOGGED_ATTEMPTS = 30;
+
+    public record EmailAttempt(Instant timestamp, String kind, String toEmail, boolean success, String error) {
+    }
+
+    private final Deque<EmailAttempt> recentAttempts = new ArrayDeque<>();
 
     @Autowired(required = false)
     private JavaMailSender mailSender;
@@ -78,6 +89,7 @@ public class EmailService {
     private void send(String toEmail, String subject, String htmlBody, String kind) {
         if (mailSender == null) {
             System.out.println("Email service not configured. Skipping " + kind + " email to: " + toEmail);
+            logAttempt(new EmailAttempt(Instant.now(), kind, toEmail, false, "mailSender bean is null"));
             return;
         }
 
@@ -91,11 +103,24 @@ public class EmailService {
 
             mailSender.send(message);
             System.out.println("Sent " + kind + " email to: " + toEmail);
+            logAttempt(new EmailAttempt(Instant.now(), kind, toEmail, true, null));
         } catch (Exception e) {
             // A misconfigured or unreachable SMTP server must not fail the request that
             // triggered the email (e.g. hotel registration) — log and move on.
             System.err.println("Failed to send " + kind + " email: " + e.getMessage());
+            logAttempt(new EmailAttempt(Instant.now(), kind, toEmail, false, String.valueOf(e.getMessage())));
         }
+    }
+
+    private synchronized void logAttempt(EmailAttempt attempt) {
+        recentAttempts.addFirst(attempt);
+        while (recentAttempts.size() > MAX_LOGGED_ATTEMPTS) {
+            recentAttempts.removeLast();
+        }
+    }
+
+    public synchronized List<EmailAttempt> getRecentAttempts() {
+        return new ArrayList<>(recentAttempts);
     }
 
     private String wrapCorporateTemplate(String heading, String bodyHtml, CallToAction cta) {
