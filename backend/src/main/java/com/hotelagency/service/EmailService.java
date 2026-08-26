@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +21,7 @@ public class EmailService {
     @Value("${app.frontend-url:http://localhost:5173}")
     private String frontendUrl;
 
+    @Async
     public void sendHotelRegistrationEmail(String toEmail, String hotelName) {
         String body = wrapCorporateTemplate(
                 "Başvurunuz Alındı",
@@ -35,6 +37,7 @@ public class EmailService {
         send(toEmail, "Otel Kaydı - Başvurunuz İnceleniyor", body, "registration");
     }
 
+    @Async
     public void sendHotelApprovalEmail(String toEmail, String hotelName) {
         String body = wrapCorporateTemplate(
                 "Başvurunuz Onaylandı",
@@ -49,6 +52,7 @@ public class EmailService {
         send(toEmail, "Otel Kaydı - Başvurunuz Onaylandı", body, "approval");
     }
 
+    @Async
     public void sendAdminNewHotelNotification(
             String adminEmail, String hotelName, String contactPerson, String hotelEmail, String phone) {
         String body = wrapCorporateTemplate(
