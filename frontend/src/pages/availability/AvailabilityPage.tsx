@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { getMyHotel, listRoomTypes } from '../../api/hotels'
 import { deleteAvailability, listAvailability, upsertAvailability } from '../../api/availability'
 import type { ApiErrorResponse } from '../../auth/types'
+import type { RoomAvailabilityResponse } from '../../api/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
 import '../../components/crud.css'
@@ -10,10 +11,17 @@ import '../../components/crud.css'
 export function AvailabilityPage() {
   const [refreshKey, setRefreshKey] = useState(0)
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<number | null>(null)
+  const [editingAvailability, setEditingAvailability] = useState<RoomAvailabilityResponse | null>(null)
   const [date, setDate] = useState('')
   const [availableRooms, setAvailableRooms] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  const resetForm = () => {
+    setEditingAvailability(null)
+    setDate('')
+    setAvailableRooms('')
+  }
 
   const hotel = useAsync(getMyHotel, [])
   const roomTypes = useAsync(
@@ -41,8 +49,7 @@ export function AvailabilityPage() {
     setSubmitting(true)
     try {
       await upsertAvailability(roomTypeId, { date, availableRooms: Number(availableRooms) })
-      setDate('')
-      setAvailableRooms('')
+      resetForm()
       refresh()
     } catch (err) {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
@@ -57,7 +64,14 @@ export function AvailabilityPage() {
 
   const handleDelete = async (id: number) => {
     await deleteAvailability(id)
+    if (editingAvailability?.id === id) resetForm()
     refresh()
+  }
+
+  const handleEdit = (a: RoomAvailabilityResponse) => {
+    setEditingAvailability(a)
+    setDate(a.date)
+    setAvailableRooms(String(a.availableRooms))
   }
 
   return (
@@ -74,7 +88,10 @@ export function AvailabilityPage() {
             <span>Oda Tipi</span>
             <select
               value={roomTypeId ?? ''}
-              onChange={(e) => setSelectedRoomTypeId(Number(e.target.value))}
+              onChange={(e) => {
+                setSelectedRoomTypeId(Number(e.target.value))
+                resetForm()
+              }}
             >
               {roomTypes.data?.map((rt) => (
                 <option key={rt.id} value={rt.id}>
@@ -100,8 +117,13 @@ export function AvailabilityPage() {
               />
             </label>
             <button type="submit" className="btn btn--primary" disabled={submitting}>
-              Kaydet
+              {submitting ? 'Kaydediliyor...' : editingAvailability ? 'Güncelle' : 'Ekle'}
             </button>
+            {editingAvailability && (
+              <button type="button" className="btn btn--small" onClick={resetForm}>
+                Vazgeç
+              </button>
+            )}
           </form>
 
           {error && <p className="form-error">{error}</p>}
@@ -122,11 +144,14 @@ export function AvailabilityPage() {
                 {[...availability.data]
                   .sort((a, b) => a.date.localeCompare(b.date))
                   .map((a) => (
-                    <tr key={a.id}>
+                    <tr key={a.id} className={editingAvailability?.id === a.id ? 'data-table__row--editing' : undefined}>
                       <td>{a.date}</td>
                       <td>{a.availableRooms}</td>
                       <td>
                         <div className="data-table__actions">
+                          <button type="button" className="btn btn--small" onClick={() => handleEdit(a)}>
+                            Düzenle
+                          </button>
                           <button type="button" className="btn btn--small btn--danger" onClick={() => handleDelete(a.id)}>
                             Sil
                           </button>

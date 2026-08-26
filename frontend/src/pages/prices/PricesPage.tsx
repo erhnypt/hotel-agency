@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { getMyHotel, listRoomTypes } from '../../api/hotels'
 import { deletePrice, listPrices, upsertPrice } from '../../api/prices'
 import type { ApiErrorResponse } from '../../auth/types'
+import type { RoomPriceResponse } from '../../api/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
 import '../../components/crud.css'
@@ -10,11 +11,18 @@ import '../../components/crud.css'
 export function PricesPage() {
   const [refreshKey, setRefreshKey] = useState(0)
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<number | null>(null)
+  const [editingPrice, setEditingPrice] = useState<RoomPriceResponse | null>(null)
   const [date, setDate] = useState('')
   const [price, setPrice] = useState('')
   const [currency, setCurrency] = useState('EUR')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  const resetForm = () => {
+    setEditingPrice(null)
+    setDate('')
+    setPrice('')
+  }
 
   const hotel = useAsync(getMyHotel, [])
   const roomTypes = useAsync(
@@ -42,8 +50,7 @@ export function PricesPage() {
     setSubmitting(true)
     try {
       await upsertPrice(roomTypeId, { date, price: Number(price), currency })
-      setDate('')
-      setPrice('')
+      resetForm()
       refresh()
     } catch (err) {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
@@ -58,7 +65,15 @@ export function PricesPage() {
 
   const handleDelete = async (id: number) => {
     await deletePrice(id)
+    if (editingPrice?.id === id) resetForm()
     refresh()
+  }
+
+  const handleEdit = (p: RoomPriceResponse) => {
+    setEditingPrice(p)
+    setDate(p.date)
+    setPrice(String(p.price))
+    setCurrency(p.currency)
   }
 
   return (
@@ -75,7 +90,10 @@ export function PricesPage() {
             <span>Oda Tipi</span>
             <select
               value={roomTypeId ?? ''}
-              onChange={(e) => setSelectedRoomTypeId(Number(e.target.value))}
+              onChange={(e) => {
+                setSelectedRoomTypeId(Number(e.target.value))
+                resetForm()
+              }}
             >
               {roomTypes.data?.map((rt) => (
                 <option key={rt.id} value={rt.id}>
@@ -103,17 +121,24 @@ export function PricesPage() {
             </label>
             <label className="form-field">
               <span>Para Birimi</span>
-              <input
-                className="form-field__input--tiny"
+              <select
+                className="form-field__select--tiny"
                 value={currency}
-                onChange={(e) => setCurrency(e.target.value.toUpperCase())}
-                maxLength={3}
-                required
-              />
+                onChange={(e) => setCurrency(e.target.value)}
+              >
+                <option value="TRY">TRY</option>
+                <option value="EUR">EUR</option>
+                <option value="USD">USD</option>
+              </select>
             </label>
             <button type="submit" className="btn btn--primary" disabled={submitting}>
-              Kaydet
+              {submitting ? 'Kaydediliyor...' : editingPrice ? 'Güncelle' : 'Ekle'}
             </button>
+            {editingPrice && (
+              <button type="button" className="btn btn--small" onClick={resetForm}>
+                Vazgeç
+              </button>
+            )}
           </form>
 
           {error && <p className="form-error">{error}</p>}
@@ -135,12 +160,15 @@ export function PricesPage() {
                 {[...prices.data]
                   .sort((a, b) => a.date.localeCompare(b.date))
                   .map((p) => (
-                    <tr key={p.id}>
+                    <tr key={p.id} className={editingPrice?.id === p.id ? 'data-table__row--editing' : undefined}>
                       <td>{p.date}</td>
                       <td>{p.price}</td>
                       <td>{p.currency}</td>
                       <td>
                         <div className="data-table__actions">
+                          <button type="button" className="btn btn--small" onClick={() => handleEdit(p)}>
+                            Düzenle
+                          </button>
                           <button type="button" className="btn btn--small btn--danger" onClick={() => handleDelete(p.id)}>
                             Sil
                           </button>

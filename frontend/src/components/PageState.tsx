@@ -1,7 +1,12 @@
 import './PageState.css'
 
 export function LoadingState() {
-  return <p className="page-state">Yükleniyor...</p>
+  return (
+    <p className="page-state">
+      <span className="page-state__pulse" />
+      Yükleniyor
+    </p>
+  )
 }
 
 export function ErrorState({ message }: { message: string }) {

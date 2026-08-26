@@ -11,6 +11,11 @@ export async function createService(hotelId: number, request: ServiceRequest): P
   return response.data
 }
 
+export async function updateService(id: number, request: ServiceRequest): Promise<ServiceResponse> {
+  const response = await apiClient.put<ServiceResponse>(`/services/${id}`, request)
+  return response.data
+}
+
 export async function deleteService(id: number): Promise<void> {
   await apiClient.delete(`/services/${id}`)
 }

@@ -1,5 +1,6 @@
 import { getMyHotel } from '../api/hotels'
 import { useAuth } from '../auth/useAuth'
+import { BrandMark } from '../components/BrandMark'
 import { ErrorState, LoadingState } from '../components/PageState'
 import { useAsync } from '../hooks/useAsync'
 import { AppShell } from './AppShell'
@@ -29,6 +30,7 @@ export function HotelAccessGate({ panelTitle, menu }: { panelTitle: string; menu
     return (
       <div className="login-page">
         <div className="login-card">
+          <BrandMark size={40} className="login-card__mark" />
           <h1 className="login-card__title">{copy.title}</h1>
           <p className="login-card__subtitle">{copy.body}</p>
           <button type="button" className="login-card__submit" onClick={logout}>

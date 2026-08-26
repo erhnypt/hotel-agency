@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { getMyHotel } from '../../api/hotels'
-import { createService, deleteService, listServices } from '../../api/services'
-import type { ServiceRequest } from '../../api/types'
+import { createService, deleteService, listServices, updateService } from '../../api/services'
+import type { ServiceRequest, ServiceResponse } from '../../api/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
 import { ServiceFormModal } from './ServiceFormModal'
@@ -10,6 +10,7 @@ import '../../components/crud.css'
 export function ServicesPage() {
   const [refreshKey, setRefreshKey] = useState(0)
   const [showCreateModal, setShowCreateModal] = useState(false)
+  const [editingService, setEditingService] = useState<ServiceResponse | null>(null)
 
   const hotel = useAsync(getMyHotel, [])
   const services = useAsync(
@@ -25,6 +26,13 @@ export function ServicesPage() {
   const handleCreate = async (request: ServiceRequest) => {
     await createService(hotel.data!.id, request)
     setShowCreateModal(false)
+    refresh()
+  }
+
+  const handleUpdate = async (request: ServiceRequest) => {
+    if (!editingService) return
+    await updateService(editingService.id, request)
+    setEditingService(null)
     refresh()
   }
 
@@ -52,6 +60,7 @@ export function ServicesPage() {
             <tr>
               <th>Ad</th>
               <th>Açıklama</th>
+              <th>Fiyat</th>
               <th></th>
             </tr>
           </thead>
@@ -61,7 +70,13 @@ export function ServicesPage() {
                 <td>{service.name}</td>
                 <td>{service.description ?? '—'}</td>
                 <td>
+                  {service.price} {service.currency}
+                </td>
+                <td>
                   <div className="data-table__actions">
+                    <button type="button" className="btn btn--small" onClick={() => setEditingService(service)}>
+                      Düzenle
+                    </button>
                     <button
                       type="button"
                       className="btn btn--small btn--danger"
@@ -75,7 +90,7 @@ export function ServicesPage() {
             ))}
             {services.data.length === 0 && (
               <tr>
-                <td colSpan={3} className="data-table__empty">
+                <td colSpan={4} className="data-table__empty">
                   Henüz hizmet yok.
                 </td>
               </tr>
@@ -84,7 +99,12 @@ export function ServicesPage() {
         </table></div>
       )}
 
-      {showCreateModal && <ServiceFormModal onClose={() => setShowCreateModal(false)} onSave={handleCreate} />}
+      {showCreateModal && (
+        <ServiceFormModal service={null} onClose={() => setShowCreateModal(false)} onSave={handleCreate} />
+      )}
+      {editingService && (
+        <ServiceFormModal service={editingService} onClose={() => setEditingService(null)} onSave={handleUpdate} />
+      )}
     </div>
   )
 }

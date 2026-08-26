@@ -77,7 +77,7 @@ export function SettingsPage() {
         </label>
 
         <h3 style={{ margin: '1.5rem 0 1rem', fontWeight: 600 }}>Şifre Değiştir</h3>
-        <p style={{ fontSize: '0.85rem', color: 'var(--color-muted)', marginBottom: '0.75rem' }}>
+        <p style={{ fontSize: '0.85rem', color: 'var(--text)', marginBottom: '0.75rem' }}>
           Şifrenizi değiştirmek istemiyorsanız bu alanları boş bırakın.
         </p>
 
@@ -111,7 +111,7 @@ export function SettingsPage() {
 
         {errorMsg && <p className="form-error">{errorMsg}</p>}
         {successMsg && (
-          <p style={{ color: 'var(--color-success, #22c55e)', marginBottom: '0.5rem' }}>
+          <p style={{ color: 'var(--success)', marginBottom: '0.5rem' }}>
             {successMsg}
           </p>
         )}

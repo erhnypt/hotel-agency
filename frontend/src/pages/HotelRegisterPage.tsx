@@ -3,6 +3,7 @@ import { Navigate, Link } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
 import { roleHomePath } from '../auth/roleHome'
 import { apiClient } from '../api/client'
+import { BrandMark } from '../components/BrandMark'
 import './LoginPage.css'
 
 export function HotelRegisterPage() {
@@ -53,18 +54,15 @@ export function HotelRegisterPage() {
     return (
       <div className="login-page">
         <div className="login-card">
+          <BrandMark size={40} className="login-card__mark" />
           <h1 className="login-card__title">Kaydınız Alındı</h1>
           <p className="login-card__subtitle">
             <strong>{formData.name}</strong> için otel başvurunuz alınmıştır. Başvurunuz acente ekibimiz
             tarafından incelenmektedir; onay durumu <strong>{formData.email}</strong> adresine e-posta ile
             bildirilecektir.
           </p>
-          <p style={{ textAlign: 'center', marginTop: '0.5rem', fontSize: '0.9rem' }}>
-            Onaylandıktan sonra belirlediğiniz şifre ile{' '}
-            <Link to="/login" style={{ color: '#a78bfa', textDecoration: 'none' }}>
-              giriş yapabilirsiniz
-            </Link>
-            .
+          <p className="login-card__footer">
+            Onaylandıktan sonra belirlediğiniz şifre ile <Link to="/login">giriş yapabilirsiniz</Link>.
           </p>
         </div>
       </div>
@@ -74,7 +72,8 @@ export function HotelRegisterPage() {
   return (
     <div className="login-page">
       <form className="login-card" onSubmit={handleSubmit}>
-        <h1 className="login-card__title">Hotel Reservation Agency</h1>
+        <BrandMark size={40} className="login-card__mark" />
+        <h1 className="login-card__brand">Santral</h1>
         <p className="login-card__subtitle">Yeni Otel Kaydı</p>
 
         <label className="login-field">
@@ -176,11 +175,8 @@ export function HotelRegisterPage() {
           {submitting ? 'Kaydediliyor...' : 'Otel Kaydı Yap'}
         </button>
 
-        <p style={{ textAlign: 'center', marginTop: '1rem', fontSize: '0.9rem' }}>
-          Zaten hesabın var mı?{' '}
-          <Link to="/login" style={{ color: '#a78bfa', textDecoration: 'none' }}>
-            Giriş Yap
-          </Link>
+        <p className="login-card__footer">
+          Zaten hesabın var mı? <Link to="/login">Giriş Yap</Link>
         </p>
       </form>
     </div>

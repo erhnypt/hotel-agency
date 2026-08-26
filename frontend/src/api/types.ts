@@ -81,12 +81,17 @@ export interface ServiceResponse {
   hotelId: number
   name: string
   description: string | null
+  price: number
+  currency: string
   createdAt: string
+  updatedAt: string
 }
 
 export interface ServiceRequest {
   name: string
   description?: string | null
+  price: number
+  currency: string
 }
 
 export interface RoomPriceResponse {
