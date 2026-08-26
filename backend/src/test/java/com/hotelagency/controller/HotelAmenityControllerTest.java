@@ -19,6 +19,7 @@ import com.hotelagency.security.JwtService;
 import com.hotelagency.security.RestAuthenticationEntryPoint;
 import com.hotelagency.security.WithMockCustomUser;
 import com.hotelagency.service.AmenityService;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -50,7 +51,8 @@ class HotelAmenityControllerTest {
     private CustomUserDetailsService userDetailsService;
 
     private ServiceResponse sampleResponse() {
-        return new ServiceResponse(1L, 1L, "Free Wi-Fi", "Lobby & rooms", Instant.now());
+        return new ServiceResponse(
+                1L, 1L, "Free Wi-Fi", "Lobby & rooms", BigDecimal.ZERO, "TRY", Instant.now(), Instant.now());
     }
 
     @Test
@@ -60,7 +62,8 @@ class HotelAmenityControllerTest {
 
         mockMvc.perform(post("/api/hotels/1/services")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new ServiceRequest("Free Wi-Fi", "Lobby & rooms"))))
+                        .content(objectMapper.writeValueAsString(
+                                new ServiceRequest("Free Wi-Fi", "Lobby & rooms", BigDecimal.ZERO, "TRY"))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.name").value("Free Wi-Fi"));
     }
@@ -70,7 +73,8 @@ class HotelAmenityControllerTest {
     void createAsAgencyStaffReturns403() throws Exception {
         mockMvc.perform(post("/api/hotels/1/services")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new ServiceRequest("Free Wi-Fi", null))))
+                        .content(objectMapper.writeValueAsString(
+                                new ServiceRequest("Free Wi-Fi", null, BigDecimal.ZERO, "TRY"))))
                 .andExpect(status().isForbidden());
     }
 
@@ -79,9 +83,21 @@ class HotelAmenityControllerTest {
     void createRejectsBlankName() throws Exception {
         mockMvc.perform(post("/api/hotels/1/services")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(new ServiceRequest("", null))))
+                        .content(objectMapper.writeValueAsString(
+                                new ServiceRequest("", null, BigDecimal.ZERO, "TRY"))))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.fieldErrors.name").exists());
+    }
+
+    @Test
+    @WithMockCustomUser(role = RoleName.HOTEL_ADMIN)
+    void createRejectsNegativePrice() throws Exception {
+        mockMvc.perform(post("/api/hotels/1/services")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(
+                                new ServiceRequest("Spa", null, new BigDecimal("-10"), "TRY"))))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.fieldErrors.price").exists());
     }
 
     @Test
@@ -91,6 +107,7 @@ class HotelAmenityControllerTest {
 
         mockMvc.perform(get("/api/hotels/1/services"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].name").value("Free Wi-Fi"));
+                .andExpect(jsonPath("$[0].name").value("Free Wi-Fi"))
+                .andExpect(jsonPath("$[0].price").value(0));
     }
 }

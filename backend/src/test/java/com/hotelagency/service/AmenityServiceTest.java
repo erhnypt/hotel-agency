@@ -17,6 +17,7 @@ import com.hotelagency.entity.RoleName;
 import com.hotelagency.entity.User;
 import com.hotelagency.exception.ResourceNotFoundException;
 import com.hotelagency.repository.AmenityRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -59,13 +60,16 @@ class AmenityServiceTest {
     void createSavesServiceUnderOwnedHotel() {
         when(hotelService.getOwnedHotel(1L, hotelAdmin)).thenReturn(hotel);
 
-        ServiceResponse response = amenityService.create(1L, new ServiceRequest("Free Wi-Fi", "Lobby & rooms"), hotelAdmin);
+        ServiceResponse response = amenityService.create(
+                1L, new ServiceRequest("Free Wi-Fi", "Lobby & rooms", BigDecimal.ZERO, "TRY"), hotelAdmin);
 
         ArgumentCaptor<Amenity> captor = ArgumentCaptor.forClass(Amenity.class);
         verify(amenityRepository).save(captor.capture());
         Amenity saved = captor.getValue();
         assertThat(saved.getHotel()).isEqualTo(hotel);
         assertThat(saved.getName()).isEqualTo("Free Wi-Fi");
+        assertThat(saved.getPrice()).isEqualByComparingTo(BigDecimal.ZERO);
+        assertThat(saved.getCurrency()).isEqualTo("TRY");
         assertThat(response.hotelId()).isEqualTo(1L);
         assertThat(response.name()).isEqualTo("Free Wi-Fi");
     }
@@ -74,7 +78,8 @@ class AmenityServiceTest {
     void createPropagatesOwnershipFailure() {
         when(hotelService.getOwnedHotel(2L, hotelAdmin)).thenThrow(new AccessDeniedException("not your hotel"));
 
-        assertThatThrownBy(() -> amenityService.create(2L, new ServiceRequest("Spa", null), hotelAdmin))
+        assertThatThrownBy(() -> amenityService.create(
+                        2L, new ServiceRequest("Spa", null, new BigDecimal("100"), "TRY"), hotelAdmin))
                 .isInstanceOf(AccessDeniedException.class);
 
         verify(amenityRepository, never()).save(any());
@@ -86,6 +91,8 @@ class AmenityServiceTest {
         amenity.setId(5L);
         amenity.setHotel(hotel);
         amenity.setName("Breakfast");
+        amenity.setPrice(new BigDecimal("150"));
+        amenity.setCurrency("TRY");
 
         when(hotelService.getViewableHotel(eq(1L), any())).thenReturn(hotel);
         when(amenityRepository.findByHotelId(1L)).thenReturn(List.of(amenity));
@@ -94,7 +101,40 @@ class AmenityServiceTest {
 
         assertThat(result).hasSize(1);
         assertThat(result.get(0).name()).isEqualTo("Breakfast");
+        assertThat(result.get(0).price()).isEqualByComparingTo("150");
         verify(hotelService).getViewableHotel(1L, hotelAdmin);
+    }
+
+    @Test
+    void updateChangesPriceWhenOwned() {
+        Amenity amenity = new Amenity();
+        amenity.setId(5L);
+        amenity.setHotel(hotel);
+        amenity.setName("Spa");
+        amenity.setPrice(BigDecimal.ZERO);
+        amenity.setCurrency("TRY");
+        when(amenityRepository.findById(5L)).thenReturn(Optional.of(amenity));
+        when(hotelService.getOwnedHotel(1L, hotelAdmin)).thenReturn(hotel);
+
+        ServiceResponse response = amenityService.update(
+                5L, new ServiceRequest("Spa & Masaj", "60 dakika", new BigDecimal("500"), "TRY"), hotelAdmin);
+
+        assertThat(amenity.getName()).isEqualTo("Spa & Masaj");
+        assertThat(amenity.getPrice()).isEqualByComparingTo("500");
+        assertThat(response.price()).isEqualByComparingTo("500");
+    }
+
+    @Test
+    void updateRejectsWhenRequesterDoesNotOwnHotel() {
+        Amenity amenity = new Amenity();
+        amenity.setId(5L);
+        amenity.setHotel(hotel);
+        when(amenityRepository.findById(5L)).thenReturn(Optional.of(amenity));
+        when(hotelService.getOwnedHotel(1L, hotelAdmin)).thenThrow(new AccessDeniedException("not your hotel"));
+
+        assertThatThrownBy(() -> amenityService.update(
+                        5L, new ServiceRequest("Spa", null, BigDecimal.TEN, "TRY"), hotelAdmin))
+                .isInstanceOf(AccessDeniedException.class);
     }
 
     @Test

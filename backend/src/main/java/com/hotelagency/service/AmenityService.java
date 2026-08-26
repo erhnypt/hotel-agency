@@ -25,8 +25,7 @@ public class AmenityService {
 
         Amenity amenity = new Amenity();
         amenity.setHotel(hotel);
-        amenity.setName(request.name());
-        amenity.setDescription(request.description());
+        applyRequest(amenity, request);
         amenityRepository.save(amenity);
 
         return ServiceResponse.from(amenity);
@@ -39,11 +38,32 @@ public class AmenityService {
     }
 
     @Transactional
+    public ServiceResponse update(Long serviceId, ServiceRequest request, User requester) {
+        Amenity amenity = getOwnedAmenity(serviceId, requester);
+
+        applyRequest(amenity, request);
+
+        return ServiceResponse.from(amenity);
+    }
+
+    @Transactional
     public void delete(Long serviceId, User requester) {
+        Amenity amenity = getOwnedAmenity(serviceId, requester);
+
+        amenityRepository.delete(amenity);
+    }
+
+    private Amenity getOwnedAmenity(Long serviceId, User requester) {
         Amenity amenity = amenityRepository.findById(serviceId)
                 .orElseThrow(() -> new ResourceNotFoundException("Service not found: " + serviceId));
         hotelService.getOwnedHotel(amenity.getHotel().getId(), requester);
+        return amenity;
+    }
 
-        amenityRepository.delete(amenity);
+    private void applyRequest(Amenity amenity, ServiceRequest request) {
+        amenity.setName(request.name());
+        amenity.setDescription(request.description());
+        amenity.setPrice(request.price());
+        amenity.setCurrency(request.currency());
     }
 }
