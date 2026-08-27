@@ -12,7 +12,7 @@
   --border: #f1e3d0;
   --border-strong: #e4d2b9;
   --text: #44546b;
-  --text-dim: #667287;
+  --text-dim: #5f6b7e;
   --text-h: #142438;
   --signal: #ff5a4d;
   --signal-hover: #eb4133;
@@ -62,8 +62,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 14px clamp(18px, 5vw, 64px);
-  background: rgba(255, 247, 238, 0.94);
-  backdrop-filter: blur(6px);
+  background: #fff7ee;
   border-bottom: 1px solid var(--border);
 }
 
@@ -89,10 +88,10 @@
 .lp-header__login {
   font-size: 13px;
   font-weight: 600;
-  color: var(--l-teal-deep);
+  color: #086a6d;
   text-decoration: none;
   padding: 8px 15px;
-  border: 1.5px solid var(--l-teal);
+  border: 1.5px solid var(--l-teal-deep);
   border-radius: 999px;
   transition: background 0.16s ease, color 0.16s ease;
 }
@@ -105,10 +104,9 @@
 /* ---------- hero ---------- */
 .lp-hero {
   position: relative;
-  isolation: isolate;
   padding: clamp(48px, 9vw, 104px) clamp(18px, 5vw, 64px) 0;
   padding-bottom: clamp(120px, 16vw, 180px);
-  overflow: clip;
+  overflow: hidden;
 }
 
 .lp-hero__img {
@@ -117,13 +115,13 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  z-index: -3;
+  z-index: 0;
 }
 
 .lp-hero__scrim {
   position: absolute;
   inset: 0;
-  z-index: -2;
+  z-index: 1;
   background:
     linear-gradient(103deg, rgba(255, 90, 77, 0.92) 0%, rgba(255, 90, 77, 0.55) 34%, rgba(20, 36, 56, 0.28) 66%, rgba(20, 36, 56, 0.62) 100%),
     linear-gradient(to top, rgba(20, 36, 56, 0.5), transparent 46%);
@@ -131,11 +129,10 @@
 
 .lp-hero__blob {
   position: absolute;
-  z-index: -1;
+  z-index: 2;
   border-radius: 50%;
   opacity: 0.92;
-  will-change: transform;
-  animation: lp-float 9s ease-in-out infinite;
+  animation: lp-drift 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
 .lp-hero__blob--sun {
@@ -152,16 +149,17 @@
   bottom: 22%;
   left: 3%;
   background: radial-gradient(circle at 40% 40%, #6fdee1, var(--l-teal-deep) 58%, rgba(10, 139, 143, 0) 78%);
-  animation-delay: -4s;
-  animation-duration: 11s;
+  animation-delay: 0.15s;
 }
 
-@keyframes lp-float {
-  0%, 100% { transform: translateY(0) }
-  50% { transform: translateY(-22px) }
+@keyframes lp-drift {
+  from { opacity: 0; transform: translateY(30px) scale(0.9) }
+  to { opacity: 0.92; transform: translateY(0) scale(1) }
 }
 
 .lp-hero__inner {
+  position: relative;
+  z-index: 3;
   max-width: 620px;
 }
 
@@ -191,7 +189,7 @@
 /* ---------- search card ---------- */
 .lp-search {
   position: relative;
-  z-index: 2;
+  z-index: 4;
   max-width: 640px;
   margin: clamp(36px, 6vw, 56px) auto calc(-1 * clamp(56px, 9vw, 96px));
   background: var(--bg-panel);
