@@ -73,7 +73,7 @@ export function HotelRegisterPage() {
     <div className="login-page">
       <form className="login-card" onSubmit={handleSubmit}>
         <BrandMark size={40} className="login-card__mark" />
-        <h1 className="login-card__brand">Santral</h1>
+        <h1 className="login-card__brand">Cassidy Travel</h1>
         <p className="login-card__subtitle">Yeni Otel Kaydı</p>
 
         <label className="login-field">

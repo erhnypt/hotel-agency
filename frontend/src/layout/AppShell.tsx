@@ -10,7 +10,7 @@ export function AppShell({ panelTitle, menu }: { panelTitle: string; menu: MenuI
     <div className="app-shell">
       <aside className="app-shell__sidebar">
         <div className="app-shell__brand">
-          Santral
+          Cassidy Travel
           <small>Otel Acentesi Merkezi</small>
         </div>
         <nav className="app-shell__nav">
