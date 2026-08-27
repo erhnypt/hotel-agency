@@ -119,7 +119,15 @@ export interface AvailableRoomResponse {
 
 export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'CANCELLED'
 
-export interface CustomerSummary {
+/** Masked card on file. No full number, no CVV — ever. */
+export interface CardOnFile {
+  cardHolder: string | null
+  cardBrand: string | null
+  cardLast4: string | null
+  cardExpiry: string | null
+}
+
+export interface CustomerSummary extends CardOnFile {
   id: number
   firstName: string
   lastName: string
@@ -127,7 +135,7 @@ export interface CustomerSummary {
   email: string | null
 }
 
-export interface CustomerResponse {
+export interface CustomerResponse extends CardOnFile {
   id: number
   firstName: string
   lastName: string
@@ -148,6 +156,10 @@ export interface CustomerRequest {
   passportNumber?: string | null
   nationality?: string | null
   notes?: string | null
+  cardHolder?: string | null
+  cardBrand?: string | null
+  cardLast4?: string | null
+  cardExpiry?: string | null
 }
 
 export interface ReservationCreateRequest {

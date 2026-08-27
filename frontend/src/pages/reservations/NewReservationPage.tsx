@@ -10,6 +10,7 @@ import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
 import type { AvailableRoomResponse } from '../../api/types'
+import { detectBrand, digitsOnly, formatCardNumber, last4 } from '../../lib/card'
 import '../../components/crud.css'
 import './NewReservationPage.css'
 
@@ -35,6 +36,9 @@ export function NewReservationPage() {
   const [newLastName, setNewLastName] = useState('')
   const [newPhone, setNewPhone] = useState('')
   const [newEmail, setNewEmail] = useState('')
+  const [newCardHolder, setNewCardHolder] = useState('')
+  const [newCardNumber, setNewCardNumber] = useState('')
+  const [newCardExpiry, setNewCardExpiry] = useState('')
 
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -73,6 +77,9 @@ export function NewReservationPage() {
     setSelectedRoomTypeId(null)
     setCustomerMode('existing')
     setCustomerId('')
+    setNewCardHolder('')
+    setNewCardNumber('')
+    setNewCardExpiry('')
     setNewFirstName('')
     setNewLastName('')
     setNewPhone('')
@@ -95,7 +102,18 @@ export function NewReservationPage() {
         customerId: customerMode === 'existing' ? Number(customerId) : null,
         newCustomer:
           customerMode === 'new'
-            ? { firstName: newFirstName, lastName: newLastName, phone: newPhone, email: newEmail || null }
+            ? {
+                firstName: newFirstName,
+                lastName: newLastName,
+                phone: newPhone,
+                email: newEmail || null,
+                cardHolder: newCardHolder.trim() || null,
+                cardBrand: digitsOnly(newCardNumber).length >= 13 ? detectBrand(newCardNumber) : null,
+                cardLast4: digitsOnly(newCardNumber).length >= 13 ? last4(newCardNumber) : null,
+                cardExpiry: /^(0[1-9]|1[0-2])\/\d{2}$/.test(newCardExpiry.trim())
+                  ? newCardExpiry.trim()
+                  : null,
+              }
             : null,
       })
       setReservationNumber(response.reservationNumber)
@@ -254,6 +272,41 @@ export function NewReservationPage() {
                 <span>E-posta</span>
                 <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
               </label>
+
+              <fieldset className="form-fieldset new-customer-fields__card">
+                <legend>Ödeme Kartı (opsiyonel)</legend>
+                <p className="form-hint">
+                  Otele iletilmek üzere kartın yalnızca markası, son 4 hanesi ve son kullanma tarihi
+                  saklanır. Tam numara ve CVV kaydedilmez.
+                </p>
+                <label className="form-field">
+                  <span>Kart Sahibi</span>
+                  <input value={newCardHolder} onChange={(e) => setNewCardHolder(e.target.value)} />
+                </label>
+                <label className="form-field">
+                  <span>Kart Numarası</span>
+                  <input
+                    inputMode="numeric"
+                    autoComplete="off"
+                    value={formatCardNumber(newCardNumber)}
+                    onChange={(e) => setNewCardNumber(e.target.value)}
+                    placeholder="•••• •••• •••• ••••"
+                  />
+                </label>
+                <label className="form-field">
+                  <span>Son Kullanma (AA/YY)</span>
+                  <input
+                    inputMode="numeric"
+                    maxLength={5}
+                    value={newCardExpiry}
+                    onChange={(e) => {
+                      const d = digitsOnly(e.target.value).slice(0, 4)
+                      setNewCardExpiry(d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d)
+                    }}
+                    placeholder="12/29"
+                  />
+                </label>
+              </fieldset>
             </div>
           )}
 

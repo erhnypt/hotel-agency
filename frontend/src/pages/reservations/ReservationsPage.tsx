@@ -7,6 +7,7 @@ import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { StatusBadge } from '../../components/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
+import { maskedCard } from '../../lib/card'
 import '../../components/crud.css'
 import './ReservationsPage.css'
 
@@ -89,6 +90,7 @@ export function ReservationsPage() {
             <th>No</th>
             <th>Oda Tipi</th>
             <th>Müşteri</th>
+            <th>Kart</th>
             <th>Check-in</th>
             <th>Check-out</th>
             <th>Misafir</th>
@@ -104,6 +106,15 @@ export function ReservationsPage() {
               <td>{r.roomTypeName}</td>
               <td>
                 {r.customer.firstName} {r.customer.lastName}
+              </td>
+              <td>
+                {maskedCard(r.customer.cardBrand, r.customer.cardLast4) ?? '—'}
+                {r.customer.cardExpiry && (
+                  <>
+                    <br />
+                    <span className="data-table__muted">SKT {r.customer.cardExpiry}</span>
+                  </>
+                )}
               </td>
               <td>{r.checkIn}</td>
               <td>{r.checkOut}</td>
@@ -154,7 +165,7 @@ export function ReservationsPage() {
           ))}
           {items.length === 0 && (
             <tr>
-              <td colSpan={9} className="data-table__empty">
+              <td colSpan={10} className="data-table__empty">
                 {emptyMessage}
               </td>
             </tr>

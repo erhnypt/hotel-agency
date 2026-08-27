@@ -57,6 +57,14 @@ public class CustomerService {
         customer.setPassportNumber(request.passportNumber());
         customer.setNationality(request.nationality());
         customer.setNotes(request.notes());
+        customer.setCardHolder(blankToNull(request.cardHolder()));
+        customer.setCardBrand(blankToNull(request.cardBrand()));
+        customer.setCardLast4(blankToNull(request.cardLast4()));
+        customer.setCardExpiry(blankToNull(request.cardExpiry()));
+    }
+
+    private static String blankToNull(String value) {
+        return value == null || value.isBlank() ? null : value.trim();
     }
 
     private Customer getCustomerOrThrow(Long id) {

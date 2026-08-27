@@ -40,6 +40,19 @@ public class Customer {
     @Column(name = "notes")
     private String notes;
 
+    /** Card on file — masked only. No full PAN, no CVV, ever. */
+    @Column(name = "card_holder")
+    private String cardHolder;
+
+    @Column(name = "card_brand", length = 20)
+    private String cardBrand;
+
+    @Column(name = "card_last4", length = 4)
+    private String cardLast4;
+
+    @Column(name = "card_expiry", length = 7)
+    private String cardExpiry;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

@@ -12,6 +12,10 @@ public record CustomerResponse(
         String passportNumber,
         String nationality,
         String notes,
+        String cardHolder,
+        String cardBrand,
+        String cardLast4,
+        String cardExpiry,
         Instant createdAt,
         Instant updatedAt) {
 
@@ -25,6 +29,10 @@ public record CustomerResponse(
                 customer.getPassportNumber(),
                 customer.getNationality(),
                 customer.getNotes(),
+                customer.getCardHolder(),
+                customer.getCardBrand(),
+                customer.getCardLast4(),
+                customer.getCardExpiry(),
                 customer.getCreatedAt(),
                 customer.getUpdatedAt());
     }

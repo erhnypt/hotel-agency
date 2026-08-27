@@ -3,6 +3,7 @@ import { createCustomer, listCustomers, updateCustomer } from '../../api/custome
 import type { CustomerRequest, CustomerResponse } from '../../api/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
+import { maskedCard } from '../../lib/card'
 import { CustomerFormModal } from './CustomerFormModal'
 import '../../components/crud.css'
 
@@ -48,6 +49,7 @@ export function CustomersPage() {
               <th>Telefon</th>
               <th>E-posta</th>
               <th>Uyruk</th>
+              <th>Kart</th>
               <th></th>
             </tr>
           </thead>
@@ -60,6 +62,7 @@ export function CustomersPage() {
                 <td>{customer.phone}</td>
                 <td>{customer.email ?? '—'}</td>
                 <td>{customer.nationality ?? '—'}</td>
+                <td>{maskedCard(customer.cardBrand, customer.cardLast4) ?? '—'}</td>
                 <td>
                   <div className="data-table__actions">
                     <button type="button" className="btn btn--small" onClick={() => setEditingCustomer(customer)}>
@@ -71,7 +74,7 @@ export function CustomersPage() {
             ))}
             {customers.data.length === 0 && (
               <tr>
-                <td colSpan={5} className="data-table__empty">
+                <td colSpan={6} className="data-table__empty">
                   Henüz müşteri yok.
                 </td>
               </tr>

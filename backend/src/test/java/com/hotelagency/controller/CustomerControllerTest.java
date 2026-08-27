@@ -49,12 +49,12 @@ class CustomerControllerTest {
     private CustomUserDetailsService userDetailsService;
 
     private CustomerRequest sampleRequest() {
-        return new CustomerRequest("John", "Smith", "+1 555 000", "john@example.com", "P1234567", "US", null);
+        return new CustomerRequest("John", "Smith", "+1 555 000", "john@example.com", "P1234567", "US", null, null, null, null, null);
     }
 
     private CustomerResponse sampleResponse() {
         return new CustomerResponse(1L, "John", "Smith", "+1 555 000", "john@example.com", "P1234567", "US", null,
-                Instant.now(), Instant.now());
+                "John Smith", "VISA", "4242", "12/29", Instant.now(), Instant.now());
     }
 
     @Test
@@ -81,7 +81,7 @@ class CustomerControllerTest {
     @Test
     @WithMockCustomUser(role = RoleName.AGENCY_STAFF)
     void createRejectsBlankFirstName() throws Exception {
-        CustomerRequest invalid = new CustomerRequest("", "Smith", "+1 555 000", null, null, null, null);
+        CustomerRequest invalid = new CustomerRequest("", "Smith", "+1 555 000", null, null, null, null, null, null, null, null);
 
         mockMvc.perform(post("/api/customers")
                         .contentType(MediaType.APPLICATION_JSON)
