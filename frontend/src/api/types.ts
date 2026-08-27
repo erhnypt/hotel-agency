@@ -160,6 +160,42 @@ export interface ReservationCreateRequest {
   newCustomer?: CustomerRequest | null
 }
 
+export type BookingRequestStatus = 'NEW' | 'IN_PROGRESS' | 'CLOSED'
+
+export interface BookingRequestCreateRequest {
+  propertyId: string
+  propertyName: string
+  hotelType: string
+  countryCode?: string | null
+  countryName?: string | null
+  checkIn: string
+  checkOut: string
+  guests: number
+  contactName: string
+  contactEmail: string
+  contactPhone: string
+  message?: string | null
+}
+
+export interface BookingRequestResponse {
+  id: number
+  propertyId: string
+  propertyName: string
+  hotelType: string
+  countryCode: string | null
+  countryName: string | null
+  checkIn: string
+  checkOut: string
+  guests: number
+  contactName: string
+  contactEmail: string
+  contactPhone: string
+  message: string | null
+  status: BookingRequestStatus
+  createdAt: string
+  updatedAt: string
+}
+
 export interface ReservationResponse {
   id: number
   reservationNumber: string

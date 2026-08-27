@@ -149,6 +149,18 @@
   color: var(--text-dim);
 }
 
+.data-table__muted {
+  color: var(--text-dim);
+  font-size: 12px;
+}
+
+.data-table__wrap {
+  max-width: 220px;
+  white-space: normal;
+  color: var(--text-dim);
+  font-size: 12.5px;
+}
+
 .form-field {
   display: flex;
   flex-direction: column;

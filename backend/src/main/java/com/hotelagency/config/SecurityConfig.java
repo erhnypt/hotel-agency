@@ -2,6 +2,8 @@ package com.hotelagency.config;
 
 import com.hotelagency.security.JwtAuthenticationFilter;
 import com.hotelagency.security.RestAuthenticationEntryPoint;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -41,11 +43,24 @@ public class SecurityConfig {
         return config.getAuthenticationManager();
     }
 
+    /** Production frontends that must always be allowed, regardless of the CORS_ORIGINS env var. */
+    private static final List<String> ALWAYS_ALLOWED_ORIGINS = List.of(
+            "https://cassidy-travel.com",
+            "https://www.cassidy-travel.com",
+            "https://hotel-agency-five.vercel.app");
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource(
             @Value("${app.cors.allowed-origins:http://localhost:5173,http://localhost:5174}") List<String> allowedOrigins) {
+        LinkedHashSet<String> merged = new LinkedHashSet<>();
+        for (String o : allowedOrigins) {
+            if (o != null && !o.isBlank()) merged.add(o.trim());
+        }
+        merged.addAll(ALWAYS_ALLOWED_ORIGINS);
+        List<String> origins = new ArrayList<>(merged);
+
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(allowedOrigins);
+        configuration.setAllowedOrigins(origins);
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
 
@@ -65,6 +80,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth/register", "/api/auth/login", "/api/auth/refresh").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/hotels").permitAll()
+                        .requestMatchers("/api/public/**").permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 

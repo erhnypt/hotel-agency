@@ -27,3 +27,6 @@ backend/logs/
 # Test credentials doc
 testlogin.md
 .vercel
+
+# Raw datasets — large, not versioned. See scripts/build-hotel-catalog.mjs for the source.
+data/*.csv

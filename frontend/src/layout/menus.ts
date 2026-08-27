@@ -9,6 +9,7 @@ export const ADMIN_MENU: MenuItem[] = [
   { label: 'Oteller', path: '/admin/hotels' },
   { label: 'Rezervasyonlar', path: '/admin/reservations', end: true },
   { label: 'Yeni Rezervasyon', path: '/admin/reservations/new' },
+  { label: 'Talepler', path: '/admin/booking-requests' },
   { label: 'Müşteriler', path: '/admin/customers' },
   { label: 'Çalışanlar', path: '/admin/staff' },
   { label: 'Ayarlar', path: '/admin/settings' },
@@ -20,6 +21,7 @@ export const STAFF_MENU: MenuItem[] = [
   { label: 'Müşteriler', path: '/staff/customers' },
   { label: 'Rezervasyonlar', path: '/staff/reservations', end: true },
   { label: 'Yeni Rezervasyon', path: '/staff/reservations/new' },
+  { label: 'Talepler', path: '/staff/booking-requests' },
   { label: 'Ayarlar', path: '/staff/settings' },
 ]
 

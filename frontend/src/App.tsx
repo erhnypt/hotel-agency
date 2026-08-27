@@ -1,7 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthContext'
-import { roleHomePath } from './auth/roleHome'
-import { useAuth } from './auth/useAuth'
 import { StaffPage } from './pages/staff/StaffPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
 import { ProtectedRoute } from './components/ProtectedRoute'
@@ -10,7 +8,9 @@ import { RoleShell } from './layout/RoleShell'
 import { AgencyAdminDashboard } from './pages/dashboard/AgencyAdminDashboard'
 import { AgencyStaffDashboard } from './pages/dashboard/AgencyStaffDashboard'
 import { HotelAdminDashboard } from './pages/dashboard/HotelAdminDashboard'
+import { BookingRequestsPage } from './pages/bookingRequests/BookingRequestsPage'
 import { CustomersPage } from './pages/customers/CustomersPage'
+import { LandingPage } from './pages/landing/LandingPage'
 import { HotelProfilePage } from './pages/hotelProfile/HotelProfilePage'
 import { HotelsPage } from './pages/hotels/HotelsPage'
 import { LoginPage } from './pages/LoginPage'
@@ -21,26 +21,21 @@ import { ReservationsPage } from './pages/reservations/ReservationsPage'
 import { RoomTypesPage } from './pages/roomTypes/RoomTypesPage'
 import { ServicesPage } from './pages/services/ServicesPage'
 
-function RoleHomeRedirect() {
-  const { user } = useAuth()
-  return <Navigate to={user ? roleHomePath(user.role) : '/login'} replace />
-}
-
 function App() {
   return (
     <AuthProvider>
       <Routes>
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<HotelRegisterPage />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/" element={<RoleHomeRedirect />} />
-
           <Route path="/admin" element={<RoleShell role="AGENCY_ADMIN" panelTitle="Acente Admin Paneli" menu={ADMIN_MENU} />}>
             <Route index element={<AgencyAdminDashboard />} />
             <Route path="hotels" element={<HotelsPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
             <Route path="reservations/new" element={<NewReservationPage />} />
+            <Route path="booking-requests" element={<BookingRequestsPage />} />
             <Route path="customers" element={<CustomersPage />} />
             <Route path="staff" element={<StaffPage />} />
             <Route path="settings" element={<SettingsPage />} />
@@ -52,6 +47,7 @@ function App() {
             <Route path="customers" element={<CustomersPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
             <Route path="reservations/new" element={<NewReservationPage />} />
+            <Route path="booking-requests" element={<BookingRequestsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 

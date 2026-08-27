@@ -8,6 +8,9 @@ const CONFIG: Record<string, { label: string; tone: Tone }> = {
   PENDING: { label: 'Bekliyor', tone: 'hold' },
   REJECTED: { label: 'Reddedildi', tone: 'break' },
   CANCELLED: { label: 'İptal Edildi', tone: 'pulled' },
+  NEW: { label: 'Yeni', tone: 'hold' },
+  IN_PROGRESS: { label: 'İşlemde', tone: 'live' },
+  CLOSED: { label: 'Kapandı', tone: 'pulled' },
 }
 
 function StatusIcon({ tone }: { tone: Tone }) {
