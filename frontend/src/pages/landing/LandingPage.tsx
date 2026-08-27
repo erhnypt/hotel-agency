@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { useMemo, useState, type FormEvent } from 'react'
+import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { Link, Navigate } from 'react-router-dom'
 import { submitBookingRequest } from '../../api/bookingRequests'
 import type { ApiErrorResponse } from '../../auth/types'
@@ -7,22 +7,21 @@ import { roleHomePath } from '../../auth/roleHome'
 import { useAuth } from '../../auth/useAuth'
 import { BrandMark } from '../../components/BrandMark'
 import { SearchSelect } from '../../components/SearchSelect'
-import { CATALOG, PEAK_MONTH, type CatalogOffer } from '../../data/catalog'
+import { loadCatalog, type CatalogHotel, type HotelCatalog } from '../../data/catalog'
 import './LandingPage.css'
 
-const MONTHS_TR: Record<string, string> = {
-  January: 'Ocak', February: 'Şubat', March: 'Mart', April: 'Nisan', May: 'Mayıs', June: 'Haziran',
-  July: 'Temmuz', August: 'Ağustos', September: 'Eylül', October: 'Ekim', November: 'Kasım', December: 'Aralık',
-}
-
-const typeLabel = (t: string) => (t === 'Resort' ? 'Resort Otel' : 'Şehir Oteli')
-
 const today = new Date().toISOString().slice(0, 10)
+const stars = (n: number | null) => (n ? '★'.repeat(n) : '')
+const hotelType = (n: number | null) => (n ? `${n}★ Otel` : 'Otel')
 
 export function LandingPage() {
   const { isAuthenticated, user } = useAuth()
 
-  const [offer, setOffer] = useState<CatalogOffer | null>(null)
+  const [catalog, setCatalog] = useState<HotelCatalog | null>(null)
+  const [catalogError, setCatalogError] = useState<string | null>(null)
+
+  const [hotel, setHotel] = useState<CatalogHotel | null>(null)
+  const [cityFilter, setCityFilter] = useState<string | null>(null)
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
   const [guests, setGuests] = useState('2')
@@ -37,22 +36,32 @@ export function LandingPage() {
   const [error, setError] = useState<string | null>(null)
   const [reference, setReference] = useState<number | null>(null)
 
-  const offers = useMemo(
-    () => [...CATALOG.offers].sort((a, b) => a.countryName.localeCompare(b.countryName, 'tr')),
-    [],
-  )
+  useEffect(() => {
+    loadCatalog().then(setCatalog).catch((e) => setCatalogError(e.message ?? 'Katalog yüklenemedi.'))
+  }, [])
+
+  const items = useMemo(() => {
+    if (!catalog) return []
+    const list = cityFilter
+      ? catalog.hotels.filter((h) => h.city === cityFilter)
+      : catalog.hotels
+    return [...list].sort(
+      (a, b) => a.city.localeCompare(b.city, 'tr') || (b.stars ?? 0) - (a.stars ?? 0),
+    )
+  }, [catalog, cityFilter])
+
+  const topCities = useMemo(() => catalog?.cities.slice(0, 12) ?? [], [catalog])
 
   if (isAuthenticated && user) {
     return <Navigate to={roleHomePath(user.role)} replace />
   }
 
   const datesValid = checkIn !== '' && checkOut !== '' && checkOut > checkIn
-  const canContinue = offer !== null && datesValid && Number(guests) >= 1
-
+  const canContinue = hotel !== null && datesValid && Number(guests) >= 1
   const nights = datesValid
     ? Math.round((Date.parse(checkOut) - Date.parse(checkIn)) / 86_400_000)
     : 0
-  const estimate = offer && nights > 0 ? offer.priceFrom * nights : null
+  const estimate = hotel && nights > 0 ? hotel.priceFrom * nights : null
 
   const handleContinue = (event: FormEvent) => {
     event.preventDefault()
@@ -62,16 +71,17 @@ export function LandingPage() {
 
   const handleSubmit = async (event: FormEvent) => {
     event.preventDefault()
-    if (!offer) return
+    if (!hotel) return
     setError(null)
     setSubmitting(true)
     try {
       const created = await submitBookingRequest({
-        propertyId: offer.propertyId,
-        propertyName: offer.propertyName,
-        hotelType: offer.hotelType,
-        countryCode: offer.countryCode,
-        countryName: offer.countryName,
+        propertyId: hotel.id,
+        propertyName: hotel.name,
+        hotelType: hotelType(hotel.stars),
+        propertyCity: hotel.city,
+        countryCode: hotel.iso2,
+        countryName: hotel.country,
         checkIn,
         checkOut,
         guests: Number(guests),
@@ -93,7 +103,8 @@ export function LandingPage() {
   }
 
   const reset = () => {
-    setOffer(null)
+    setHotel(null)
+    setCityFilter(null)
     setCheckIn('')
     setCheckOut('')
     setGuests('2')
@@ -125,9 +136,27 @@ export function LandingPage() {
             Oteli seçin, rezervasyonu <span>biz tamamlayalım</span>
           </h1>
           <p className="landing__lede">
-            Danışmanlarımız talebinizi inceleyip uygunluk ve fiyat teyidiyle 24 saat içinde size döner.
-            Ön ödeme gerekmez.
+            {catalog ? `${catalog.count.toLocaleString('tr-TR')} otel` : 'Binlerce otel'} arasından seçin;
+            danışmanlarımız uygunluk ve fiyat teyidiyle 24 saat içinde size döner. Ön ödeme gerekmez.
           </p>
+
+          {topCities.length > 0 && (
+            <div className="landing__chips">
+              {topCities.map((c) => (
+                <button
+                  key={c.name}
+                  type="button"
+                  className={'landing__chip' + (cityFilter === c.name ? ' is-active' : '')}
+                  onClick={() => {
+                    setCityFilter(cityFilter === c.name ? null : c.name)
+                    setHotel(null)
+                  }}
+                >
+                  {c.name}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="landing__search-card">
@@ -151,8 +180,8 @@ export function LandingPage() {
                 Referans <strong>#{reference}</strong>
               </p>
               <p className="landing__success-note">
-                {offer?.countryName} · {offer && typeLabel(offer.hotelType)} — {checkIn} / {checkOut},{' '}
-                {guests} misafir. E-postanıza bir onay göndereceğiz.
+                {hotel?.name} — {hotel?.city}, {hotel?.country}. {checkIn} / {checkOut}, {guests} misafir.
+                E-postanıza bir onay göndereceğiz.
               </p>
               <button type="button" className="landing__btn landing__btn--ghost" onClick={reset}>
                 Yeni talep oluştur
@@ -163,19 +192,36 @@ export function LandingPage() {
               <h2 className="landing__form-title">Otel araması</h2>
 
               <label className="landing__label">
-                <span>Otel / Destinasyon</span>
-                <SearchSelect<CatalogOffer>
-                  items={offers}
-                  value={offer}
-                  onChange={setOffer}
-                  getKey={(o) => o.id}
-                  getLabel={(o) => `${o.countryName} — ${typeLabel(o.hotelType)}`}
-                  getMeta={(o) =>
-                    `${o.priceFrom} ${CATALOG.currency}'den başlayan gecelik · ${o.bookings.toLocaleString('tr-TR')} kayıt`
-                  }
-                  getSearchText={(o) => `${o.countryName} ${o.hotelType} ${o.propertyName} ${o.countryCode}`}
-                  placeholder="Ülke veya otel tipi ara..."
-                />
+                <span>
+                  Otel{' '}
+                  {cityFilter && (
+                    <button
+                      type="button"
+                      className="landing__filter-clear"
+                      onClick={() => setCityFilter(null)}
+                    >
+                      {cityFilter} ×
+                    </button>
+                  )}
+                </span>
+                {catalogError ? (
+                  <span className="landing__error">{catalogError}</span>
+                ) : !catalog ? (
+                  <span className="landing__loading">Oteller yükleniyor...</span>
+                ) : (
+                  <SearchSelect<CatalogHotel>
+                    items={items}
+                    value={hotel}
+                    onChange={setHotel}
+                    getKey={(h) => h.id}
+                    getLabel={(h) => h.name}
+                    getMeta={(h) =>
+                      `${h.city}, ${h.country}${h.stars ? ` · ${stars(h.stars)}` : ''} · ${h.priceFrom} ${catalog.currency}'den`
+                    }
+                    getSearchText={(h) => `${h.name} ${h.city} ${h.country}`}
+                    placeholder="Otel adı veya şehir ara..."
+                  />
+                )}
               </label>
 
               <div className="landing__row">
@@ -210,7 +256,7 @@ export function LandingPage() {
 
               {estimate !== null && (
                 <p className="landing__estimate">
-                  Tahmini tutar <strong>~{estimate.toLocaleString('tr-TR')} {CATALOG.currency}</strong>{' '}
+                  Tahmini tutar <strong>~{estimate.toLocaleString('tr-TR')} {catalog?.currency}</strong>{' '}
                   <span>({nights} gece · gösterge fiyat, teyit sonrası kesinleşir)</span>
                 </p>
               )}
@@ -235,7 +281,7 @@ export function LandingPage() {
               </button>
               <h2 className="landing__form-title">İletişim bilgileriniz</h2>
               <p className="landing__form-sub">
-                {offer?.countryName} · {offer && typeLabel(offer.hotelType)} — {checkIn} / {checkOut}, {guests} misafir
+                {hotel?.name} · {hotel?.city} — {checkIn} / {checkOut}, {guests} misafir
               </p>
 
               <label className="landing__label">
@@ -272,44 +318,15 @@ export function LandingPage() {
         </div>
       </section>
 
-      <section className="landing__properties">
-        <h2 className="landing__section-title">Otellerimiz</h2>
-        <div className="landing__property-grid">
-          {CATALOG.properties.map((p) => (
-            <article key={p.id} className="landing__property">
-              <div className="landing__property-head">
-                <h3>{p.name}</h3>
-                <span className="landing__tag">{typeLabel(p.type)}</span>
-              </div>
-              <dl className="landing__property-stats">
-                <div>
-                  <dt>Gecelik</dt>
-                  <dd>
-                    {p.priceFrom} {CATALOG.currency}'den
-                  </dd>
-                </div>
-                <div>
-                  <dt>Ort. konaklama</dt>
-                  <dd>{p.avgStayNights} gece</dd>
-                </div>
-                <div>
-                  <dt>Yoğun sezon</dt>
-                  <dd>{MONTHS_TR[PEAK_MONTH[p.id]] ?? '—'}</dd>
-                </div>
-              </dl>
-            </article>
-          ))}
-        </div>
-      </section>
-
       <footer className="landing__footer">
         <div className="landing__brand">
           <BrandMark size={20} className="landing__brand-mark" />
           <span className="landing__brand-name">Cassidy Travel</span>
         </div>
         <p className="landing__footer-note">
-          Katalog verisi: {CATALOG.source}. {CATALOG.offers.length} destinasyon,{' '}
-          {CATALOG.rowsProcessed.toLocaleString('tr-TR')} kayıttan derlendi.
+          {catalog
+            ? `${catalog.count.toLocaleString('tr-TR')} otel · ${catalog.cities.length} destinasyon · kaynak: ${catalog.source}`
+            : ''}
         </p>
         <Link to="/login" className="landing__login-link">
           Personel Girişi

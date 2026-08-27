@@ -48,7 +48,7 @@ export function BookingRequestsPage() {
               <tr>
                 <th>Tarih</th>
                 <th>Otel</th>
-                <th>Destinasyon</th>
+                <th>Şehir / Ülke</th>
                 <th>Konaklama</th>
                 <th>Misafir</th>
                 <th>İletişim</th>
@@ -66,7 +66,15 @@ export function BookingRequestsPage() {
                     <br />
                     <span className="data-table__muted">{r.hotelType}</span>
                   </td>
-                  <td>{r.countryName ?? '—'}</td>
+                  <td>
+                    {r.propertyCity ?? '—'}
+                    {r.countryName && (
+                      <>
+                        <br />
+                        <span className="data-table__muted">{r.countryName}</span>
+                      </>
+                    )}
+                  </td>
                   <td>
                     {r.checkIn} → {r.checkOut}
                   </td>

@@ -166,6 +166,7 @@ export interface BookingRequestCreateRequest {
   propertyId: string
   propertyName: string
   hotelType: string
+  propertyCity?: string | null
   countryCode?: string | null
   countryName?: string | null
   checkIn: string
@@ -182,6 +183,7 @@ export interface BookingRequestResponse {
   propertyId: string
   propertyName: string
   hotelType: string
+  propertyCity: string | null
   countryCode: string | null
   countryName: string | null
   checkIn: string

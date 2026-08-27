@@ -1,47 +1,46 @@
-import catalogJson from './hotels.catalog.json'
+/**
+ * Hotel catalog for the landing-page search. The JSON lives in `public/` and is
+ * fetched once at runtime (it can hold thousands of hotels — too big to bundle).
+ * Regenerate it with `npm run catalog:build`.
+ */
 
-export interface CatalogProperty {
+export interface CatalogHotel {
   id: string
   name: string
-  type: string
-  totalBookings: number
-  avgNightlyRate: number
+  city: string
+  country: string
+  iso2: string
+  stars: number | null
   priceFrom: number
-  avgStayNights: number
-  topRoomTypes: string[]
-  monthlyRate: Record<string, number>
+  lat: number | null
+  lon: number | null
 }
 
-export interface CatalogOffer {
-  id: string
-  propertyId: string
-  propertyName: string
-  hotelType: string
-  countryCode: string
-  countryName: string
-  bookings: number
-  priceFrom: number
-  avgNightlyRate: number
+export interface CatalogCity {
+  name: string
+  country: string
+  iso2: string
+  count: number
 }
 
 export interface HotelCatalog {
   generatedAt: string
   source: string
   currency: string
-  rowsProcessed: number
-  properties: CatalogProperty[]
-  offers: CatalogOffer[]
+  priceNote?: string
+  cities: CatalogCity[]
+  count: number
+  hotels: CatalogHotel[]
 }
 
-export const CATALOG = catalogJson as HotelCatalog
+let cache: Promise<HotelCatalog> | null = null
 
-export const PEAK_MONTH: Record<string, string> = (() => {
-  const out: Record<string, string> = {}
-  for (const p of CATALOG.properties) {
-    const entries = Object.entries(p.monthlyRate)
-    if (entries.length) {
-      out[p.id] = entries.reduce((a, b) => (b[1] > a[1] ? b : a))[0]
-    }
+export function loadCatalog(): Promise<HotelCatalog> {
+  if (!cache) {
+    cache = fetch(`${import.meta.env.BASE_URL}hotels.catalog.json`).then((r) => {
+      if (!r.ok) throw new Error(`Katalog yüklenemedi (${r.status})`)
+      return r.json() as Promise<HotelCatalog>
+    })
   }
-  return out
-})()
+  return cache
+}

@@ -38,7 +38,7 @@ class BookingRequestServiceTest {
 
     private BookingRequestCreateRequest sampleRequest() {
         return new BookingRequestCreateRequest(
-                "city-hotel", "Cassidy City Hotel", "City", "PRT", "Portugal",
+                "n123", "Grand Lisboa Hotel", "Hotel", "Lizbon", "PT", "Portekiz",
                 LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 13), 2,
                 "Jane Doe", "jane@example.com", "+351 555 111", "  Late arrival  ");
     }
@@ -54,7 +54,8 @@ class BookingRequestServiceTest {
         BookingRequest saved = captor.getValue();
         assertThat(saved.getStatus()).isEqualTo(BookingRequestStatus.NEW);
         assertThat(saved.getMessage()).isEqualTo("Late arrival");
-        assertThat(saved.getPropertyName()).isEqualTo("Cassidy City Hotel");
+        assertThat(saved.getPropertyName()).isEqualTo("Grand Lisboa Hotel");
+        assertThat(saved.getPropertyCity()).isEqualTo("Lizbon");
         assertThat(response.status()).isEqualTo(BookingRequestStatus.NEW);
         assertThat(response.contactEmail()).isEqualTo("jane@example.com");
     }
@@ -62,7 +63,7 @@ class BookingRequestServiceTest {
     @Test
     void createRejectsWhenCheckOutNotAfterCheckIn() {
         BookingRequestCreateRequest bad = new BookingRequestCreateRequest(
-                "city-hotel", "Cassidy City Hotel", "City", null, null,
+                "n123", "Grand Lisboa Hotel", "Hotel", "Lizbon", null, null,
                 LocalDate.of(2026, 9, 13), LocalDate.of(2026, 9, 13), 2,
                 "Jane Doe", "jane@example.com", "+351 555 111", null);
 
@@ -74,7 +75,7 @@ class BookingRequestServiceTest {
     void createBlanksOptionalCountryToNull() {
         when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         BookingRequestCreateRequest req = new BookingRequestCreateRequest(
-                "resort-hotel", "Cassidy Resort Hotel", "Resort", "  ", "",
+                "w456", "Seaside Resort", "Hotel", "  ", "  ", "",
                 LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 12), 3,
                 "A B", "a@b.com", "123", "   ");
 
@@ -82,6 +83,7 @@ class BookingRequestServiceTest {
 
         ArgumentCaptor<BookingRequest> captor = ArgumentCaptor.forClass(BookingRequest.class);
         verify(repository).save(captor.capture());
+        assertThat(captor.getValue().getPropertyCity()).isNull();
         assertThat(captor.getValue().getCountryCode()).isNull();
         assertThat(captor.getValue().getCountryName()).isNull();
         assertThat(captor.getValue().getMessage()).isNull();

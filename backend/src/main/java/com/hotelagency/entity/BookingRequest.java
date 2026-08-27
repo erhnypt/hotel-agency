@@ -33,6 +33,9 @@ public class BookingRequest {
     @Column(name = "hotel_type", nullable = false, length = 32)
     private String hotelType;
 
+    @Column(name = "property_city", length = 128)
+    private String propertyCity;
+
     @Column(name = "country_code", length = 3)
     private String countryCode;
 
