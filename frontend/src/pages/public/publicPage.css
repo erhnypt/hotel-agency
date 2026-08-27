@@ -1,0 +1,179 @@
+/* Public content pages (Hakkımızda, İletişim, SSS, Gizlilik, Koşullar).
+   Rides on the `.lp` light token world defined in ../landing/LandingPage.css. */
+
+.lp-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(40px, 8vw, 80px) clamp(18px, 5vw, 40px) clamp(48px, 8vw, 88px);
+}
+
+.lp-page__head {
+  margin-bottom: clamp(28px, 5vw, 44px);
+  padding-bottom: 22px;
+  border-bottom: 2px solid var(--l-sun);
+}
+
+.lp-page__head h1 {
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: var(--text-h);
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+
+.lp-page__lead {
+  margin-top: 14px;
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.6;
+  color: var(--text);
+  max-width: 62ch;
+}
+
+/* prose */
+.lp-prose {
+  color: var(--text);
+  font-size: 1rem;
+  line-height: 1.72;
+}
+
+.lp-prose h2 {
+  margin: 2.2em 0 0.6em;
+  font-size: 1.3rem;
+  color: var(--text-h);
+  letter-spacing: -0.01em;
+}
+
+.lp-prose h2:first-child {
+  margin-top: 0;
+}
+
+.lp-prose p {
+  margin: 0 0 1.1em;
+  max-width: 66ch;
+}
+
+.lp-prose ul,
+.lp-prose ol {
+  margin: 0 0 1.2em;
+  padding-left: 1.3em;
+  max-width: 64ch;
+}
+
+.lp-prose li {
+  margin-bottom: 0.5em;
+}
+
+.lp-prose li::marker {
+  color: var(--l-coral);
+}
+
+.lp-prose a {
+  color: var(--l-teal-deep);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.lp-prose a:hover {
+  color: var(--l-coral);
+}
+
+.lp-prose address {
+  font-style: normal;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  color: var(--text-h);
+}
+
+/* contact */
+.lp-contact {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin-bottom: 1.2em;
+}
+
+.lp-contact__card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 22px 24px;
+}
+
+.lp-contact__card h2 {
+  margin: 0 0 12px;
+  font-size: 1.05rem;
+}
+
+.lp-contact__list {
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lp-contact__list div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.lp-contact__list dt {
+  font-size: 12px;
+  color: var(--text-dim);
+}
+
+.lp-contact__list dd {
+  margin: 0;
+  color: var(--text-h);
+}
+
+/* faq */
+.lp-faq {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 1.4em;
+}
+
+.lp-faq__item {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  overflow: hidden;
+}
+
+.lp-faq__item summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 15px 18px;
+  font-weight: 600;
+  color: var(--text-h);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.lp-faq__item summary::-webkit-details-marker {
+  display: none;
+}
+
+.lp-faq__item summary::after {
+  content: '+';
+  font-size: 1.2rem;
+  font-weight: 400;
+  color: var(--l-coral);
+  transition: transform 0.18s ease;
+}
+
+.lp-faq__item[open] summary::after {
+  transform: rotate(45deg);
+}
+
+.lp-faq__item p {
+  margin: 0;
+  padding: 0 18px 16px;
+  max-width: none;
+  color: var(--text);
+}

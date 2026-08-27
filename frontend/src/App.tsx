@@ -11,6 +11,11 @@ import { HotelAdminDashboard } from './pages/dashboard/HotelAdminDashboard'
 import { BookingRequestsPage } from './pages/bookingRequests/BookingRequestsPage'
 import { CustomersPage } from './pages/customers/CustomersPage'
 import { LandingPage } from './pages/landing/LandingPage'
+import { AboutPage } from './pages/public/AboutPage'
+import { ContactPage } from './pages/public/ContactPage'
+import { FaqPage } from './pages/public/FaqPage'
+import { PrivacyPage } from './pages/public/PrivacyPage'
+import { TermsPage } from './pages/public/TermsPage'
 import { HotelProfilePage } from './pages/hotelProfile/HotelProfilePage'
 import { HotelsPage } from './pages/hotels/HotelsPage'
 import { LoginPage } from './pages/LoginPage'
@@ -26,6 +31,11 @@ function App() {
     <AuthProvider>
       <Routes>
         <Route path="/" element={<LandingPage />} />
+        <Route path="/hakkimizda" element={<AboutPage />} />
+        <Route path="/iletisim" element={<ContactPage />} />
+        <Route path="/sss" element={<FaqPage />} />
+        <Route path="/gizlilik" element={<PrivacyPage />} />
+        <Route path="/kosullar" element={<TermsPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<HotelRegisterPage />} />
 

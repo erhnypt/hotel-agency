@@ -1,12 +1,12 @@
 import axios from 'axios'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { Link, Navigate } from 'react-router-dom'
+import { Navigate } from 'react-router-dom'
 import { submitBookingRequest } from '../../api/bookingRequests'
 import type { ApiErrorResponse } from '../../auth/types'
 import { roleHomePath } from '../../auth/roleHome'
 import { useAuth } from '../../auth/useAuth'
-import { BrandMark } from '../../components/BrandMark'
 import { SearchSelect } from '../../components/SearchSelect'
+import { PublicFooter, PublicHeader } from '../public/PublicChrome'
 import { loadCatalog, type CatalogHotel, type HotelCatalog } from '../../data/catalog'
 import './LandingPage.css'
 
@@ -206,15 +206,7 @@ export function LandingPage() {
 
   return (
     <div className="lp">
-      <header className="lp-header">
-        <div className="lp-brand">
-          <BrandMark size={24} className="lp-brand__mark" />
-          <span className="lp-brand__name">Cassidy Travel</span>
-        </div>
-        <Link to="/login" className="lp-header__login">
-          Personel Girişi
-        </Link>
-      </header>
+      <PublicHeader />
 
       <section className="lp-hero">
         <img className="lp-hero__img" src={HERO_IMG} alt="" aria-hidden="true" loading="eager" />
@@ -458,20 +450,7 @@ export function LandingPage() {
         </button>
       </section>
 
-      <footer className="lp-footer">
-        <div className="lp-brand lp-brand--footer">
-          <BrandMark size={20} className="lp-brand__mark" />
-          <span className="lp-brand__name">Cassidy Travel</span>
-        </div>
-        <p className="lp-footer__note">
-          {catalog
-            ? `${catalog.count.toLocaleString('tr-TR')} otel · ${catalog.cities.length} destinasyon. Katalog kaynağı: ${catalog.source}. Görseller: Unsplash (temsilîdir).`
-            : 'Görseller: Unsplash (temsilîdir).'}
-        </p>
-        <Link to="/login" className="lp-footer__login">
-          Personel Girişi
-        </Link>
-      </footer>
+      <PublicFooter />
     </div>
   )
 }
