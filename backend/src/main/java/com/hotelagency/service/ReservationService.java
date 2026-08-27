@@ -9,7 +9,6 @@ import com.hotelagency.entity.Reservation;
 import com.hotelagency.entity.ReservationStatus;
 import com.hotelagency.entity.ReservationStatusHistory;
 import com.hotelagency.entity.RoleName;
-import com.hotelagency.entity.RoomPrice;
 import com.hotelagency.entity.RoomType;
 import com.hotelagency.entity.User;
 import com.hotelagency.exception.InvalidReservationException;
@@ -17,8 +16,6 @@ import com.hotelagency.exception.ResourceNotFoundException;
 import com.hotelagency.repository.CustomerRepository;
 import com.hotelagency.repository.ReservationRepository;
 import com.hotelagency.repository.ReservationStatusHistoryRepository;
-import com.hotelagency.repository.RoomAvailabilityRepository;
-import com.hotelagency.repository.RoomPriceRepository;
 import com.hotelagency.repository.RoomTypeRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -35,11 +32,13 @@ public class ReservationService {
 
     private static final long RESERVATION_NUMBER_OFFSET = 100_000L;
 
+    /** Statuses that hold a room and therefore count against availability. */
+    private static final List<ReservationStatus> ACTIVE_STATUSES =
+            List.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED);
+
     private final ReservationRepository reservationRepository;
     private final ReservationStatusHistoryRepository historyRepository;
     private final RoomTypeRepository roomTypeRepository;
-    private final RoomPriceRepository roomPriceRepository;
-    private final RoomAvailabilityRepository roomAvailabilityRepository;
     private final CustomerRepository customerRepository;
     private final CustomerService customerService;
     private final HotelService hotelService;
@@ -61,10 +60,10 @@ public class ReservationService {
                     "Room type capacity is insufficient for " + request.guests() + " guests");
         }
 
+        assertRoomFree(roomType, request.checkIn(), request.checkOut());
         List<LocalDate> nights = datesBetween(request.checkIn(), request.checkOut());
-        assertAvailable(roomType.getId(), nights);
-        PriceQuote quote = quotePrice(roomType.getId(), nights)
-                .orElseThrow(() -> new InvalidReservationException("Room price not set for the selected dates"));
+        PriceQuote quote = quotePrice(roomType, nights)
+                .orElseThrow(() -> new InvalidReservationException("Nightly price is not set for this room type"));
 
         Customer customer = resolveCustomer(request);
 
@@ -84,7 +83,6 @@ public class ReservationService {
         reservation.setReservationNumber("RES-" + (RESERVATION_NUMBER_OFFSET + reservation.getId()));
         reservationRepository.save(reservation);
 
-        decrementAvailability(roomType.getId(), nights);
         recordHistory(reservation, ReservationStatus.PENDING);
 
         return ReservationResponse.from(reservation);
@@ -101,8 +99,8 @@ public class ReservationService {
 
         return roomTypeRepository.findByHotelId(hotelId).stream()
                 .filter(roomType -> roomType.getCapacity() >= guests)
-                .filter(roomType -> findUnavailableDates(roomType.getId(), nights).isEmpty())
-                .flatMap(roomType -> quotePrice(roomType.getId(), nights)
+                .filter(roomType -> isRoomFree(roomType, checkIn, checkOut))
+                .flatMap(roomType -> quotePrice(roomType, nights)
                         .map(quote -> new AvailableRoomResponse(
                                 roomType.getId(),
                                 roomType.getName(),
@@ -156,7 +154,6 @@ public class ReservationService {
         }
 
         reservation.setStatus(ReservationStatus.REJECTED);
-        restoreAvailability(reservation);
         recordHistory(reservation, ReservationStatus.REJECTED);
 
         return ReservationResponse.from(reservation);
@@ -173,7 +170,6 @@ public class ReservationService {
         }
 
         reservation.setStatus(ReservationStatus.CANCELLED);
-        restoreAvailability(reservation);
         recordHistory(reservation, ReservationStatus.CANCELLED);
 
         return ReservationResponse.from(reservation);
@@ -206,47 +202,26 @@ public class ReservationService {
         }
     }
 
-    private void assertAvailable(Long roomTypeId, List<LocalDate> nights) {
-        List<LocalDate> unavailable = findUnavailableDates(roomTypeId, nights);
-        if (!unavailable.isEmpty()) {
-            throw new InvalidReservationException("Room not available on " + unavailable.get(0));
+    private void assertRoomFree(RoomType roomType, LocalDate checkIn, LocalDate checkOut) {
+        if (!isRoomFree(roomType, checkIn, checkOut)) {
+            throw new InvalidReservationException(
+                    "No rooms of this type are available for the selected dates");
         }
     }
 
-    private List<LocalDate> findUnavailableDates(Long roomTypeId, List<LocalDate> nights) {
-        return nights.stream()
-                .filter(date -> roomAvailabilityRepository.findByRoomTypeIdAndDate(roomTypeId, date)
-                        .map(availability -> availability.getAvailableRooms() < 1)
-                        .orElse(true))
-                .toList();
+    /** A room type is free when its total room count exceeds the overlapping active reservations. */
+    private boolean isRoomFree(RoomType roomType, LocalDate checkIn, LocalDate checkOut) {
+        long booked = reservationRepository.countOverlapping(
+                roomType.getId(), checkIn, checkOut, ACTIVE_STATUSES);
+        return roomType.getNumberOfRooms() - booked >= 1;
     }
 
-    private Optional<PriceQuote> quotePrice(Long roomTypeId, List<LocalDate> nights) {
-        BigDecimal total = BigDecimal.ZERO;
-        String currency = null;
-        for (LocalDate date : nights) {
-            Optional<RoomPrice> price = roomPriceRepository.findByRoomTypeIdAndDate(roomTypeId, date);
-            if (price.isEmpty()) {
-                return Optional.empty();
-            }
-            total = total.add(price.get().getPrice());
-            currency = price.get().getCurrency();
+    private Optional<PriceQuote> quotePrice(RoomType roomType, List<LocalDate> nights) {
+        if (roomType.getBasePrice() == null) {
+            return Optional.empty();
         }
-        return Optional.of(new PriceQuote(total, currency));
-    }
-
-    private void decrementAvailability(Long roomTypeId, List<LocalDate> nights) {
-        for (LocalDate date : nights) {
-            roomAvailabilityRepository.findByRoomTypeIdAndDate(roomTypeId, date)
-                    .ifPresent(availability -> availability.setAvailableRooms(availability.getAvailableRooms() - 1));
-        }
-    }
-
-    private void restoreAvailability(Reservation reservation) {
-        for (LocalDate date : datesBetween(reservation.getCheckIn(), reservation.getCheckOut())) {
-            roomAvailabilityRepository.findByRoomTypeIdAndDate(reservation.getRoomType().getId(), date)
-                    .ifPresent(availability -> availability.setAvailableRooms(availability.getAvailableRooms() + 1));
-        }
+        BigDecimal total = roomType.getBasePrice().multiply(BigDecimal.valueOf(nights.size()));
+        return Optional.of(new PriceQuote(total, roomType.getCurrency()));
     }
 
     private void recordHistory(Reservation reservation, ReservationStatus status) {

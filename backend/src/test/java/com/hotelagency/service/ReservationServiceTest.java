@@ -3,6 +3,7 @@ package com.hotelagency.service;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -17,21 +18,15 @@ import com.hotelagency.entity.Reservation;
 import com.hotelagency.entity.ReservationStatus;
 import com.hotelagency.entity.Role;
 import com.hotelagency.entity.RoleName;
-import com.hotelagency.entity.RoomAvailability;
-import com.hotelagency.entity.RoomPrice;
 import com.hotelagency.entity.RoomType;
 import com.hotelagency.entity.User;
 import com.hotelagency.exception.InvalidReservationException;
-import com.hotelagency.exception.ResourceNotFoundException;
 import com.hotelagency.repository.CustomerRepository;
 import com.hotelagency.repository.ReservationRepository;
 import com.hotelagency.repository.ReservationStatusHistoryRepository;
-import com.hotelagency.repository.RoomAvailabilityRepository;
-import com.hotelagency.repository.RoomPriceRepository;
 import com.hotelagency.repository.RoomTypeRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
@@ -51,10 +46,6 @@ class ReservationServiceTest {
     @Mock
     private RoomTypeRepository roomTypeRepository;
     @Mock
-    private RoomPriceRepository roomPriceRepository;
-    @Mock
-    private RoomAvailabilityRepository roomAvailabilityRepository;
-    @Mock
     private CustomerRepository customerRepository;
     @Mock
     private CustomerService customerService;
@@ -72,8 +63,8 @@ class ReservationServiceTest {
     @BeforeEach
     void setUp() {
         reservationService = new ReservationService(
-                reservationRepository, historyRepository, roomTypeRepository, roomPriceRepository,
-                roomAvailabilityRepository, customerRepository, customerService, hotelService);
+                reservationRepository, historyRepository, roomTypeRepository,
+                customerRepository, customerService, hotelService);
 
         hotel = new Hotel();
         hotel.setId(1L);
@@ -83,7 +74,10 @@ class ReservationServiceTest {
         roomType.setHotel(hotel);
         roomType.setName("Deluxe Room");
         roomType.setCapacity(2);
+        roomType.setNumberOfRooms(5);
         roomType.setBedType("King Bed");
+        roomType.setBasePrice(new BigDecimal("120.00"));
+        roomType.setCurrency("EUR");
 
         customer = new Customer();
         customer.setId(3L);
@@ -108,29 +102,10 @@ class ReservationServiceTest {
                 1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null);
     }
 
-    private void stubPrice(LocalDate date, String price, String currency) {
-        RoomPrice roomPrice = new RoomPrice();
-        roomPrice.setPrice(new BigDecimal(price));
-        roomPrice.setCurrency(currency);
-        when(roomPriceRepository.findByRoomTypeIdAndDate(2L, date)).thenReturn(Optional.of(roomPrice));
-    }
-
-    private void stubAvailability(LocalDate date, int available) {
-        RoomAvailability availability = new RoomAvailability();
-        availability.setAvailableRooms(available);
-        when(roomAvailabilityRepository.findByRoomTypeIdAndDate(2L, date)).thenReturn(Optional.of(availability));
-    }
-
-    private void stubFullyBookable() {
+    private void stubBookable() {
         when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
         when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
-        for (LocalDate date : List.of(
-                LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 11), LocalDate.of(2026, 9, 12),
-                LocalDate.of(2026, 9, 13), LocalDate.of(2026, 9, 14))) {
-            stubAvailability(date, 5);
-            stubPrice(date, "120.00", "EUR");
-        }
-        when(customerRepository.findById(3L)).thenReturn(Optional.of(customer));
+        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(0L);
         when(reservationRepository.save(any())).thenAnswer(inv -> {
             Reservation r = inv.getArgument(0);
             if (r.getId() == null) {
@@ -141,8 +116,9 @@ class ReservationServiceTest {
     }
 
     @Test
-    void createCalculatesTotalPriceFromDailyRates() {
-        stubFullyBookable();
+    void createCalculatesTotalPriceFromNightlyRate() {
+        stubBookable();
+        when(customerRepository.findById(3L)).thenReturn(Optional.of(customer));
 
         ReservationResponse response = reservationService.create(sampleRequest(), staff);
 
@@ -153,52 +129,10 @@ class ReservationServiceTest {
     }
 
     @Test
-    void createDecrementsAvailabilityForEachNight() {
-        when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
-        when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
-        List<RoomAvailability> availabilities = new ArrayList<>();
-        for (LocalDate date : List.of(
-                LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 11), LocalDate.of(2026, 9, 12),
-                LocalDate.of(2026, 9, 13), LocalDate.of(2026, 9, 14))) {
-            RoomAvailability availability = new RoomAvailability();
-            availability.setAvailableRooms(5);
-            when(roomAvailabilityRepository.findByRoomTypeIdAndDate(2L, date)).thenReturn(Optional.of(availability));
-            availabilities.add(availability);
-            stubPrice(date, "120.00", "EUR");
-        }
-        when(customerRepository.findById(3L)).thenReturn(Optional.of(customer));
-        when(reservationRepository.save(any())).thenAnswer(inv -> {
-            Reservation r = inv.getArgument(0);
-            if (r.getId() == null) {
-                r.setId(99L);
-            }
-            return r;
-        });
-
-        reservationService.create(sampleRequest(), staff);
-
-        assertThat(availabilities).allSatisfy(a -> assertThat(a.getAvailableRooms()).isEqualTo(4));
-    }
-
-    @Test
     void createUsesNewCustomerWhenNoCustomerIdProvided() {
-        when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
-        when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
-        for (LocalDate date : List.of(
-                LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 11), LocalDate.of(2026, 9, 12),
-                LocalDate.of(2026, 9, 13), LocalDate.of(2026, 9, 14))) {
-            stubAvailability(date, 5);
-            stubPrice(date, "120.00", "EUR");
-        }
+        stubBookable();
         CustomerRequest newCustomer = new CustomerRequest("Jane", "Doe", "+1 555", null, null, null, null);
         when(customerService.createEntity(newCustomer)).thenReturn(customer);
-        when(reservationRepository.save(any())).thenAnswer(inv -> {
-            Reservation r = inv.getArgument(0);
-            if (r.getId() == null) {
-                r.setId(99L);
-            }
-            return r;
-        });
 
         ReservationCreateRequest request = new ReservationCreateRequest(
                 1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, null, newCustomer);
@@ -244,31 +178,29 @@ class ReservationServiceTest {
     }
 
     @Test
-    void createRejectsWhenRoomNotAvailableOnSomeDate() {
+    void createRejectsWhenAllRoomsOfThatTypeAreBooked() {
+        roomType.setNumberOfRooms(1);
         when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
         when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
-        stubAvailability(LocalDate.of(2026, 9, 10), 5);
-        stubAvailability(LocalDate.of(2026, 9, 11), 0);
-
-        assertThatThrownBy(() -> reservationService.create(sampleRequest(), staff))
-                .isInstanceOf(InvalidReservationException.class)
-                .hasMessageContaining("2026-09-11");
-    }
-
-    @Test
-    void createRejectsWhenPriceMissingForSomeDate() {
-        when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
-        when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
-        for (LocalDate date : List.of(
-                LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 11), LocalDate.of(2026, 9, 12),
-                LocalDate.of(2026, 9, 13), LocalDate.of(2026, 9, 14))) {
-            stubAvailability(date, 5);
-        }
-        stubPrice(LocalDate.of(2026, 9, 10), "120.00", "EUR");
-        // no price stubbed for the remaining dates
+        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(1L);
 
         assertThatThrownBy(() -> reservationService.create(sampleRequest(), staff))
                 .isInstanceOf(InvalidReservationException.class);
+
+        verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    void createRejectsWhenNightlyPriceNotSet() {
+        roomType.setBasePrice(null);
+        when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
+        when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
+        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(0L);
+
+        assertThatThrownBy(() -> reservationService.create(sampleRequest(), staff))
+                .isInstanceOf(InvalidReservationException.class);
+
+        verify(reservationRepository, never()).save(any());
     }
 
     @Test
@@ -354,16 +286,15 @@ class ReservationServiceTest {
     }
 
     @Test
-    void rejectRestoresAvailability() {
+    void rejectTransitionsPendingToRejected() {
         Reservation reservation = fullReservation();
         when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
         when(hotelService.requireOwnHotelId(hotelAdmin)).thenReturn(1L);
-        List<RoomAvailability> availabilities = stubDistinctAvailabilityForStay(reservation, 4);
 
         ReservationResponse response = reservationService.reject(1L, hotelAdmin);
 
         assertThat(response.status()).isEqualTo(ReservationStatus.REJECTED);
-        assertThat(availabilities).allSatisfy(a -> assertThat(a.getAvailableRooms()).isEqualTo(5));
+        verify(historyRepository).save(any());
     }
 
     @Test
@@ -389,43 +320,33 @@ class ReservationServiceTest {
     }
 
     @Test
-    void cancelFromConfirmedRestoresAvailabilityAndRecordsHistory() {
+    void cancelFromConfirmedRecordsHistory() {
         Reservation reservation = fullReservation();
         reservation.setStatus(ReservationStatus.CONFIRMED);
         when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
-        List<RoomAvailability> availabilities = stubDistinctAvailabilityForStay(reservation, 4);
 
         ReservationResponse response = reservationService.cancel(1L, staff);
 
         assertThat(response.status()).isEqualTo(ReservationStatus.CANCELLED);
-        assertThat(availabilities).allSatisfy(a -> assertThat(a.getAvailableRooms()).isEqualTo(5));
         verify(historyRepository).save(any());
     }
 
-    private List<RoomAvailability> stubDistinctAvailabilityForStay(Reservation reservation, int startingCount) {
-        List<RoomAvailability> availabilities = new ArrayList<>();
-        for (LocalDate date = reservation.getCheckIn(); date.isBefore(reservation.getCheckOut()); date = date.plusDays(1)) {
-            RoomAvailability availability = new RoomAvailability();
-            availability.setAvailableRooms(startingCount);
-            when(roomAvailabilityRepository.findByRoomTypeIdAndDate(reservation.getRoomType().getId(), date))
-                    .thenReturn(Optional.of(availability));
-            availabilities.add(availability);
-        }
-        return availabilities;
-    }
-
     @Test
-    void searchAvailableRoomsFiltersByCapacityAvailabilityAndPrice() {
+    void searchAvailableRoomsFiltersByCapacityAndQuotesNightlyRate() {
         RoomType tooSmall = new RoomType();
         tooSmall.setId(5L);
         tooSmall.setHotel(hotel);
         tooSmall.setCapacity(1);
+        tooSmall.setNumberOfRooms(3);
+        tooSmall.setBasePrice(new BigDecimal("80.00"));
+        tooSmall.setCurrency("EUR");
+
+        roomType.setBasePrice(new BigDecimal("150.00"));
 
         when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
         when(roomTypeRepository.findByHotelId(1L)).thenReturn(List.of(roomType, tooSmall));
+        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(0L);
         LocalDate date = LocalDate.of(2026, 9, 10);
-        stubAvailability(date, 3);
-        stubPrice(date, "150.00", "EUR");
 
         List<AvailableRoomResponse> result = reservationService.searchAvailableRooms(
                 1L, date, date.plusDays(1), 2, staff);
@@ -433,6 +354,36 @@ class ReservationServiceTest {
         assertThat(result).hasSize(1);
         assertThat(result.get(0).roomTypeId()).isEqualTo(2L);
         assertThat(result.get(0).totalPrice()).isEqualByComparingTo("150.00");
+    }
+
+    @Test
+    void searchAvailableRoomsSkipsRoomTypesWithoutAPrice() {
+        roomType.setBasePrice(null);
+
+        when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
+        when(roomTypeRepository.findByHotelId(1L)).thenReturn(List.of(roomType));
+        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(0L);
+        LocalDate date = LocalDate.of(2026, 9, 10);
+
+        List<AvailableRoomResponse> result = reservationService.searchAvailableRooms(
+                1L, date, date.plusDays(1), 2, staff);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void searchAvailableRoomsExcludesFullyBookedRoomTypes() {
+        roomType.setNumberOfRooms(2);
+
+        when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
+        when(roomTypeRepository.findByHotelId(1L)).thenReturn(List.of(roomType));
+        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(2L);
+        LocalDate date = LocalDate.of(2026, 9, 10);
+
+        List<AvailableRoomResponse> result = reservationService.searchAvailableRooms(
+                1L, date, date.plusDays(1), 2, staff);
+
+        assertThat(result).isEmpty();
     }
 
     private Reservation fullReservation() {

@@ -56,7 +56,7 @@ class RoomTypeControllerTest {
 
     private RoomTypeResponse sampleResponse() {
         return new RoomTypeResponse(1L, 1L, "Deluxe Room", "Spacious room", 3, 5, "King Bed",
-                new BigDecimal("35.00"), List.of(), Instant.now(), Instant.now());
+                new BigDecimal("35.00"), new BigDecimal("120.00"), "EUR", List.of(), Instant.now(), Instant.now());
     }
 
     @Test

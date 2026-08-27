@@ -14,6 +14,8 @@ public record RoomTypeResponse(
         Integer numberOfRooms,
         String bedType,
         BigDecimal roomSize,
+        BigDecimal basePrice,
+        String currency,
         List<RoomImageResponse> images,
         Instant createdAt,
         Instant updatedAt) {
@@ -28,6 +30,8 @@ public record RoomTypeResponse(
                 roomType.getNumberOfRooms(),
                 roomType.getBedType(),
                 roomType.getRoomSize(),
+                roomType.getBasePrice(),
+                roomType.getCurrency(),
                 images,
                 roomType.getCreatedAt(),
                 roomType.getUpdatedAt());

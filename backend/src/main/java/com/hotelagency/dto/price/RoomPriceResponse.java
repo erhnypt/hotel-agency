@@ -1,20 +1,11 @@
 package com.hotelagency.dto.price;
 
-import com.hotelagency.entity.RoomPrice;
+import com.hotelagency.entity.RoomType;
 import java.math.BigDecimal;
-import java.time.Instant;
-import java.time.LocalDate;
 
-public record RoomPriceResponse(
-        Long id, Long roomTypeId, LocalDate date, BigDecimal price, String currency, Instant updatedAt) {
+public record RoomPriceResponse(Long roomTypeId, BigDecimal basePrice, String currency) {
 
-    public static RoomPriceResponse from(RoomPrice roomPrice) {
-        return new RoomPriceResponse(
-                roomPrice.getId(),
-                roomPrice.getRoomType().getId(),
-                roomPrice.getDate(),
-                roomPrice.getPrice(),
-                roomPrice.getCurrency(),
-                roomPrice.getUpdatedAt());
+    public static RoomPriceResponse from(RoomType roomType) {
+        return new RoomPriceResponse(roomType.getId(), roomType.getBasePrice(), roomType.getCurrency());
     }
 }

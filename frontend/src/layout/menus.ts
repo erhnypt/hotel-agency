@@ -29,7 +29,6 @@ export const HOTEL_MENU: MenuItem[] = [
   { label: 'Oda Tipleri', path: '/hotel/rooms' },
   { label: 'Hizmetler', path: '/hotel/services' },
   { label: 'Fiyatlar', path: '/hotel/prices' },
-  { label: 'Müsaitlik', path: '/hotel/availability' },
   { label: 'Rezervasyonlar', path: '/hotel/reservations' },
   { label: 'Ayarlar', path: '/hotel/settings' },
 ]

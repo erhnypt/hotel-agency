@@ -42,6 +42,13 @@ public class RoomType {
     @Column(name = "room_size")
     private BigDecimal roomSize;
 
+    /** Nightly rate charged for this room type. Null until the hotel sets a price. */
+    @Column(name = "base_price")
+    private BigDecimal basePrice;
+
+    @Column(name = "currency", nullable = false, length = 3)
+    private String currency = "EUR";
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

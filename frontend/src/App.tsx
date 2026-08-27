@@ -10,7 +10,6 @@ import { RoleShell } from './layout/RoleShell'
 import { AgencyAdminDashboard } from './pages/dashboard/AgencyAdminDashboard'
 import { AgencyStaffDashboard } from './pages/dashboard/AgencyStaffDashboard'
 import { HotelAdminDashboard } from './pages/dashboard/HotelAdminDashboard'
-import { AvailabilityPage } from './pages/availability/AvailabilityPage'
 import { CustomersPage } from './pages/customers/CustomersPage'
 import { HotelProfilePage } from './pages/hotelProfile/HotelProfilePage'
 import { HotelsPage } from './pages/hotels/HotelsPage'
@@ -62,7 +61,6 @@ function App() {
             <Route path="rooms" element={<RoomTypesPage />} />
             <Route path="services" element={<ServicesPage />} />
             <Route path="prices" element={<PricesPage />} />
-            <Route path="availability" element={<AvailabilityPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>

@@ -64,6 +64,7 @@ export function RoomTypesPage() {
               <th>Kapasite</th>
               <th>Yatak Tipi</th>
               <th>Oda Sayısı</th>
+              <th>Gecelik Fiyat</th>
               <th>m²</th>
               <th>Görseller</th>
               <th></th>
@@ -76,6 +77,9 @@ export function RoomTypesPage() {
                 <td>{roomType.capacity}</td>
                 <td>{roomType.bedType}</td>
                 <td>{roomType.numberOfRooms}</td>
+                <td>
+                  {roomType.basePrice != null ? `${roomType.basePrice} ${roomType.currency}` : '—'}
+                </td>
                 <td>{roomType.roomSize ?? '—'}</td>
                 <td>
                   <button type="button" className="btn btn--small" onClick={() => setImagesRoomType(roomType)}>
@@ -100,7 +104,7 @@ export function RoomTypesPage() {
             ))}
             {roomTypes.data.length === 0 && (
               <tr>
-                <td colSpan={7} className="data-table__empty">
+                <td colSpan={8} className="data-table__empty">
                   Henüz oda tipi yok.
                 </td>
               </tr>

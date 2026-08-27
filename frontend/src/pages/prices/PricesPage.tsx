@@ -1,28 +1,19 @@
 import axios from 'axios'
-import { useState, type FormEvent } from 'react'
+import { useEffect, useState, type FormEvent } from 'react'
 import { getMyHotel, listRoomTypes } from '../../api/hotels'
-import { deletePrice, listPrices, upsertPrice } from '../../api/prices'
+import { getPrice, setPrice } from '../../api/prices'
 import type { ApiErrorResponse } from '../../auth/types'
-import type { RoomPriceResponse } from '../../api/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
 import '../../components/crud.css'
 
 export function PricesPage() {
-  const [refreshKey, setRefreshKey] = useState(0)
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<number | null>(null)
-  const [editingPrice, setEditingPrice] = useState<RoomPriceResponse | null>(null)
-  const [date, setDate] = useState('')
-  const [price, setPrice] = useState('')
+  const [price, setPriceValue] = useState('')
   const [currency, setCurrency] = useState('EUR')
   const [error, setError] = useState<string | null>(null)
+  const [saved, setSaved] = useState(false)
   const [submitting, setSubmitting] = useState(false)
-
-  const resetForm = () => {
-    setEditingPrice(null)
-    setDate('')
-    setPrice('')
-  }
 
   const hotel = useAsync(getMyHotel, [])
   const roomTypes = useAsync(
@@ -32,12 +23,24 @@ export function PricesPage() {
 
   const roomTypeId = selectedRoomTypeId ?? roomTypes.data?.[0]?.id ?? null
 
-  const prices = useAsync(
-    () => (roomTypeId ? listPrices(roomTypeId) : Promise.resolve([])),
-    [roomTypeId, refreshKey],
-  )
-
-  const refresh = () => setRefreshKey((key) => key + 1)
+  useEffect(() => {
+    if (!roomTypeId) return
+    let active = true
+    setError(null)
+    setSaved(false)
+    getPrice(roomTypeId)
+      .then((p) => {
+        if (!active) return
+        setPriceValue(p.basePrice != null ? String(p.basePrice) : '')
+        setCurrency(p.currency || 'EUR')
+      })
+      .catch(() => {
+        if (active) setError('Fiyat yüklenemedi.')
+      })
+    return () => {
+      active = false
+    }
+  }, [roomTypeId])
 
   if (hotel.loading || roomTypes.loading) return <LoadingState />
   if (hotel.error) return <ErrorState message={hotel.error} />
@@ -47,11 +50,11 @@ export function PricesPage() {
     event.preventDefault()
     if (!roomTypeId) return
     setError(null)
+    setSaved(false)
     setSubmitting(true)
     try {
-      await upsertPrice(roomTypeId, { date, price: Number(price), currency })
-      resetForm()
-      refresh()
+      await setPrice(roomTypeId, { price: Number(price), currency })
+      setSaved(true)
     } catch (err) {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
@@ -61,19 +64,6 @@ export function PricesPage() {
     } finally {
       setSubmitting(false)
     }
-  }
-
-  const handleDelete = async (id: number) => {
-    await deletePrice(id)
-    if (editingPrice?.id === id) resetForm()
-    refresh()
-  }
-
-  const handleEdit = (p: RoomPriceResponse) => {
-    setEditingPrice(p)
-    setDate(p.date)
-    setPrice(String(p.price))
-    setCurrency(p.currency)
   }
 
   return (
@@ -86,13 +76,18 @@ export function PricesPage() {
         <p className="page-state">Fiyat girmek için önce bir oda tipi oluşturmalısınız.</p>
       ) : (
         <>
+          <p className="page-state">
+            Her oda tipi için tek bir gecelik fiyat girin. Rezervasyon tutarı bu fiyatın gece
+            sayısıyla çarpımıdır.
+          </p>
+
           <label className="select-field">
             <span>Oda Tipi</span>
             <select
               value={roomTypeId ?? ''}
               onChange={(e) => {
                 setSelectedRoomTypeId(Number(e.target.value))
-                resetForm()
+                setSaved(false)
               }}
             >
               {roomTypes.data?.map((rt) => (
@@ -105,17 +100,16 @@ export function PricesPage() {
 
           <form onSubmit={handleSubmit} className="inline-form">
             <label className="form-field">
-              <span>Tarih</span>
-              <input type="date" value={date} onChange={(e) => setDate(e.target.value)} required />
-            </label>
-            <label className="form-field">
-              <span>Fiyat</span>
+              <span>Gecelik Fiyat</span>
               <input
                 type="number"
                 min={0}
                 step="0.01"
                 value={price}
-                onChange={(e) => setPrice(e.target.value)}
+                onChange={(e) => {
+                  setPriceValue(e.target.value)
+                  setSaved(false)
+                }}
                 required
               />
             </label>
@@ -124,7 +118,10 @@ export function PricesPage() {
               <select
                 className="form-field__select--tiny"
                 value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
+                onChange={(e) => {
+                  setCurrency(e.target.value)
+                  setSaved(false)
+                }}
               >
                 <option value="TRY">TRY</option>
                 <option value="EUR">EUR</option>
@@ -132,60 +129,12 @@ export function PricesPage() {
               </select>
             </label>
             <button type="submit" className="btn btn--primary" disabled={submitting}>
-              {submitting ? 'Kaydediliyor...' : editingPrice ? 'Güncelle' : 'Ekle'}
+              {submitting ? 'Kaydediliyor...' : 'Kaydet'}
             </button>
-            {editingPrice && (
-              <button type="button" className="btn btn--small" onClick={resetForm}>
-                Vazgeç
-              </button>
-            )}
           </form>
 
           {error && <p className="form-error">{error}</p>}
-
-          {prices.loading && <LoadingState />}
-          {prices.error && <ErrorState message={prices.error} />}
-
-          {prices.data && (
-            <div className="data-table-wrapper"><table className="data-table">
-              <thead>
-                <tr>
-                  <th>Tarih</th>
-                  <th>Fiyat</th>
-                  <th>Para Birimi</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody>
-                {[...prices.data]
-                  .sort((a, b) => a.date.localeCompare(b.date))
-                  .map((p) => (
-                    <tr key={p.id} className={editingPrice?.id === p.id ? 'data-table__row--editing' : undefined}>
-                      <td>{p.date}</td>
-                      <td>{p.price}</td>
-                      <td>{p.currency}</td>
-                      <td>
-                        <div className="data-table__actions">
-                          <button type="button" className="btn btn--small" onClick={() => handleEdit(p)}>
-                            Düzenle
-                          </button>
-                          <button type="button" className="btn btn--small btn--danger" onClick={() => handleDelete(p.id)}>
-                            Sil
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                {prices.data.length === 0 && (
-                  <tr>
-                    <td colSpan={4} className="data-table__empty">
-                      Henüz fiyat girilmemiş.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table></div>
-          )}
+          {saved && <p className="form-success">Fiyat kaydedildi.</p>}
         </>
       )}
     </div>

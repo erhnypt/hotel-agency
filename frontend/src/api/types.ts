@@ -62,6 +62,8 @@ export interface RoomTypeResponse {
   numberOfRooms: number
   bedType: string
   roomSize: number | null
+  basePrice: number | null
+  currency: string
   images: RoomImageResponse[]
   createdAt: string
   updatedAt: string
@@ -95,31 +97,14 @@ export interface ServiceRequest {
 }
 
 export interface RoomPriceResponse {
-  id: number
   roomTypeId: number
-  date: string
-  price: number
+  basePrice: number | null
   currency: string
-  updatedAt: string
 }
 
 export interface RoomPriceRequest {
-  date: string
   price: number
   currency: string
-}
-
-export interface RoomAvailabilityResponse {
-  id: number
-  roomTypeId: number
-  date: string
-  availableRooms: number
-  updatedAt: string
-}
-
-export interface RoomAvailabilityRequest {
-  date: string
-  availableRooms: number
 }
 
 export interface AvailableRoomResponse {
