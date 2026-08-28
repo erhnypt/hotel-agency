@@ -1,5 +1,5 @@
 -- Second reset for a clean slate after this session's email/domain testing
--- (Domain Test Oteli, Cassidy Domain Test, etc.). Same shape as V13.
+-- (Domain Test Oteli, Domain Test 2, etc.). Same shape as V13.
 DELETE FROM reservation_status_history;
 DELETE FROM reservations;
 DELETE FROM room_images;

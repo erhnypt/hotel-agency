@@ -46,7 +46,7 @@ class PublicBookingRequestControllerTest {
         return """
                 {
                   "propertyId": "city-hotel",
-                  "propertyName": "Cassidy City Hotel",
+                  "propertyName": "Central City Hotel",
                   "hotelType": "City",
                   "countryCode": "PRT",
                   "countryName": "Portugal",

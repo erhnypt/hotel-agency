@@ -146,7 +146,7 @@ const tr: Dict = {
   'footer.staffLogin': 'Kurumsal Giriş',
 
   'about.title': 'Hakkımızda',
-  'about.lead': 'Cassidy Travel, gezginlerle otel ağı arasında duran bağımsız bir seyahat acentesidir.',
+  'about.lead': 'Gezginlerle otel ağı arasında duran bağımsız bir seyahat acentesiyiz.',
   'about.h1': 'Ne yapıyoruz',
   'about.p1':
     'Dünyanın dört bir yanından binlerce oteli tek bir yerde toplarız. Siz nereye gitmek istediğinizi söylersiniz; biz uygunluğu araştırır, fiyatı otelle görüşür ve rezervasyonun tamamlanmasını baştan sona takip ederiz. Aramızdaki fark, bir arama motoru değil, işi sizin adınıza yürüten bir ekip olmamızdır.',
@@ -202,7 +202,7 @@ const tr: Dict = {
 
   'privacy.title': 'Gizlilik Politikası',
   'privacy.lead':
-    "Bu sayfa, Cassidy Travel'ın rezervasyon talepleri kapsamında kişisel verileri nasıl işlediğini açıklar.",
+    "Bu sayfa, acentemizin rezervasyon talepleri kapsamında kişisel verileri nasıl işlediğini açıklar.",
   'privacy.h1': 'Hangi verileri topluyoruz',
   'privacy.p1':
     'Ana sayfadaki talep formundan yalnızca şu bilgileri alırız: ad soyad, e-posta adresi, telefon numarası, seçtiğiniz otel ve destinasyon, giriş/çıkış tarihleri, misafir sayısı ve varsa notunuz.',
@@ -221,10 +221,10 @@ const tr: Dict = {
 
   'terms.title': 'Kullanım Koşulları',
   'terms.lead':
-    'Cassidy Travel web sitesini ve talep hizmetini kullanırken aşağıdaki koşullar geçerlidir.',
+    'Web sitemizi ve talep hizmetini kullanırken aşağıdaki koşullar geçerlidir.',
   'terms.h1': 'Acentenin rolü',
   'terms.p1':
-    'Cassidy Travel, konaklamayı kendisi sağlamaz; gezginle otel arasında aracı bir seyahat acentesidir. Konaklama sözleşmesi sizinle otel arasında kurulur.',
+    'Acentemiz konaklamayı kendisi sağlamaz; gezginle otel arasında aracı bir seyahat acentesidir. Konaklama sözleşmesi sizinle otel arasında kurulur.',
   'terms.h2': 'Fiyatlar',
   'terms.p2':
     'Sitede gösterilen gecelik tutarlar göstergedir ve bağlayıcı bir teklif oluşturmaz. Kesin fiyat, tarihlerinize ve oda tipine göre otelden alınan teyitle birlikte bildirilir.',
@@ -236,7 +236,7 @@ const tr: Dict = {
     'Onaylanan rezervasyonların iptal ve değişiklik hakları, ilgili otelin koşullarına tabidir ve teyit e-postasında yer alır. İptal talebinizi bize ilettiğinizde süreci sizin adınıza yürütürüz.',
   'terms.h5': 'Sorumluluk',
   'terms.p5':
-    'Otelin sunduğu hizmetin niteliğinden otel sorumludur. Cassidy Travel, bilgilerin doğru ve güncel olması için makul özeni gösterir; otel kaynaklı değişiklik ve aksaklıklardan sorumlu tutulamaz.',
+    'Otelin sunduğu hizmetin niteliğinden otel sorumludur. Acentemiz, bilgilerin doğru ve güncel olması için makul özeni gösterir; otel kaynaklı değişiklik ve aksaklıklardan sorumlu tutulamaz.',
   'terms.h6': 'Değişiklikler',
   'terms.p6': 'Bu koşullar zaman zaman güncellenebilir. Güncel sürüm her zaman bu sayfada yayımlanır.',
 
@@ -376,7 +376,7 @@ const en: Dict = {
   'footer.staffLogin': 'Staff Login',
 
   'about.title': 'About Us',
-  'about.lead': 'Cassidy Travel is an independent travel agency between travellers and a hotel network.',
+  'about.lead': 'We are an independent travel agency between travellers and a hotel network.',
   'about.h1': 'What we do',
   'about.p1':
     'We bring thousands of hotels from around the world together in one place. You tell us where you want to go; we check availability, negotiate the price with the hotel and follow the booking through to completion. The difference is that we are not a search engine but a team that does the work on your behalf.',
@@ -432,7 +432,7 @@ const en: Dict = {
 
   'privacy.title': 'Privacy Policy',
   'privacy.lead':
-    'This page explains how Cassidy Travel processes personal data in the context of reservation requests.',
+    'This page explains how the agency processes personal data in the context of reservation requests.',
   'privacy.h1': 'What data we collect',
   'privacy.p1':
     'From the request form on the home page we only take: full name, email address, phone number, the hotel and destination you select, check-in/check-out dates, number of guests and your note if any.',
@@ -451,10 +451,10 @@ const en: Dict = {
 
   'terms.title': 'Terms of Use',
   'terms.lead':
-    'The following terms apply when you use the Cassidy Travel website and request service.',
+    'The following terms apply when you use this website and request service.',
   'terms.h1': 'The role of the agency',
   'terms.p1':
-    'Cassidy Travel does not provide the accommodation itself; it is a travel agency acting as an intermediary between the traveller and the hotel. The accommodation contract is between you and the hotel.',
+    'The agency does not provide the accommodation itself; it is a travel agency acting as an intermediary between the traveller and the hotel. The accommodation contract is between you and the hotel.',
   'terms.h2': 'Prices',
   'terms.p2':
     'The nightly amounts shown on the site are indicative and do not constitute a binding offer. The exact price is notified together with the confirmation obtained from the hotel for your dates and room type.',
@@ -466,7 +466,7 @@ const en: Dict = {
     'Cancellation and change rights for confirmed reservations are subject to the hotel\'s terms and are included in the confirmation email. When you send us your cancellation request, we handle the process on your behalf.',
   'terms.h5': 'Liability',
   'terms.p5':
-    'The hotel is responsible for the nature of the service it provides. Cassidy Travel takes reasonable care to keep information accurate and up to date; it cannot be held responsible for changes or disruptions originating from the hotel.',
+    'The hotel is responsible for the nature of the service it provides. The agency takes reasonable care to keep information accurate and up to date; it cannot be held responsible for changes or disruptions originating from the hotel.',
   'terms.h6': 'Changes',
   'terms.p6': 'These terms may be updated from time to time. The current version is always published on this page.',
 
@@ -606,7 +606,7 @@ const ru: Dict = {
   'footer.staffLogin': 'Вход для сотрудников',
 
   'about.title': 'О нас',
-  'about.lead': 'Cassidy Travel — независимое туристическое агентство между путешественниками и сетью отелей.',
+  'about.lead': 'Мы — независимое туристическое агентство между путешественниками и сетью отелей.',
   'about.h1': 'Чем мы занимаемся',
   'about.p1':
     'Мы собираем тысячи отелей со всего мира в одном месте. Вы говорите, куда хотите поехать; мы проверяем наличие мест, договариваемся с отелем о цене и доводим бронирование до конца. Отличие в том, что мы не поисковик, а команда, которая делает работу за вас.',
@@ -662,7 +662,7 @@ const ru: Dict = {
 
   'privacy.title': 'Политика конфиденциальности',
   'privacy.lead':
-    'На этой странице описано, как Cassidy Travel обрабатывает персональные данные в рамках заявок на бронирование.',
+    'На этой странице описано, как агентство обрабатывает персональные данные в рамках заявок на бронирование.',
   'privacy.h1': 'Какие данные мы собираем',
   'privacy.p1':
     'Из формы заявки на главной странице мы берём только: имя и фамилию, адрес эл. почты, номер телефона, выбранные вами отель и направление, даты заезда/выезда, число гостей и примечание, если оно есть.',
@@ -681,10 +681,10 @@ const ru: Dict = {
 
   'terms.title': 'Условия использования',
   'terms.lead':
-    'При использовании сайта и сервиса заявок Cassidy Travel действуют следующие условия.',
+    'При использовании сайта и сервиса заявок действуют следующие условия.',
   'terms.h1': 'Роль агентства',
   'terms.p1':
-    'Cassidy Travel не предоставляет проживание сам по себе; это туристическое агентство-посредник между путешественником и отелем. Договор на проживание заключается между вами и отелем.',
+    'Агентство не предоставляет проживание само по себе; это туристическое агентство-посредник между путешественником и отелем. Договор на проживание заключается между вами и отелем.',
   'terms.h2': 'Цены',
   'terms.p2':
     'Указанные на сайте суммы за ночь являются ориентировочными и не являются офертой. Точная цена сообщается вместе с подтверждением, полученным от отеля на ваши даты и тип номера.',
@@ -696,7 +696,7 @@ const ru: Dict = {
     'Права на отмену и изменение подтверждённых броней подчиняются условиям соответствующего отеля и указаны в письме с подтверждением. Когда вы направляете нам запрос на отмену, процесс мы ведём за вас.',
   'terms.h5': 'Ответственность',
   'terms.p5':
-    'За характер предоставляемой услуги отвечает отель. Cassidy Travel прилагает разумные усилия, чтобы информация была точной и актуальной; агентство не несёт ответственности за изменения и сбои, исходящие от отеля.',
+    'За характер предоставляемой услуги отвечает отель. Агентство прилагает разумные усилия, чтобы информация была точной и актуальной; агентство не несёт ответственности за изменения и сбои, исходящие от отеля.',
   'terms.h6': 'Изменения',
   'terms.p6': 'Эти условия могут время от времени обновляться. Актуальная версия всегда публикуется на этой странице.',
 
@@ -836,7 +836,7 @@ const de: Dict = {
   'footer.staffLogin': 'Mitarbeiter-Login',
 
   'about.title': 'Über uns',
-  'about.lead': 'Cassidy Travel ist eine unabhängige Reiseagentur zwischen Reisenden und einem Hotelnetzwerk.',
+  'about.lead': 'Wir sind eine unabhängige Reiseagentur zwischen Reisenden und einem Hotelnetzwerk.',
   'about.h1': 'Was wir tun',
   'about.p1':
     'Wir bringen Tausende Hotels aus aller Welt an einem Ort zusammen. Sie sagen uns, wohin Sie möchten; wir prüfen die Verfügbarkeit, verhandeln den Preis mit dem Hotel und begleiten die Buchung bis zum Abschluss. Der Unterschied: Wir sind keine Suchmaschine, sondern ein Team, das die Arbeit für Sie erledigt.',
@@ -892,7 +892,7 @@ const de: Dict = {
 
   'privacy.title': 'Datenschutz',
   'privacy.lead':
-    'Diese Seite erläutert, wie Cassidy Travel personenbezogene Daten im Rahmen von Reservierungsanfragen verarbeitet.',
+    'Diese Seite erläutert, wie die Agentur personenbezogene Daten im Rahmen von Reservierungsanfragen verarbeitet.',
   'privacy.h1': 'Welche Daten wir erheben',
   'privacy.p1':
     'Aus dem Anfrageformular auf der Startseite erheben wir nur: Vor- und Nachname, E-Mail-Adresse, Telefonnummer, das von Ihnen gewählte Hotel und Reiseziel, An-/Abreisedaten, Gästezahl und ggf. Ihre Anmerkung.',
@@ -911,10 +911,10 @@ const de: Dict = {
 
   'terms.title': 'Nutzungsbedingungen',
   'terms.lead':
-    'Für die Nutzung der Website und des Anfrageservice von Cassidy Travel gelten die folgenden Bedingungen.',
+    'Für die Nutzung der Website und des Anfrageservice gelten die folgenden Bedingungen.',
   'terms.h1': 'Die Rolle der Agentur',
   'terms.p1':
-    'Cassidy Travel stellt die Unterkunft nicht selbst bereit; es ist eine Reiseagentur als Vermittler zwischen Reisendem und Hotel. Der Beherbergungsvertrag kommt zwischen Ihnen und dem Hotel zustande.',
+    'Die Agentur stellt die Unterkunft nicht selbst bereit; sie ist eine Reiseagentur als Vermittler zwischen Reisendem und Hotel. Der Beherbergungsvertrag kommt zwischen Ihnen und dem Hotel zustande.',
   'terms.h2': 'Preise',
   'terms.p2':
     'Die auf der Website angezeigten Nachtpreise sind Richtwerte und stellen kein verbindliches Angebot dar. Der genaue Preis wird zusammen mit der vom Hotel für Ihre Daten und Ihren Zimmertyp erhaltenen Bestätigung mitgeteilt.',
@@ -926,7 +926,7 @@ const de: Dict = {
     'Storno- und Änderungsrechte für bestätigte Reservierungen unterliegen den Bedingungen des jeweiligen Hotels und sind in der Bestätigungs-E-Mail enthalten. Wenn Sie uns Ihre Stornoanfrage senden, übernehmen wir den Ablauf für Sie.',
   'terms.h5': 'Haftung',
   'terms.p5':
-    'Für die Art der erbrachten Leistung ist das Hotel verantwortlich. Cassidy Travel wendet angemessene Sorgfalt an, damit die Informationen korrekt und aktuell sind; für vom Hotel ausgehende Änderungen und Störungen kann die Agentur nicht verantwortlich gemacht werden.',
+    'Für die Art der erbrachten Leistung ist das Hotel verantwortlich. Die Agentur wendet angemessene Sorgfalt an, damit die Informationen korrekt und aktuell sind; für vom Hotel ausgehende Änderungen und Störungen kann die Agentur nicht verantwortlich gemacht werden.',
   'terms.h6': 'Änderungen',
   'terms.p6': 'Diese Bedingungen können von Zeit zu Zeit aktualisiert werden. Die aktuelle Fassung wird stets auf dieser Seite veröffentlicht.',
 
@@ -1066,7 +1066,7 @@ const es: Dict = {
   'footer.staffLogin': 'Acceso de personal',
 
   'about.title': 'Sobre nosotros',
-  'about.lead': 'Cassidy Travel es una agencia de viajes independiente entre viajeros y una red de hoteles.',
+  'about.lead': 'Somos una agencia de viajes independiente entre viajeros y una red de hoteles.',
   'about.h1': 'Qué hacemos',
   'about.p1':
     'Reunimos miles de hoteles de todo el mundo en un solo lugar. Tú nos dices adónde quieres ir; nosotros comprobamos la disponibilidad, negociamos el precio con el hotel y hacemos seguimiento de la reserva hasta completarla. La diferencia es que no somos un buscador, sino un equipo que hace el trabajo por ti.',
@@ -1122,7 +1122,7 @@ const es: Dict = {
 
   'privacy.title': 'Política de privacidad',
   'privacy.lead':
-    'Esta página explica cómo trata Cassidy Travel los datos personales en el contexto de las solicitudes de reserva.',
+    'Esta página explica cómo trata la agencia los datos personales en el contexto de las solicitudes de reserva.',
   'privacy.h1': 'Qué datos recogemos',
   'privacy.p1':
     'Del formulario de solicitud de la página de inicio solo tomamos: nombre y apellidos, correo electrónico, número de teléfono, el hotel y el destino que selecciones, fechas de entrada/salida, número de huéspedes y tu nota si la hay.',
@@ -1141,10 +1141,10 @@ const es: Dict = {
 
   'terms.title': 'Términos de uso',
   'terms.lead':
-    'Al usar el sitio web y el servicio de solicitudes de Cassidy Travel se aplican los siguientes términos.',
+    'Al usar el sitio web y el servicio de solicitudes se aplican los siguientes términos.',
   'terms.h1': 'El papel de la agencia',
   'terms.p1':
-    'Cassidy Travel no presta el alojamiento por sí misma; es una agencia de viajes que actúa como intermediaria entre el viajero y el hotel. El contrato de alojamiento se celebra entre tú y el hotel.',
+    'La agencia no presta el alojamiento por sí misma; es una agencia de viajes que actúa como intermediaria entre el viajero y el hotel. El contrato de alojamiento se celebra entre tú y el hotel.',
   'terms.h2': 'Precios',
   'terms.p2':
     'Los importes por noche mostrados en el sitio son orientativos y no constituyen una oferta vinculante. El precio exacto se comunica junto con la confirmación obtenida del hotel para tus fechas y tipo de habitación.',
@@ -1156,7 +1156,7 @@ const es: Dict = {
     'Los derechos de cancelación y cambio de las reservas confirmadas están sujetos a las condiciones del hotel correspondiente y figuran en el correo de confirmación. Cuando nos envías tu solicitud de cancelación, gestionamos el proceso por ti.',
   'terms.h5': 'Responsabilidad',
   'terms.p5':
-    'El hotel es responsable de la naturaleza del servicio que presta. Cassidy Travel pone un cuidado razonable en mantener la información exacta y actualizada; no se le puede responsabilizar de los cambios o incidencias que tengan su origen en el hotel.',
+    'El hotel es responsable de la naturaleza del servicio que presta. La agencia pone un cuidado razonable en mantener la información exacta y actualizada; no se le puede responsabilizar de los cambios o incidencias que tengan su origen en el hotel.',
   'terms.h6': 'Cambios',
   'terms.p6': 'Estos términos pueden actualizarse de vez en cuando. La versión vigente se publica siempre en esta página.',
 
@@ -1296,7 +1296,7 @@ const ar: Dict = {
   'footer.staffLogin': 'دخول الموظفين',
 
   'about.title': 'من نحن',
-  'about.lead': 'Cassidy Travel وكالة سفر مستقلة بين المسافرين وشبكة فنادق.',
+  'about.lead': 'نحن وكالة سفر مستقلة بين المسافرين وشبكة فنادق.',
   'about.h1': 'ماذا نفعل',
   'about.p1':
     'نجمع آلاف الفنادق من جميع أنحاء العالم في مكان واحد. أنت تخبرنا إلى أين تريد الذهاب؛ ونحن نتحقق من التوفر، ونتفاوض على السعر مع الفندق، ونتابع الحجز حتى اكتماله. الفرق أننا لسنا محرك بحث، بل فريق ينجز العمل نيابةً عنك.',
@@ -1352,7 +1352,7 @@ const ar: Dict = {
 
   'privacy.title': 'سياسة الخصوصية',
   'privacy.lead':
-    'توضح هذه الصفحة كيف تعالج Cassidy Travel البيانات الشخصية في سياق طلبات الحجز.',
+    'توضح هذه الصفحة كيف تعالج الوكالة البيانات الشخصية في سياق طلبات الحجز.',
   'privacy.h1': 'ما البيانات التي نجمعها',
   'privacy.p1':
     'من نموذج الطلب في الصفحة الرئيسية نأخذ فقط: الاسم الكامل، وعنوان البريد الإلكتروني، ورقم الهاتف، والفندق والوجهة اللذين تختارهما، وتواريخ الوصول/المغادرة، وعدد الضيوف، وملاحظتك إن وُجدت.',
@@ -1371,10 +1371,10 @@ const ar: Dict = {
 
   'terms.title': 'شروط الاستخدام',
   'terms.lead':
-    'تنطبق الشروط التالية عند استخدام موقع Cassidy Travel وخدمة الطلبات.',
+    'تنطبق الشروط التالية عند استخدام الموقع وخدمة الطلبات.',
   'terms.h1': 'دور الوكالة',
   'terms.p1':
-    'لا تقدّم Cassidy Travel الإقامة بنفسها؛ فهي وكالة سفر وسيطة بين المسافر والفندق. يُبرَم عقد الإقامة بينك وبين الفندق.',
+    'لا تقدّم الوكالة الإقامة بنفسها؛ فهي وكالة سفر وسيطة بين المسافر والفندق. يُبرَم عقد الإقامة بينك وبين الفندق.',
   'terms.h2': 'الأسعار',
   'terms.p2':
     'المبالغ الليلية المعروضة على الموقع تقديرية ولا تشكّل عرضًا مُلزِمًا. يُبلَّغ السعر الدقيق مع التأكيد المُستلَم من الفندق لتواريخك ونوع غرفتك.',
@@ -1386,7 +1386,7 @@ const ar: Dict = {
     'تخضع حقوق الإلغاء والتغيير للحجوزات المؤكدة لشروط الفندق المعني وهي مدرجة في رسالة التأكيد. عند إرسالك طلب الإلغاء إلينا، نتولى العملية نيابةً عنك.',
   'terms.h5': 'المسؤولية',
   'terms.p5':
-    'الفندق مسؤول عن طبيعة الخدمة التي يقدّمها. تبذل Cassidy Travel عناية معقولة للحفاظ على دقة المعلومات وحداثتها؛ ولا يمكن تحميلها مسؤولية التغييرات أو الأعطال الصادرة عن الفندق.',
+    'الفندق مسؤول عن طبيعة الخدمة التي يقدّمها. تبذل الوكالة عناية معقولة للحفاظ على دقة المعلومات وحداثتها؛ ولا يمكن تحميلها مسؤولية التغييرات أو الأعطال الصادرة عن الفندق.',
   'terms.h6': 'التغييرات',
   'terms.p6': 'قد تُحدَّث هذه الشروط من حين لآخر. تُنشَر النسخة الحالية دائمًا على هذه الصفحة.',
 

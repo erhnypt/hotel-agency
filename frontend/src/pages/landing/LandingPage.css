@@ -1,5 +1,5 @@
 /*
-  Cassidy Travel — public landing.
+  Public landing.
   Its own bright, holiday-energy world; deliberately unlike the dark operator
   panels. Shared tokens (--bg, --signal, --radius, --shadow, …) are re-scoped
   to a light palette on `.lp` so nested primitives (SearchSelect, BrandMark)

@@ -45,8 +45,6 @@ public class SecurityConfig {
 
     /** Production frontends that must always be allowed, regardless of the CORS_ORIGINS env var. */
     private static final List<String> ALWAYS_ALLOWED_ORIGINS = List.of(
-            "https://cassidy-travel.com",
-            "https://www.cassidy-travel.com",
             "https://travellsites.com",
             "https://www.travellsites.com",
             "https://hotel-agency-five.vercel.app");

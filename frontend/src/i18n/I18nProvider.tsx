@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 import { DICT, LANGS, RTL_LANGS, type Lang } from './dict'
 import { I18nContext } from './I18nContext'
 
-const STORAGE_KEY = 'cassidy.lang'
+const STORAGE_KEY = 'app.lang'
 
 function detectInitial(): Lang {
   try {

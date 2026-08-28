@@ -1,4 +1,4 @@
-# Test Credentials — hotelAcency Cassidy Travel
+# Test Credentials — hotelAcency
 
 Kayıtlı test hesapları ve oluşturma talimatları.
 
