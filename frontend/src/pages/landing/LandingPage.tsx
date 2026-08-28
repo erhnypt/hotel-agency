@@ -6,21 +6,20 @@ import type { ApiErrorResponse } from '../../auth/types'
 import { roleHomePath } from '../../auth/roleHome'
 import { useAuth } from '../../auth/useAuth'
 import { SearchSelect } from '../../components/SearchSelect'
+import { useT } from '../../i18n/useT'
 import { PublicFooter, PublicHeader } from '../public/PublicChrome'
 import { loadCatalog, type CatalogHotel, type HotelCatalog } from '../../data/catalog'
 import './LandingPage.css'
 
 const today = new Date().toISOString().slice(0, 10)
 const starLabel = (n: number | null) => (n ? '★'.repeat(n) : '')
-const hotelTypeLabel = (n: number | null) => (n ? `${n}★ Otel` : 'Otel')
+const hotelType = (n: number | null) => (n ? `${n}★` : 'Hotel')
 
 const UNSPLASH = (id: string, w: number) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=72`
 
 const HERO_IMG = UNSPLASH('1507525428034-b723cf961d3e', 1600)
 
-// Curated destination photography (Unsplash). Cities not listed fall back to a
-// gradient card. Illustrative only — not tied to any specific property.
 const DEST_PHOTOS: Record<string, string> = {
   'İstanbul': '1541432901042-2d8bd64b4a9b',
   'Londra': '1513635269975-59663e0ac1ad',
@@ -48,20 +47,12 @@ const DEST_PHOTOS: Record<string, string> = {
   'Sidney': '1506973035872-a4ec16b8e8d9',
   'Marakeş': '1597212618440-806262de4f6b',
 }
-const cityImg = (city: string) =>
-  DEST_PHOTOS[city] ? UNSPLASH(DEST_PHOTOS[city], 640) : null
+const cityImg = (city: string) => (DEST_PHOTOS[city] ? UNSPLASH(DEST_PHOTOS[city], 640) : null)
 
 const TRUST = [
+  { key: 1, icon: <path d="M4 7h16v10H4z M4 11h16 M8 15h4" /> },
   {
-    title: 'Ön ödeme yok',
-    body: 'Ödemeyi otelde yaparsınız. Biz uygunluğu ve en iyi fiyatı ayarlarız.',
-    icon: (
-      <path d="M4 7h16v10H4z M4 11h16 M8 15h4" />
-    ),
-  },
-  {
-    title: '24 saatte yanıt',
-    body: 'Talebiniz bir danışmana düşer, aynı iş günü içinde dönüş yapılır.',
+    key: 2,
     icon: (
       <>
         <circle cx="12" cy="12" r="8" />
@@ -70,8 +61,7 @@ const TRUST = [
     ),
   },
   {
-    title: 'Binlerce otel',
-    body: 'Şehir merkezinden sahil resort’a, dünyanın dört bir yanından seçenek.',
+    key: 3,
     icon: (
       <>
         <path d="M4 20V9l8-5 8 5v11" />
@@ -83,6 +73,7 @@ const TRUST = [
 
 export function LandingPage() {
   const { isAuthenticated, user } = useAuth()
+  const { t, lang } = useT()
 
   const [catalog, setCatalog] = useState<HotelCatalog | null>(null)
   const [catalogError, setCatalogError] = useState<string | null>(null)
@@ -106,8 +97,10 @@ export function LandingPage() {
   const searchRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    loadCatalog().then(setCatalog).catch((e) => setCatalogError(e.message ?? 'Katalog yüklenemedi.'))
-  }, [])
+    loadCatalog()
+      .then(setCatalog)
+      .catch(() => setCatalogError(t('landing.catalogError')))
+  }, [t])
 
   const items = useMemo(() => {
     if (!catalog) return []
@@ -161,7 +154,7 @@ export function LandingPage() {
       const created = await submitBookingRequest({
         propertyId: hotel.id,
         propertyName: hotel.name,
-        hotelType: hotelTypeLabel(hotel.stars),
+        hotelType: hotelType(hotel.stars),
         propertyCity: hotel.city,
         countryCode: hotel.iso2,
         countryName: hotel.country,
@@ -178,7 +171,7 @@ export function LandingPage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('Talep gönderilemedi. Lütfen tekrar deneyin.')
+        setError(t('landing.errorSubmit'))
       }
     } finally {
       setSubmitting(false)
@@ -201,8 +194,9 @@ export function LandingPage() {
   }
 
   const summary = hotel
-    ? `${hotel.name} · ${hotel.city} — ${checkIn} / ${checkOut}, ${guests} misafir`
+    ? `${hotel.name} · ${hotel.city} · ${checkIn} → ${checkOut} · ${guests}`
     : ''
+  const fromPrice = (price: number, currency: string) => t('landing.fromPrice', { price, currency })
 
   return (
     <div className="lp">
@@ -216,14 +210,14 @@ export function LandingPage() {
 
         <div className="lp-hero__inner">
           <h1 className="lp-hero__title">
-            Bir sonraki tatiliniz
+            {t('landing.heroTitle1')}
             <br />
-            <em>bir talep uzağınızda</em>
+            <em>{t('landing.heroTitle2')}</em>
           </h1>
           <p className="lp-hero__lede">
-            {catalog ? `${catalog.count.toLocaleString('tr-TR')} otel` : 'Binlerce otel'} arasından seçin,
-            gerisini Cassidy Travel danışmanları halletsin. Uygunluk ve fiyat teyidi 24 saat içinde,
-            ön ödemesiz.
+            {catalog
+              ? t('landing.heroLede', { count: catalog.count.toLocaleString(lang) })
+              : t('landing.heroLedeNoCount')}
           </p>
         </div>
 
@@ -242,22 +236,28 @@ export function LandingPage() {
                   />
                 </svg>
               </span>
-              <h2>Talebiniz alındı</h2>
+              <h2>{t('landing.doneTitle')}</h2>
               <p className="lp-done__ref">
-                Referans no <strong>#{reference}</strong>
+                {t('landing.doneRef')} <strong>#{reference}</strong>
               </p>
               <p className="lp-done__note">
-                {hotel?.name} — {hotel?.city}, {hotel?.country}. {checkIn} / {checkOut}, {guests} misafir.
-                E-postanıza bir onay göndereceğiz.
+                {t('landing.doneNote', {
+                  hotel: hotel?.name ?? '',
+                  city: hotel?.city ?? '',
+                  country: hotel?.country ?? '',
+                  checkIn,
+                  checkOut,
+                  guests,
+                })}
               </p>
               <button type="button" className="lp-btn lp-btn--ghost" onClick={reset}>
-                Yeni talep oluştur
+                {t('landing.newRequest')}
               </button>
             </div>
           ) : step === 'search' ? (
             <form className="lp-form" onSubmit={handleContinue}>
               <div className="lp-form__head">
-                <h2>Otel arayın</h2>
+                <h2>{t('landing.searchTitle')}</h2>
                 {cityFilter && (
                   <button type="button" className="lp-pill lp-pill--clear" onClick={() => setCityFilter(null)}>
                     {cityFilter}
@@ -267,11 +267,11 @@ export function LandingPage() {
               </div>
 
               <label className="lp-field lp-field--wide">
-                <span className="lp-field__label">Otel</span>
+                <span className="lp-field__label">{t('landing.fieldHotel')}</span>
                 {catalogError ? (
                   <span className="lp-inline-error">{catalogError}</span>
                 ) : !catalog ? (
-                  <span className="lp-loading">Oteller yükleniyor…</span>
+                  <span className="lp-loading">{t('landing.loadingHotels')}</span>
                 ) : (
                   <SearchSelect<CatalogHotel>
                     items={items}
@@ -280,21 +280,21 @@ export function LandingPage() {
                     getKey={(h) => h.id}
                     getLabel={(h) => h.name}
                     getMeta={(h) =>
-                      `${h.city}, ${h.country}${h.stars ? ` · ${starLabel(h.stars)}` : ''} · ${h.priceFrom} ${catalog.currency}'den`
+                      `${h.city}, ${h.country}${h.stars ? ` · ${starLabel(h.stars)}` : ''} · ${fromPrice(h.priceFrom, catalog.currency)}`
                     }
                     getSearchText={(h) => `${h.name} ${h.city} ${h.country}`}
-                    placeholder="Otel adı veya şehir…"
+                    placeholder={t('landing.searchPlaceholder')}
                   />
                 )}
               </label>
 
               <div className="lp-form__row">
                 <label className="lp-field">
-                  <span className="lp-field__label">Giriş</span>
+                  <span className="lp-field__label">{t('landing.fieldCheckIn')}</span>
                   <input type="date" min={today} value={checkIn} onChange={(e) => setCheckIn(e.target.value)} />
                 </label>
                 <label className="lp-field">
-                  <span className="lp-field__label">Çıkış</span>
+                  <span className="lp-field__label">{t('landing.fieldCheckOut')}</span>
                   <input
                     type="date"
                     min={checkIn || today}
@@ -303,23 +303,25 @@ export function LandingPage() {
                   />
                 </label>
                 <label className="lp-field lp-field--narrow">
-                  <span className="lp-field__label">Misafir</span>
+                  <span className="lp-field__label">{t('landing.fieldGuests')}</span>
                   <input type="number" min={1} value={guests} onChange={(e) => setGuests(e.target.value)} />
                 </label>
               </div>
 
               {estimate !== null && (
                 <p className="lp-estimate">
-                  <span>Tahmini tutar</span>
-                  <strong>~{estimate.toLocaleString('tr-TR')} {catalog?.currency}</strong>
-                  <span className="lp-estimate__note">{nights} gece · gösterge, teyitle kesinleşir</span>
+                  <span>{t('landing.estimate')}</span>
+                  <strong>
+                    ~{estimate.toLocaleString(lang)} {catalog?.currency}
+                  </strong>
+                  <span className="lp-estimate__note">{t('landing.estimateNote', { nights })}</span>
                 </p>
               )}
 
               {error && <p className="lp-inline-error">{error}</p>}
 
               <button type="submit" className="lp-btn lp-btn--block" disabled={!canContinue}>
-                Devam et
+                {t('landing.continue')}
               </button>
             </form>
           ) : (
@@ -332,41 +334,41 @@ export function LandingPage() {
                   setError(null)
                 }}
               >
-                ← Arama
+                {t('landing.backToSearch')}
               </button>
               <div className="lp-form__head">
-                <h2>İletişim bilgileriniz</h2>
+                <h2>{t('landing.contactTitle')}</h2>
               </div>
               <p className="lp-form__summary">{summary}</p>
 
               <label className="lp-field lp-field--wide">
-                <span className="lp-field__label">Ad Soyad</span>
+                <span className="lp-field__label">{t('landing.name')}</span>
                 <input value={name} onChange={(e) => setName(e.target.value)} required />
               </label>
               <div className="lp-form__row lp-form__row--2">
                 <label className="lp-field">
-                  <span className="lp-field__label">E-posta</span>
+                  <span className="lp-field__label">{t('landing.email')}</span>
                   <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
                 </label>
                 <label className="lp-field">
-                  <span className="lp-field__label">Telefon</span>
+                  <span className="lp-field__label">{t('landing.phone')}</span>
                   <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
                 </label>
               </div>
               <label className="lp-field lp-field--wide">
-                <span className="lp-field__label">Not (opsiyonel)</span>
+                <span className="lp-field__label">{t('landing.note')}</span>
                 <textarea
                   rows={3}
                   value={message}
                   onChange={(e) => setMessage(e.target.value)}
-                  placeholder="Oda tercihi, özel istekler…"
+                  placeholder={t('landing.notePlaceholder')}
                 />
               </label>
 
               {error && <p className="lp-inline-error">{error}</p>}
 
               <button type="submit" className="lp-btn lp-btn--block" disabled={submitting}>
-                {submitting ? 'Gönderiliyor…' : 'Talebi gönder'}
+                {submitting ? t('landing.submitting') : t('landing.submit')}
               </button>
             </form>
           )}
@@ -375,7 +377,7 @@ export function LandingPage() {
 
       {destinations.length > 0 && (
         <section className="lp-dest">
-          <h2 className="lp-dest__title">Popüler destinasyonlar</h2>
+          <h2 className="lp-dest__title">{t('landing.destTitle')}</h2>
           <div className="lp-dest__grid">
             {destinations.map((d) => {
               const img = cityImg(d.name)
@@ -398,7 +400,7 @@ export function LandingPage() {
                     <span className="lp-card__city">{d.name}</span>
                     <span className="lp-card__meta">
                       {d.country}
-                      {d.priceFrom != null && ` · ${d.priceFrom} EUR'den`}
+                      {d.priceFrom != null && ` · ${fromPrice(d.priceFrom, 'EUR')}`}
                     </span>
                   </span>
                 </button>
@@ -410,15 +412,12 @@ export function LandingPage() {
 
       <section className="lp-trust">
         <div className="lp-trust__lead">
-          <h2>Neden bir acente?</h2>
-          <p>
-            Yüzlerce otel arasından sizin adınıza karşılaştırır, pazarlığı yapar ve rezervasyonu
-            baştan sona takip ederiz. Siz sadece nereye gitmek istediğinizi söyleyin.
-          </p>
+          <h2>{t('landing.trustHeading')}</h2>
+          <p>{t('landing.trustLede')}</p>
         </div>
         <ul className="lp-trust__list">
-          {TRUST.map((t) => (
-            <li key={t.title} className="lp-trust__item">
+          {TRUST.map((item) => (
+            <li key={item.key} className="lp-trust__item">
               <svg
                 className="lp-trust__icon"
                 width="24"
@@ -431,11 +430,11 @@ export function LandingPage() {
                 strokeLinejoin="round"
                 aria-hidden="true"
               >
-                {t.icon}
+                {item.icon}
               </svg>
               <div>
-                <strong>{t.title}</strong>
-                <span>{t.body}</span>
+                <strong>{t(`landing.trust${item.key}Title`)}</strong>
+                <span>{t(`landing.trust${item.key}Body`)}</span>
               </div>
             </li>
           ))}
@@ -443,10 +442,10 @@ export function LandingPage() {
       </section>
 
       <section className="lp-band">
-        <h2>Aradığınız oteli bulamadınız mı?</h2>
-        <p>Aklınızdaki oteli veya bölgeyi yazın; danışmanlarımız sizin için araştırsın.</p>
+        <h2>{t('landing.bandTitle')}</h2>
+        <p>{t('landing.bandBody')}</p>
         <button type="button" className="lp-btn lp-btn--on-dark" onClick={focusSearch}>
-          Talep oluştur
+          {t('landing.bandCta')}
         </button>
       </section>
 

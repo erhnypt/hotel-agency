@@ -4,10 +4,13 @@ import { useAuth } from '../auth/useAuth'
 import { roleHomePath } from '../auth/roleHome'
 import { apiClient } from '../api/client'
 import { BrandMark } from '../components/BrandMark'
+import { LanguageSwitcher } from '../i18n/LanguageSwitcher'
+import { useT } from '../i18n/useT'
 import './LoginPage.css'
 
 export function HotelRegisterPage() {
   const { isAuthenticated, user } = useAuth()
+  const { t } = useT()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -44,7 +47,7 @@ export function HotelRegisterPage() {
       setRegistered(true)
     } catch (err: unknown) {
       const axiosError = err as { response?: { data?: { message?: string } }; message?: string }
-      setError(axiosError?.response?.data?.message ?? axiosError?.message ?? 'Bir hata oluştu.')
+      setError(axiosError?.response?.data?.message ?? axiosError?.message ?? t('register.error'))
     } finally {
       setSubmitting(false)
     }
@@ -55,14 +58,12 @@ export function HotelRegisterPage() {
       <div className="login-page">
         <div className="login-card">
           <BrandMark size={40} className="login-card__mark" />
-          <h1 className="login-card__title">Kaydınız Alındı</h1>
+          <h1 className="login-card__title">{t('register.doneTitle')}</h1>
           <p className="login-card__subtitle">
-            <strong>{formData.name}</strong> için otel başvurunuz alınmıştır. Başvurunuz acente ekibimiz
-            tarafından incelenmektedir; onay durumu <strong>{formData.email}</strong> adresine e-posta ile
-            bildirilecektir.
+            {t('register.doneBody', { name: formData.name, email: formData.email })}
           </p>
           <p className="login-card__footer">
-            Onaylandıktan sonra belirlediğiniz şifre ile <Link to="/login">giriş yapabilirsiniz</Link>.
+            {t('register.doneFooterPre')} <Link to="/login">{t('register.doneFooterLink')}</Link>.
           </p>
         </div>
       </div>
@@ -71,13 +72,16 @@ export function HotelRegisterPage() {
 
   return (
     <div className="login-page">
+      <div className="login-page__lang">
+        <LanguageSwitcher />
+      </div>
       <form className="login-card" onSubmit={handleSubmit}>
         <BrandMark size={40} className="login-card__mark" />
         <h1 className="login-card__brand">Cassidy Travel</h1>
-        <p className="login-card__subtitle">Yeni Otel Kaydı</p>
+        <p className="login-card__subtitle">{t('register.subtitle')}</p>
 
         <label className="login-field">
-          <span>Otel Adı *</span>
+          <span>{t('register.name')} *</span>
           <input
             type="text"
             name="name"
@@ -89,7 +93,7 @@ export function HotelRegisterPage() {
         </label>
 
         <label className="login-field">
-          <span>İletişim Kişi Adı *</span>
+          <span>{t('register.contactPerson')} *</span>
           <input
             type="text"
             name="contactPerson"
@@ -100,7 +104,7 @@ export function HotelRegisterPage() {
         </label>
 
         <label className="login-field">
-          <span>E-posta *</span>
+          <span>{t('register.email')} *</span>
           <input
             type="email"
             name="email"
@@ -111,7 +115,7 @@ export function HotelRegisterPage() {
         </label>
 
         <label className="login-field">
-          <span>Şifre (En az 8 karakter) *</span>
+          <span>{t('register.password')} *</span>
           <input
             type="password"
             name="password"
@@ -123,12 +127,12 @@ export function HotelRegisterPage() {
         </label>
 
         <label className="login-field">
-          <span>Telefon *</span>
+          <span>{t('register.phone')} *</span>
           <input type="tel" name="phone" value={formData.phone} onChange={handleChange} required />
         </label>
 
         <label className="login-field">
-          <span>Adres *</span>
+          <span>{t('register.address')} *</span>
           <input
             type="text"
             name="address"
@@ -139,12 +143,12 @@ export function HotelRegisterPage() {
         </label>
 
         <label className="login-field">
-          <span>Şehir *</span>
+          <span>{t('register.city')} *</span>
           <input type="text" name="city" value={formData.city} onChange={handleChange} required />
         </label>
 
         <label className="login-field">
-          <span>Ülke *</span>
+          <span>{t('register.country')} *</span>
           <input
             type="text"
             name="country"
@@ -155,13 +159,13 @@ export function HotelRegisterPage() {
         </label>
 
         <label className="login-field">
-          <span>Açıklama</span>
+          <span>{t('register.description')}</span>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
             rows={3}
-            placeholder="Otel hakkında kısa bilgi..."
+            placeholder={t('register.descriptionPlaceholder')}
           />
         </label>
 
@@ -172,11 +176,11 @@ export function HotelRegisterPage() {
         )}
 
         <button type="submit" className="login-card__submit" disabled={submitting}>
-          {submitting ? 'Kaydediliyor...' : 'Otel Kaydı Yap'}
+          {submitting ? t('register.submitting') : t('register.submit')}
         </button>
 
         <p className="login-card__footer">
-          Zaten hesabın var mı? <Link to="/login">Giriş Yap</Link>
+          {t('login.haveAccount')} <Link to="/login">{t('login.submit')}</Link>
         </p>
       </form>
     </div>

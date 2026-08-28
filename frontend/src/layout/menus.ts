@@ -1,36 +1,36 @@
 export interface MenuItem {
-  label: string
+  labelKey: string
   path: string
   end?: boolean
 }
 
 export const ADMIN_MENU: MenuItem[] = [
-  { label: 'Dashboard', path: '/admin', end: true },
-  { label: 'Oteller', path: '/admin/hotels' },
-  { label: 'Rezervasyonlar', path: '/admin/reservations', end: true },
-  { label: 'Yeni Rezervasyon', path: '/admin/reservations/new' },
-  { label: 'Talepler', path: '/admin/booking-requests' },
-  { label: 'Müşteriler', path: '/admin/customers' },
-  { label: 'Çalışanlar', path: '/admin/staff' },
-  { label: 'Ayarlar', path: '/admin/settings' },
+  { labelKey: 'nav.dashboard', path: '/admin', end: true },
+  { labelKey: 'nav.hotels', path: '/admin/hotels' },
+  { labelKey: 'nav.reservations', path: '/admin/reservations', end: true },
+  { labelKey: 'nav.newReservation', path: '/admin/reservations/new' },
+  { labelKey: 'nav.requests', path: '/admin/booking-requests' },
+  { labelKey: 'nav.customers', path: '/admin/customers' },
+  { labelKey: 'nav.staff', path: '/admin/staff' },
+  { labelKey: 'nav.settings', path: '/admin/settings' },
 ]
 
 export const STAFF_MENU: MenuItem[] = [
-  { label: 'Dashboard', path: '/staff', end: true },
-  { label: 'Oteller', path: '/staff/hotels' },
-  { label: 'Müşteriler', path: '/staff/customers' },
-  { label: 'Rezervasyonlar', path: '/staff/reservations', end: true },
-  { label: 'Yeni Rezervasyon', path: '/staff/reservations/new' },
-  { label: 'Talepler', path: '/staff/booking-requests' },
-  { label: 'Ayarlar', path: '/staff/settings' },
+  { labelKey: 'nav.dashboard', path: '/staff', end: true },
+  { labelKey: 'nav.hotels', path: '/staff/hotels' },
+  { labelKey: 'nav.customers', path: '/staff/customers' },
+  { labelKey: 'nav.reservations', path: '/staff/reservations', end: true },
+  { labelKey: 'nav.newReservation', path: '/staff/reservations/new' },
+  { labelKey: 'nav.requests', path: '/staff/booking-requests' },
+  { labelKey: 'nav.settings', path: '/staff/settings' },
 ]
 
 export const HOTEL_MENU: MenuItem[] = [
-  { label: 'Dashboard', path: '/hotel', end: true },
-  { label: 'Otel Profili', path: '/hotel/profile' },
-  { label: 'Oda Tipleri', path: '/hotel/rooms' },
-  { label: 'Hizmetler', path: '/hotel/services' },
-  { label: 'Fiyatlar', path: '/hotel/prices' },
-  { label: 'Rezervasyonlar', path: '/hotel/reservations' },
-  { label: 'Ayarlar', path: '/hotel/settings' },
+  { labelKey: 'nav.dashboard', path: '/hotel', end: true },
+  { labelKey: 'nav.hotelProfile', path: '/hotel/profile' },
+  { labelKey: 'nav.roomTypes', path: '/hotel/rooms' },
+  { labelKey: 'nav.services', path: '/hotel/services' },
+  { labelKey: 'nav.prices', path: '/hotel/prices' },
+  { labelKey: 'nav.reservations', path: '/hotel/reservations' },
+  { labelKey: 'nav.settings', path: '/hotel/settings' },
 ]

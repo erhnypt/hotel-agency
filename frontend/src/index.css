@@ -192,3 +192,28 @@ p {
 .gap-sm {
   gap: 1rem;
 }
+
+/* ---- RTL (Arabic) ---- */
+[dir='rtl'] body {
+  text-align: right;
+}
+[dir='rtl'] .lp-card__body,
+[dir='rtl'] .lp-hero__inner,
+[dir='rtl'] .lp-page,
+[dir='rtl'] .form-field,
+[dir='rtl'] .login-field {
+  text-align: right;
+}
+[dir='rtl'] .app-shell__nav-item,
+[dir='rtl'] .lp-prose ul,
+[dir='rtl'] .lp-prose ol {
+  text-align: right;
+}
+[dir='rtl'] .lp-prose ul,
+[dir='rtl'] .lp-prose ol {
+  padding-left: 0;
+  padding-right: 1.3em;
+}
+[dir='rtl'] .lang-switcher {
+  padding-inline: 12px 10px;
+}

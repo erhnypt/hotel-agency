@@ -8,11 +8,11 @@ import type { MenuItem } from './menus'
 
 export function RoleShell({
   role,
-  panelTitle,
+  panelTitleKey,
   menu,
 }: {
   role: RoleName
-  panelTitle: string
+  panelTitleKey: string
   menu: MenuItem[]
 }) {
   const { user } = useAuth()
@@ -22,8 +22,8 @@ export function RoleShell({
   }
 
   if (role === 'HOTEL_ADMIN') {
-    return <HotelAccessGate panelTitle={panelTitle} menu={menu} />
+    return <HotelAccessGate panelTitleKey={panelTitleKey} menu={menu} />
   }
 
-  return <AppShell panelTitle={panelTitle} menu={menu} />
+  return <AppShell panelTitleKey={panelTitleKey} menu={menu} />
 }

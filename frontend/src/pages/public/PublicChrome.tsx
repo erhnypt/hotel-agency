@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
 import { BrandMark } from '../../components/BrandMark'
+import { LanguageSwitcher } from '../../i18n/LanguageSwitcher'
+import { useT } from '../../i18n/useT'
 import '../landing/LandingPage.css'
 
 export const CONTACT = {
@@ -7,19 +9,22 @@ export const CONTACT = {
   phone: '+90 212 555 0 100',
   phoneHref: 'tel:+902125550100',
   email: 'merhaba@cassidy-travel.com',
-  hours: 'Hafta içi 09:00 – 18:00',
 }
 
 export function PublicHeader() {
+  const { t } = useT()
   return (
     <header className="lp-header">
-      <Link to="/" className="lp-brand" aria-label="Cassidy Travel ana sayfa">
+      <Link to="/" className="lp-brand" aria-label="Cassidy Travel">
         <BrandMark size={24} className="lp-brand__mark" />
         <span className="lp-brand__name">Cassidy Travel</span>
       </Link>
-      <Link to="/login" className="lp-header__login">
-        Kurumsal Giriş
-      </Link>
+      <div className="lp-header__right">
+        <LanguageSwitcher variant="light" />
+        <Link to="/login" className="lp-header__login">
+          {t('landing.loginCta')}
+        </Link>
+      </div>
     </header>
   )
 }
@@ -41,6 +46,7 @@ function SocialIcon({ name }: { name: 'instagram' | 'facebook' | 'x' }) {
 }
 
 export function PublicFooter() {
+  const { t } = useT()
   return (
     <footer className="lp-footer">
       <div className="lp-footer__grid">
@@ -49,10 +55,7 @@ export function PublicFooter() {
             <BrandMark size={20} className="lp-brand__mark" />
             <span className="lp-brand__name">Cassidy Travel</span>
           </div>
-          <p className="lp-footer__blurb">
-            Gezginlerle otel ağı arasında duran bağımsız seyahat acentesi. Uygunluğu araştırır,
-            fiyatı görüşür, rezervasyonu baştan sona biz takip ederiz.
-          </p>
+          <p className="lp-footer__blurb">{t('footer.blurb')}</p>
           <address className="lp-footer__address">
             {CONTACT.address.map((line) => (
               <span key={line}>{line}</span>
@@ -60,24 +63,24 @@ export function PublicFooter() {
           </address>
         </div>
 
-        <nav className="lp-footer__col" aria-label="Kurumsal">
-          <h3>Kurumsal</h3>
-          <Link to="/hakkimizda">Hakkımızda</Link>
-          <Link to="/iletisim">İletişim</Link>
-          <Link to="/sss">Sıkça Sorulan Sorular</Link>
+        <nav className="lp-footer__col" aria-label={t('footer.corporate')}>
+          <h3>{t('footer.corporate')}</h3>
+          <Link to="/hakkimizda">{t('footer.about')}</Link>
+          <Link to="/iletisim">{t('footer.contactPage')}</Link>
+          <Link to="/sss">{t('footer.faq')}</Link>
         </nav>
 
-        <nav className="lp-footer__col" aria-label="Yasal">
-          <h3>Yasal</h3>
-          <Link to="/gizlilik">Gizlilik Politikası</Link>
-          <Link to="/kosullar">Kullanım Koşulları</Link>
+        <nav className="lp-footer__col" aria-label={t('footer.legal')}>
+          <h3>{t('footer.legal')}</h3>
+          <Link to="/gizlilik">{t('footer.privacy')}</Link>
+          <Link to="/kosullar">{t('footer.terms')}</Link>
         </nav>
 
         <div className="lp-footer__col">
-          <h3>Bize Ulaşın</h3>
+          <h3>{t('footer.contact')}</h3>
           <a href={CONTACT.phoneHref}>{CONTACT.phone}</a>
           <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
-          <span className="lp-footer__muted">{CONTACT.hours}</span>
+          <span className="lp-footer__muted">{t('footer.hours')}</span>
           <div className="lp-footer__social">
             <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" aria-label="Instagram">
               <SocialIcon name="instagram" />
@@ -93,9 +96,9 @@ export function PublicFooter() {
       </div>
 
       <div className="lp-footer__bottom">
-        <span>© {new Date().getFullYear()} Cassidy Travel</span>
+        <span>{t('footer.rights', { year: new Date().getFullYear() })}</span>
         <Link to="/login" className="lp-footer__login">
-          Kurumsal Giriş
+          {t('footer.staffLogin')}
         </Link>
       </div>
     </footer>

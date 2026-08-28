@@ -3,11 +3,14 @@ import { Navigate, useNavigate, Link } from 'react-router-dom'
 import { roleHomePath } from '../auth/roleHome'
 import { useAuth } from '../auth/useAuth'
 import { BrandMark } from '../components/BrandMark'
+import { LanguageSwitcher } from '../i18n/LanguageSwitcher'
+import { useT } from '../i18n/useT'
 import './LoginPage.css'
 
 export function LoginPage() {
   const { isAuthenticated, user, login } = useAuth()
   const navigate = useNavigate()
+  const { t } = useT()
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -26,7 +29,7 @@ export function LoginPage() {
       const loggedInUser = await login(email, password)
       navigate(roleHomePath(loggedInUser.role), { replace: true })
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Giriş başarısız oldu.')
+      setError(err instanceof Error ? err.message : t('login.error'))
     } finally {
       setSubmitting(false)
     }
@@ -34,13 +37,16 @@ export function LoginPage() {
 
   return (
     <div className="login-page">
+      <div className="login-page__lang">
+        <LanguageSwitcher />
+      </div>
       <form className="login-card" onSubmit={handleSubmit}>
         <BrandMark size={40} className="login-card__mark" />
         <h1 className="login-card__brand">Cassidy Travel</h1>
-        <p className="login-card__subtitle">Hesabınıza giriş yapın</p>
+        <p className="login-card__subtitle">{t('login.subtitle')}</p>
 
         <label className="login-field">
-          <span>E-posta</span>
+          <span>{t('login.email')}</span>
           <input
             type="email"
             value={email}
@@ -52,7 +58,7 @@ export function LoginPage() {
         </label>
 
         <label className="login-field">
-          <span>Şifre</span>
+          <span>{t('login.password')}</span>
           <input
             type="password"
             value={password}
@@ -69,11 +75,11 @@ export function LoginPage() {
         )}
 
         <button type="submit" className="login-card__submit" disabled={submitting}>
-          {submitting ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+          {submitting ? t('login.submitting') : t('login.submit')}
         </button>
 
         <p className="login-card__footer">
-          Yeni otel kaydı? <Link to="/register">Kayıt Ol</Link>
+          {t('login.footer')} <Link to="/register">{t('login.register')}</Link>
         </p>
       </form>
     </div>

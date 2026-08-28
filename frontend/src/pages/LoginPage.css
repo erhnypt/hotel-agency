@@ -7,6 +7,13 @@
   box-sizing: border-box;
   background: var(--bg);
   background-image: radial-gradient(ellipse 620px 420px at 50% 50%, rgba(37, 99, 235, 0.06), transparent 70%);
+  position: relative;
+}
+
+.login-page__lang {
+  position: absolute;
+  top: 18px;
+  inset-inline-end: 20px;
 }
 
 .login-card {

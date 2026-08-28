@@ -40,7 +40,7 @@ function App() {
         <Route path="/register" element={<HotelRegisterPage />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/admin" element={<RoleShell role="AGENCY_ADMIN" panelTitle="Acente Admin Paneli" menu={ADMIN_MENU} />}>
+          <Route path="/admin" element={<RoleShell role="AGENCY_ADMIN" panelTitleKey="panel.admin" menu={ADMIN_MENU} />}>
             <Route index element={<AgencyAdminDashboard />} />
             <Route path="hotels" element={<HotelsPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
@@ -51,7 +51,7 @@ function App() {
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 
-          <Route path="/staff" element={<RoleShell role="AGENCY_STAFF" panelTitle="Acente Çalışanı Paneli" menu={STAFF_MENU} />}>
+          <Route path="/staff" element={<RoleShell role="AGENCY_STAFF" panelTitleKey="panel.staff" menu={STAFF_MENU} />}>
             <Route index element={<AgencyStaffDashboard />} />
             <Route path="hotels" element={<HotelsPage />} />
             <Route path="customers" element={<CustomersPage />} />
@@ -61,7 +61,7 @@ function App() {
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 
-          <Route path="/hotel" element={<RoleShell role="HOTEL_ADMIN" panelTitle="Otel Paneli" menu={HOTEL_MENU} />}>
+          <Route path="/hotel" element={<RoleShell role="HOTEL_ADMIN" panelTitleKey="panel.hotel" menu={HOTEL_MENU} />}>
             <Route index element={<HotelAdminDashboard />} />
             <Route path="profile" element={<HotelProfilePage />} />
             <Route path="rooms" element={<RoomTypesPage />} />
