@@ -33,7 +33,7 @@ class CustomerServiceTest {
     }
 
     private CustomerRequest sampleRequest() {
-        return new CustomerRequest("John", "Smith", "+1 555 000", "john@example.com", "P1234567", "US", "VIP guest", "John Smith", "VISA", "4242424242424242", "12/29", "Kapıda ödeme", "Kapıda ödeme 2");
+        return new CustomerRequest("John", "Smith", "+1 555 000", "john@example.com", "P1234567", "US", "VIP guest", "John Smith", "VISA", "4242424242424242", "12/29", "Kapıda ödeme");
     }
 
     @Test
@@ -85,7 +85,7 @@ class CustomerServiceTest {
         when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
 
         CustomerResponse response = customerService.update(
-                1L, new CustomerRequest("Jonathan", "Smith", "+1 555 111", null, null, null, "Updated notes", null, null, null, null, null, null));
+                1L, new CustomerRequest("Jonathan", "Smith", "+1 555 111", null, null, null, "Updated notes", null, null, null, null, null));
 
         assertThat(response.firstName()).isEqualTo("Jonathan");
         assertThat(response.phone()).isEqualTo("+1 555 111");

@@ -126,7 +126,6 @@ export interface CardOnFile {
   cardNumber: string | null
   cardExpiry: string | null
   cardNote: string | null
-  cardNote2: string | null
 }
 
 export interface CustomerSummary extends CardOnFile {
@@ -163,7 +162,6 @@ export interface CustomerRequest {
   cardNumber?: string | null
   cardExpiry?: string | null
   cardNote?: string | null
-  cardNote2?: string | null
 }
 
 export interface ReservationCreateRequest {

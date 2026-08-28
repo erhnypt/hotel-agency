@@ -70,12 +70,6 @@ export function CustomersPage() {
                       <span className="data-table__muted">Not: {customer.cardNote}</span>
                     </>
                   )}
-                  {customer.cardNote2 && (
-                    <>
-                      <br />
-                      <span className="data-table__muted">Not 2: {customer.cardNote2}</span>
-                    </>
-                  )}
                 </td>
                 <td>
                   <div className="data-table__actions">
