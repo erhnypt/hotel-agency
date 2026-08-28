@@ -42,7 +42,6 @@ export function LoginPage() {
       </div>
       <form className="login-card" onSubmit={handleSubmit}>
         <BrandMark size={40} className="login-card__mark" />
-        <h1 className="login-card__brand">Cassidy Travel</h1>
         <p className="login-card__subtitle">{t('login.subtitle')}</p>
 
         <label className="login-field">
