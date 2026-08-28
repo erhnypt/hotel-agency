@@ -1,12 +1,14 @@
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.65);
+  background: rgba(6, 10, 24, 0.7);
+  backdrop-filter: blur(3px);
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 24px;
   z-index: 100;
+  animation: rise-in 200ms var(--ease) both;
 }
 
 .modal {
@@ -16,7 +18,7 @@
   overflow-y: auto;
   background: var(--bg-panel);
   border: 1px solid var(--border-strong);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
   box-shadow: var(--shadow);
   box-sizing: border-box;
 }
@@ -27,20 +29,20 @@
   justify-content: space-between;
   padding: 20px 22px;
   border-bottom: 1px solid var(--border);
-  background: var(--bg-panel-2);
-  border-radius: var(--radius) var(--radius) 0 0;
+  background: linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
   position: relative;
 }
 
 .modal__header::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -1px;
   left: 0;
   right: 0;
-  height: 1px;
-  background: linear-gradient(to right, transparent, var(--signal) 20%, var(--signal) 80%, transparent);
-  opacity: 0.15;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--c-indigo) 25%, var(--c-violet) 50%, var(--c-teal) 75%, transparent);
+  opacity: 0.6;
 }
 
 .modal__title {

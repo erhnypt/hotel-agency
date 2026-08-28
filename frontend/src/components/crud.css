@@ -27,13 +27,13 @@
 .page-header h2::before {
   content: '';
   display: inline-flex;
-  margin-right: 6px;
-  width: 10px;
-  height: 10px;
-  border: 1px solid var(--signal);
-  border-right: none;
-  border-bottom: none;
-  opacity: 0.3;
+  margin-right: 8px;
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  background: var(--signal-gradient);
+  transform: rotate(45deg);
+  box-shadow: 0 2px 8px -2px rgba(109, 118, 245, 0.6);
 }
 
 .btn {
@@ -46,31 +46,33 @@
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
-  transition: all 150ms ease;
+  transition: all 160ms var(--ease);
 }
 
 .btn:hover {
   border-color: var(--signal);
-  color: var(--signal);
+  color: var(--text-h);
   background: var(--signal-bg);
+  transform: translateY(-1px);
 }
 
 .btn:disabled {
   opacity: 0.45;
   cursor: not-allowed;
+  transform: none;
 }
 
 .btn--primary {
-  border-color: var(--signal);
-  background: var(--signal);
-  color: var(--text-h);
+  border: 1px solid transparent;
+  background: var(--signal-gradient);
+  color: var(--signal-ink);
+  font-weight: 600;
 }
 
 .btn--primary:hover {
-  background: var(--signal-hover);
-  border-color: var(--signal-hover);
-  color: var(--text-h);
+  color: var(--signal-ink);
   transform: translateY(-1px);
+  box-shadow: var(--shadow-signal);
 }
 
 .btn--danger {
@@ -94,7 +96,8 @@
   width: 100%;
   overflow-x: auto;
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
 }
 
 .data-table {
@@ -107,11 +110,11 @@
 
 .data-table th {
   text-align: left;
-  padding: 12px 14px;
-  border-bottom: 1px solid var(--border);
-  background: var(--bg-panel-2);
-  color: var(--text-dim);
-  font-weight: 500;
+  padding: 13px 14px;
+  border-bottom: 2px solid var(--border-strong);
+  background: linear-gradient(180deg, var(--bg-panel-2), var(--bg-panel));
+  color: var(--text);
+  font-weight: 600;
   font-size: 10.5px;
   font-family: var(--mono);
   text-transform: uppercase;
@@ -129,12 +132,17 @@
   border-bottom: none;
 }
 
+.data-table tbody tr {
+  transition: background 140ms var(--ease);
+}
+
 .data-table tbody tr:hover td {
-  background: rgba(37, 99, 235, 0.03);
+  background: var(--signal-bg);
 }
 
 .data-table__row--editing td {
   background: var(--signal-bg);
+  box-shadow: inset 3px 0 0 var(--signal);
 }
 
 .data-table__actions {
@@ -175,9 +183,11 @@
 
 .form-fieldset {
   border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border-left: 3px solid var(--c-violet);
+  border-radius: 0 var(--radius) var(--radius) 0;
   padding: 14px 16px 2px;
   margin: 8px 0 18px;
+  background: rgba(109, 118, 245, 0.04);
 }
 
 .form-fieldset legend {
@@ -222,7 +232,7 @@
 .form-field select:focus {
   outline: none;
   border-color: var(--signal);
-  box-shadow: 0 0 0 3px var(--signal-bg);
+  box-shadow: 0 0 0 3px var(--signal-bg), var(--shadow-sm);
 }
 
 .form-field input:disabled,

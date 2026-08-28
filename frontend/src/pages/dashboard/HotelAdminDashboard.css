@@ -11,8 +11,8 @@
 .hotel-dashboard__hotel-name::before {
   content: '';
   display: inline-block;
-  width: 3px;
-  height: 15px;
-  background: var(--signal);
-  border-radius: 1px;
+  width: 4px;
+  height: 16px;
+  background: var(--signal-gradient);
+  border-radius: 2px;
 }

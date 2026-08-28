@@ -1,16 +1,30 @@
 .app-shell {
   display: flex;
   min-height: 100svh;
-  background: var(--bg);
+  background: transparent;
 }
 
 .app-shell__sidebar {
   flex-shrink: 0;
-  width: 232px;
+  width: 236px;
   padding: 20px 14px;
-  background: var(--bg-panel-2);
+  background:
+    linear-gradient(180deg, var(--bg-panel-2) 0%, var(--bg-panel) 55%, var(--bg) 100%);
   border-right: 1px solid var(--border);
   box-sizing: border-box;
+  position: relative;
+}
+
+.app-shell__sidebar::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -1px;
+  bottom: 0;
+  width: 1px;
+  background: linear-gradient(180deg, transparent, var(--signal) 30%, var(--c-violet) 70%, transparent);
+  opacity: 0.4;
+  pointer-events: none;
 }
 
 .app-shell__brand {
@@ -22,7 +36,10 @@
   font-weight: 600;
   letter-spacing: 0.14em;
   text-transform: uppercase;
-  color: var(--signal);
+  background: var(--signal-gradient);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .app-shell__brand small {
@@ -34,12 +51,13 @@
   letter-spacing: 0.01em;
   text-transform: none;
   color: var(--text-dim);
+  -webkit-text-fill-color: var(--text-dim);
 }
 
 .app-shell__nav {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 3px;
   counter-reset: lane;
 }
 
@@ -48,11 +66,12 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: 9px 10px;
+  padding: 9px 12px;
   border-radius: var(--radius);
   font-size: 13.5px;
   color: var(--text);
   text-decoration: none;
+  transition: background 160ms var(--ease), color 160ms var(--ease), transform 160ms var(--ease);
 }
 
 .app-shell__nav-item::before {
@@ -62,22 +81,25 @@
   font-family: var(--mono);
   font-size: 10.5px;
   color: var(--text-dim);
+  transition: color 160ms var(--ease);
 }
 
 .app-shell__nav-item:hover {
-  background: rgba(37, 99, 235, 0.05);
+  background: var(--signal-bg);
   color: var(--text-h);
+  transform: translateX(2px);
 }
 
-.app-shell__nav-item--active {
-  background: var(--signal-bg);
-  color: var(--signal);
-  border-bottom: 2px solid var(--signal);
-  padding-bottom: 7px;
+.app-shell__nav-item--active,
+.app-shell__nav-item--active:hover {
+  background: var(--signal-gradient);
+  color: var(--signal-ink);
+  transform: none;
+  box-shadow: var(--shadow-signal);
 }
 
 .app-shell__nav-item--active::before {
-  color: var(--signal);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .app-shell__main {
@@ -91,7 +113,7 @@
   justify-content: space-between;
   gap: 20px;
   padding: 20px 32px;
-  background: var(--bg-panel);
+  background: linear-gradient(180deg, var(--bg-panel) 0%, var(--bg-panel-2) 100%);
   border-bottom: 1px solid var(--border);
   position: relative;
 }
@@ -99,12 +121,21 @@
 .app-shell__header::after {
   content: '';
   position: absolute;
-  bottom: 0;
+  bottom: -1px;
   left: 0;
   right: 0;
-  height: 1px;
-  background: linear-gradient(to right, transparent, var(--signal) 20%, var(--signal) 80%, transparent);
-  opacity: 0.1;
+  height: 2px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--c-indigo) 22%,
+    var(--c-violet) 45%,
+    var(--c-teal) 68%,
+    transparent
+  );
+  background-size: 220% 100%;
+  opacity: 0.55;
+  animation: shimmer-x 9s linear infinite;
 }
 
 .app-shell__title {
@@ -132,15 +163,18 @@
   color: var(--text-h);
   font-size: 13px;
   cursor: pointer;
+  transition: border-color 150ms var(--ease), color 150ms var(--ease), background 150ms var(--ease);
 }
 
 .app-shell__logout:hover {
   border-color: var(--danger-border);
   color: var(--danger);
+  background: var(--danger-bg);
 }
 
 .app-shell__content {
   padding: 32px;
+  animation: rise-in 440ms var(--ease) both;
 }
 
 @media (max-width: 760px) {
@@ -155,6 +189,17 @@
     display: flex;
     align-items: center;
     gap: 16px;
+    background: linear-gradient(90deg, var(--bg-panel-2), var(--bg-panel));
+  }
+
+  .app-shell__sidebar::after {
+    top: auto;
+    right: 0;
+    left: 0;
+    bottom: -1px;
+    width: auto;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--signal) 30%, var(--c-violet) 70%, transparent);
   }
 
   .app-shell__brand {
@@ -174,6 +219,10 @@
 
   .app-shell__nav-item {
     flex-shrink: 0;
+  }
+
+  .app-shell__nav-item:hover {
+    transform: none;
   }
 
   .app-shell__header {
