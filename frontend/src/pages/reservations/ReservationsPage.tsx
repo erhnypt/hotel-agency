@@ -115,6 +115,12 @@ export function ReservationsPage() {
                     <span className="data-table__muted">SKT {r.customer.cardExpiry}</span>
                   </>
                 )}
+                {r.customer.cardNote && (
+                  <>
+                    <br />
+                    <span className="data-table__muted">Not: {r.customer.cardNote}</span>
+                  </>
+                )}
               </td>
               <td>{r.checkIn}</td>
               <td>{r.checkOut}</td>

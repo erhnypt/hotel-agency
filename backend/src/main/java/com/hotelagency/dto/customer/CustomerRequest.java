@@ -17,5 +17,6 @@ public record CustomerRequest(
         @Size(max = 255) String cardHolder,
         @Size(max = 20) String cardBrand,
         @Pattern(regexp = "\\d{12,19}", message = "cardNumber must be 12-19 digits") String cardNumber,
-        @Pattern(regexp = "(0[1-9]|1[0-2])/\\d{2}", message = "cardExpiry must be MM/YY") String cardExpiry) {
+        @Pattern(regexp = "(0[1-9]|1[0-2])/\\d{2}", message = "cardExpiry must be MM/YY") String cardExpiry,
+        @Size(max = 255) String cardNote) {
 }

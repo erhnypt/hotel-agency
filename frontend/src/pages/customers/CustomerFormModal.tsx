@@ -26,6 +26,7 @@ export function CustomerFormModal({
   const [cardHolder, setCardHolder] = useState(customer?.cardHolder ?? '')
   const [cardNumber, setCardNumber] = useState(customer?.cardNumber ?? '')
   const [cardExpiry, setCardExpiry] = useState(customer?.cardExpiry ?? '')
+  const [cardNote, setCardNote] = useState(customer?.cardNote ?? '')
 
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
@@ -66,6 +67,7 @@ export function CustomerFormModal({
         cardBrand: digits ? brand : null,
         cardNumber: digits || null,
         cardExpiry: expiry,
+        cardNote: cardNote.trim() || null,
       })
     } catch (err) {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
@@ -141,6 +143,16 @@ export function CustomerFormModal({
               onChange={(e) => handleExpiry(e.target.value)}
               placeholder="12/29"
               maxLength={5}
+            />
+          </label>
+          <label className="form-field">
+            <span>Kart Notu</span>
+            <input
+              type="text"
+              value={cardNote}
+              onChange={(e) => setCardNote(e.target.value)}
+              maxLength={255}
+              placeholder="Kısa not (ör. kapıda ödeme)"
             />
           </label>
         </fieldset>

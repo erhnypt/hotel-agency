@@ -62,7 +62,15 @@ export function CustomersPage() {
                 <td>{customer.phone}</td>
                 <td>{customer.email ?? '—'}</td>
                 <td>{customer.nationality ?? '—'}</td>
-                <td>{cardLabel(customer.cardBrand, customer.cardNumber) ?? '—'}</td>
+                <td>
+                  {cardLabel(customer.cardBrand, customer.cardNumber) ?? '—'}
+                  {customer.cardNote && (
+                    <>
+                      <br />
+                      <span className="data-table__muted">Not: {customer.cardNote}</span>
+                    </>
+                  )}
+                </td>
                 <td>
                   <div className="data-table__actions">
                     <button type="button" className="btn btn--small" onClick={() => setEditingCustomer(customer)}>

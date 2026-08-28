@@ -50,7 +50,7 @@ class ReservationControllerTest {
 
     private ReservationResponse sampleResponse(ReservationStatus status) {
         CustomerResponse customer = new CustomerResponse(3L, "John", "Smith", "+1 555", "john@example.com",
-                null, null, null, null, null, null, null, Instant.now(), Instant.now());
+                null, null, null, null, null, null, null, null, Instant.now(), Instant.now());
         return new ReservationResponse(1L, "RES-100001", 1L, "Grand Hotel", 2L, "Deluxe Room", customer,
                 LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, new BigDecimal("600.00"), "EUR",
                 status, 99L, Instant.now(), Instant.now());

@@ -61,6 +61,7 @@ public class CustomerService {
         customer.setCardBrand(blankToNull(request.cardBrand()));
         customer.setCardNumber(blankToNull(request.cardNumber()));
         customer.setCardExpiry(blankToNull(request.cardExpiry()));
+        customer.setCardNote(blankToNull(request.cardNote()));
     }
 
     private static String blankToNull(String value) {

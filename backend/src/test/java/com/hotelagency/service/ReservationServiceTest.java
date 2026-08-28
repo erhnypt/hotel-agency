@@ -131,7 +131,7 @@ class ReservationServiceTest {
     @Test
     void createUsesNewCustomerWhenNoCustomerIdProvided() {
         stubBookable();
-        CustomerRequest newCustomer = new CustomerRequest("Jane", "Doe", "+1 555", null, null, null, null, null, null, null, null);
+        CustomerRequest newCustomer = new CustomerRequest("Jane", "Doe", "+1 555", null, null, null, null, null, null, null, null, null);
         when(customerService.createEntity(newCustomer)).thenReturn(customer);
 
         ReservationCreateRequest request = new ReservationCreateRequest(

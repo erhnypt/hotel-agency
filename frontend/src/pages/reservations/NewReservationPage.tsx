@@ -39,6 +39,7 @@ export function NewReservationPage() {
   const [newCardHolder, setNewCardHolder] = useState('')
   const [newCardNumber, setNewCardNumber] = useState('')
   const [newCardExpiry, setNewCardExpiry] = useState('')
+  const [newCardNote, setNewCardNote] = useState('')
 
   const [submitting, setSubmitting] = useState(false)
   const [submitError, setSubmitError] = useState<string | null>(null)
@@ -80,6 +81,7 @@ export function NewReservationPage() {
     setNewCardHolder('')
     setNewCardNumber('')
     setNewCardExpiry('')
+    setNewCardNote('')
     setNewFirstName('')
     setNewLastName('')
     setNewPhone('')
@@ -113,6 +115,7 @@ export function NewReservationPage() {
                 cardExpiry: /^(0[1-9]|1[0-2])\/\d{2}$/.test(newCardExpiry.trim())
                   ? newCardExpiry.trim()
                   : null,
+                cardNote: newCardNote.trim() || null,
               }
             : null,
       })
@@ -304,6 +307,16 @@ export function NewReservationPage() {
         setNewCardExpiry(d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d)
       }}
       placeholder="12/29"
+    />
+  </label>
+  <label className="form-field">
+    <span>Kart Notu</span>
+    <input
+      type="text"
+      maxLength={255}
+      value={newCardNote}
+      onChange={(e) => setNewCardNote(e.target.value)}
+      placeholder="Kısa not (ör. kapıda ödeme)"
     />
   </label>
 </fieldset>
