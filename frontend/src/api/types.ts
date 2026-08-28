@@ -119,11 +119,11 @@ export interface AvailableRoomResponse {
 
 export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'CANCELLED'
 
-/** Masked card on file. No full number, no CVV — ever. */
+/** Card on file (school project). Full number is stored; CVV never is. */
 export interface CardOnFile {
   cardHolder: string | null
   cardBrand: string | null
-  cardLast4: string | null
+  cardNumber: string | null
   cardExpiry: string | null
 }
 
@@ -158,7 +158,7 @@ export interface CustomerRequest {
   notes?: string | null
   cardHolder?: string | null
   cardBrand?: string | null
-  cardLast4?: string | null
+  cardNumber?: string | null
   cardExpiry?: string | null
 }
 

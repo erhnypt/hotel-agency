@@ -40,15 +40,15 @@ public class Customer {
     @Column(name = "notes")
     private String notes;
 
-    /** Card on file — masked only. No full PAN, no CVV, ever. */
+    /** Card on file (school project). Full number is stored; CVV is never stored. */
     @Column(name = "card_holder")
     private String cardHolder;
 
     @Column(name = "card_brand", length = 20)
     private String cardBrand;
 
-    @Column(name = "card_last4", length = 4)
-    private String cardLast4;
+    @Column(name = "card_number", length = 25)
+    private String cardNumber;
 
     @Column(name = "card_expiry", length = 7)
     private String cardExpiry;

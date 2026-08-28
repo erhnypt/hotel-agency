@@ -3,7 +3,7 @@ import { createCustomer, listCustomers, updateCustomer } from '../../api/custome
 import type { CustomerRequest, CustomerResponse } from '../../api/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
-import { maskedCard } from '../../lib/card'
+import { cardLabel } from '../../lib/card'
 import { CustomerFormModal } from './CustomerFormModal'
 import '../../components/crud.css'
 
@@ -62,7 +62,7 @@ export function CustomersPage() {
                 <td>{customer.phone}</td>
                 <td>{customer.email ?? '—'}</td>
                 <td>{customer.nationality ?? '—'}</td>
-                <td>{maskedCard(customer.cardBrand, customer.cardLast4) ?? '—'}</td>
+                <td>{cardLabel(customer.cardBrand, customer.cardNumber) ?? '—'}</td>
                 <td>
                   <div className="data-table__actions">
                     <button type="button" className="btn btn--small" onClick={() => setEditingCustomer(customer)}>

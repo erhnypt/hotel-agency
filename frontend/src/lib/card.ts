@@ -1,7 +1,6 @@
 /**
- * Card helpers for the customer form. The full number and CVV live only in
- * component state and are never sent to the API — we submit brand + last 4 +
- * expiry, which is what a hotel booking actually needs.
+ * Card helpers for the customer form (school project).
+ * The full number is stored and shown. A CVV is never collected or stored.
  */
 
 export function digitsOnly(value: string): string {
@@ -35,13 +34,8 @@ export function formatCardNumber(value: string): string {
   return out.join(' ')
 }
 
-export function last4(number: string): string | null {
-  const n = digitsOnly(number)
-  return n.length >= 4 ? n.slice(-4) : null
-}
-
-/** e.g. "VISA •••• 4242" */
-export function maskedCard(brand?: string | null, l4?: string | null): string | null {
-  if (!l4) return null
-  return `${brand ?? 'Kart'} •••• ${l4}`
+/** e.g. "VISA 4242 4242 4242 4242" — full number, not masked. */
+export function cardLabel(brand?: string | null, number?: string | null): string | null {
+  if (!number) return null
+  return `${brand ?? 'Kart'} ${formatCardNumber(number)}`
 }

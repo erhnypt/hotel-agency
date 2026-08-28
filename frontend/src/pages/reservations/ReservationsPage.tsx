@@ -7,7 +7,7 @@ import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { StatusBadge } from '../../components/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
-import { maskedCard } from '../../lib/card'
+import { cardLabel } from '../../lib/card'
 import '../../components/crud.css'
 import './ReservationsPage.css'
 
@@ -108,7 +108,7 @@ export function ReservationsPage() {
                 {r.customer.firstName} {r.customer.lastName}
               </td>
               <td>
-                {maskedCard(r.customer.cardBrand, r.customer.cardLast4) ?? '—'}
+                {cardLabel(r.customer.cardBrand, r.customer.cardNumber) ?? '—'}
                 {r.customer.cardExpiry && (
                   <>
                     <br />

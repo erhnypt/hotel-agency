@@ -59,7 +59,7 @@ public class CustomerService {
         customer.setNotes(request.notes());
         customer.setCardHolder(blankToNull(request.cardHolder()));
         customer.setCardBrand(blankToNull(request.cardBrand()));
-        customer.setCardLast4(blankToNull(request.cardLast4()));
+        customer.setCardNumber(blankToNull(request.cardNumber()));
         customer.setCardExpiry(blankToNull(request.cardExpiry()));
     }
 

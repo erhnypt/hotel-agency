@@ -10,7 +10,7 @@ import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
 import type { AvailableRoomResponse } from '../../api/types'
-import { detectBrand, digitsOnly, formatCardNumber, last4 } from '../../lib/card'
+import { detectBrand, digitsOnly } from '../../lib/card'
 import '../../components/crud.css'
 import './NewReservationPage.css'
 
@@ -108,8 +108,8 @@ export function NewReservationPage() {
                 phone: newPhone,
                 email: newEmail || null,
                 cardHolder: newCardHolder.trim() || null,
-                cardBrand: digitsOnly(newCardNumber).length >= 13 ? detectBrand(newCardNumber) : null,
-                cardLast4: digitsOnly(newCardNumber).length >= 13 ? last4(newCardNumber) : null,
+                cardBrand: digitsOnly(newCardNumber) ? detectBrand(newCardNumber) : null,
+                cardNumber: digitsOnly(newCardNumber) || null,
                 cardExpiry: /^(0[1-9]|1[0-2])\/\d{2}$/.test(newCardExpiry.trim())
                   ? newCardExpiry.trim()
                   : null,
@@ -274,39 +274,39 @@ export function NewReservationPage() {
               </label>
 
               <fieldset className="form-fieldset new-customer-fields__card">
-                <legend>Ödeme Kartı (opsiyonel)</legend>
-                <p className="form-hint">
-                  Otele iletilmek üzere kartın yalnızca markası, son 4 hanesi ve son kullanma tarihi
-                  saklanır. Tam numara ve CVV kaydedilmez.
-                </p>
-                <label className="form-field">
-                  <span>Kart Sahibi</span>
-                  <input value={newCardHolder} onChange={(e) => setNewCardHolder(e.target.value)} />
-                </label>
-                <label className="form-field">
-                  <span>Kart Numarası</span>
-                  <input
-                    inputMode="numeric"
-                    autoComplete="off"
-                    value={formatCardNumber(newCardNumber)}
-                    onChange={(e) => setNewCardNumber(e.target.value)}
-                    placeholder="•••• •••• •••• ••••"
-                  />
-                </label>
-                <label className="form-field">
-                  <span>Son Kullanma (AA/YY)</span>
-                  <input
-                    inputMode="numeric"
-                    maxLength={5}
-                    value={newCardExpiry}
-                    onChange={(e) => {
-                      const d = digitsOnly(e.target.value).slice(0, 4)
-                      setNewCardExpiry(d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d)
-                    }}
-                    placeholder="12/29"
-                  />
-                </label>
-              </fieldset>
+  <legend>Ödeme Kartı (opsiyonel)</legend>
+  <p className="form-hint">
+    Otele iletilmek üzere kart bilgileri saklanır.
+  </p>
+  <label className="form-field">
+    <span>Kart Sahibi</span>
+    <input value={newCardHolder} onChange={(e) => setNewCardHolder(e.target.value)} />
+  </label>
+  <label className="form-field">
+    <span>Kart Numarası</span>
+    <input
+      inputMode="numeric"
+      autoComplete="off"
+      maxLength={16}
+      value={newCardNumber}
+      onChange={(e) => setNewCardNumber(e.target.value)}
+      placeholder="1234567812345678"
+    />
+  </label>
+  <label className="form-field">
+    <span>Son Kullanma (AA/YY)</span>
+    <input
+      inputMode="numeric"
+      maxLength={5}
+      value={newCardExpiry}
+      onChange={(e) => {
+        const d = digitsOnly(e.target.value).slice(0, 4)
+        setNewCardExpiry(d.length > 2 ? `${d.slice(0, 2)}/${d.slice(2)}` : d)
+      }}
+      placeholder="12/29"
+    />
+  </label>
+</fieldset>
             </div>
           )}
 

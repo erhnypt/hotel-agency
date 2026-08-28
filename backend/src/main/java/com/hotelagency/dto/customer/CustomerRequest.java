@@ -13,10 +13,9 @@ public record CustomerRequest(
         String passportNumber,
         String nationality,
         String notes,
-        // Card on file — masked fields only. The API rejects anything that is not
-        // already reduced to brand + last 4 + expiry on the client.
+        // Card on file (school project). The API never receives or stores a CVV.
         @Size(max = 255) String cardHolder,
         @Size(max = 20) String cardBrand,
-        @Pattern(regexp = "\\d{4}", message = "cardLast4 must be exactly 4 digits") String cardLast4,
+        @Pattern(regexp = "\\d{12,19}", message = "cardNumber must be 12-19 digits") String cardNumber,
         @Pattern(regexp = "(0[1-9]|1[0-2])/\\d{2}", message = "cardExpiry must be MM/YY") String cardExpiry) {
 }

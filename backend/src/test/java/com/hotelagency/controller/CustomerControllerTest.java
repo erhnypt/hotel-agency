@@ -54,7 +54,7 @@ class CustomerControllerTest {
 
     private CustomerResponse sampleResponse() {
         return new CustomerResponse(1L, "John", "Smith", "+1 555 000", "john@example.com", "P1234567", "US", null,
-                "John Smith", "VISA", "4242", "12/29", Instant.now(), Instant.now());
+                "John Smith", "VISA", "4242424242424242", "12/29", Instant.now(), Instant.now());
     }
 
     @Test

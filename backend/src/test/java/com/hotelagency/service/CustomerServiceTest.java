@@ -33,7 +33,7 @@ class CustomerServiceTest {
     }
 
     private CustomerRequest sampleRequest() {
-        return new CustomerRequest("John", "Smith", "+1 555 000", "john@example.com", "P1234567", "US", "VIP guest", "John Smith", "VISA", "4242", "12/29");
+        return new CustomerRequest("John", "Smith", "+1 555 000", "john@example.com", "P1234567", "US", "VIP guest", "John Smith", "VISA", "4242424242424242", "12/29");
     }
 
     @Test
@@ -47,10 +47,10 @@ class CustomerServiceTest {
         assertThat(saved.getLastName()).isEqualTo("Smith");
         assertThat(saved.getEmail()).isEqualTo("john@example.com");
         assertThat(saved.getCardBrand()).isEqualTo("VISA");
-        assertThat(saved.getCardLast4()).isEqualTo("4242");
+        assertThat(saved.getCardNumber()).isEqualTo("4242424242424242");
         assertThat(saved.getCardExpiry()).isEqualTo("12/29");
         assertThat(response.firstName()).isEqualTo("John");
-        assertThat(response.cardLast4()).isEqualTo("4242");
+        assertThat(response.cardNumber()).isEqualTo("4242424242424242");
     }
 
     @Test

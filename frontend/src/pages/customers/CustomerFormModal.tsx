@@ -3,7 +3,7 @@ import { useState, type FormEvent } from 'react'
 import type { ApiErrorResponse } from '../../auth/types'
 import { Modal } from '../../components/Modal'
 import type { CustomerRequest, CustomerResponse } from '../../api/types'
-import { detectBrand, digitsOnly, formatCardNumber, last4, maskedCard } from '../../lib/card'
+import { detectBrand, digitsOnly, formatCardNumber } from '../../lib/card'
 import '../../components/crud.css'
 
 export function CustomerFormModal({
@@ -24,15 +24,14 @@ export function CustomerFormModal({
   const [notes, setNotes] = useState(customer?.notes ?? '')
 
   const [cardHolder, setCardHolder] = useState(customer?.cardHolder ?? '')
-  const [cardNumber, setCardNumber] = useState('')
+  const [cardNumber, setCardNumber] = useState(customer?.cardNumber ?? '')
   const [cardExpiry, setCardExpiry] = useState(customer?.cardExpiry ?? '')
 
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
-  const existingMasked = maskedCard(customer?.cardBrand, customer?.cardLast4)
-  const typedDigits = digitsOnly(cardNumber)
-  const liveBrand = typedDigits.length >= 4 ? detectBrand(cardNumber) : null
+  const digits = digitsOnly(cardNumber)
+  const brand = digits.length >= 4 ? detectBrand(cardNumber) : null
 
   const handleExpiry = (raw: string) => {
     const d = digitsOnly(raw).slice(0, 4)
@@ -43,16 +42,13 @@ export function CustomerFormModal({
     event.preventDefault()
     setError(null)
 
-    // Never send the full number or a CVV — only brand + last 4 + expiry.
-    let brand = customer?.cardBrand ?? null
-    let l4 = customer?.cardLast4 ?? null
-    if (typedDigits.length >= 13) {
-      brand = detectBrand(cardNumber)
-      l4 = last4(cardNumber)
-    }
     const expiry = cardExpiry.trim() || null
     if (expiry && !/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
       setError('Son kullanma tarihi AA/YY biçiminde olmalı.')
+      return
+    }
+    if (digits && (digits.length < 12 || digits.length > 19)) {
+      setError('Kart numarası 12-19 hane olmalı.')
       return
     }
 
@@ -67,8 +63,8 @@ export function CustomerFormModal({
         nationality: nationality || null,
         notes: notes || null,
         cardHolder: cardHolder.trim() || null,
-        cardBrand: brand,
-        cardLast4: l4,
+        cardBrand: digits ? brand : null,
+        cardNumber: digits || null,
         cardExpiry: expiry,
       })
     } catch (err) {
@@ -117,21 +113,24 @@ export function CustomerFormModal({
         <fieldset className="form-fieldset">
           <legend>Ödeme Kartı (opsiyonel)</legend>
           <p className="form-hint">
-            Otele iletilmek üzere kartın <strong>yalnızca markası, son 4 hanesi ve son kullanma
-            tarihi</strong> saklanır. Tam kart numarası ve CVV kaydedilmez, hiçbir yere gönderilmez.
+            Otele rezervasyonla birlikte iletilir. Test amaçlıdır — CVV alınmaz ve saklanmaz.
           </p>
           <label className="form-field">
             <span>Kart Sahibi</span>
-            <input value={cardHolder} onChange={(e) => setCardHolder(e.target.value)} placeholder="Kart üzerindeki isim" />
+            <input
+              value={cardHolder}
+              onChange={(e) => setCardHolder(e.target.value)}
+              placeholder="Kart üzerindeki isim"
+            />
           </label>
           <label className="form-field">
-            <span>Kart Numarası {liveBrand && <em className="form-field__hint">{liveBrand}</em>}</span>
+            <span>Kart Numarası {brand && <em className="form-field__hint">{brand}</em>}</span>
             <input
               inputMode="numeric"
               autoComplete="off"
               value={formatCardNumber(cardNumber)}
               onChange={(e) => setCardNumber(e.target.value)}
-              placeholder={existingMasked ?? '•••• •••• •••• ••••'}
+              placeholder="4242 4242 4242 4242"
             />
           </label>
           <label className="form-field">
@@ -144,9 +143,6 @@ export function CustomerFormModal({
               maxLength={5}
             />
           </label>
-          {existingMasked && typedDigits.length < 13 && (
-            <p className="form-hint">Kayıtlı kart: {existingMasked}. Değiştirmek için yeni numara girin.</p>
-          )}
         </fieldset>
 
         {error && <p className="form-error">{error}</p>}
