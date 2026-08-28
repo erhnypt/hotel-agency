@@ -16,8 +16,9 @@ export function PublicHeader() {
   const { t } = useT()
   return (
     <header className="lp-header">
-      <Link to="/" className="lp-brand" aria-label={t('nav.home')}>
-        <BrandMark size={24} className="lp-brand__mark" />
+      <Link to="/" className="lp-brand" aria-label={CONTACT.name}>
+        <BrandMark size={26} className="lp-brand__mark" />
+        <span className="lp-brand__name">{CONTACT.name}</span>
       </Link>
       <div className="lp-header__right">
         <LanguageSwitcher variant="light" />
@@ -52,13 +53,11 @@ export function PublicFooter() {
       <div className="lp-footer__grid">
         <div className="lp-footer__brand">
           <div className="lp-brand lp-brand--footer">
-            <BrandMark size={20} className="lp-brand__mark" />
+            <BrandMark size={22} className="lp-brand__mark" />
+            <span className="lp-brand__name">{CONTACT.name}</span>
           </div>
           <p className="lp-footer__blurb">{t('footer.blurb')}</p>
           <address className="lp-footer__address">
-            <span>
-              <strong>{CONTACT.name}</strong>
-            </span>
             {CONTACT.street.map((line) => (
               <span key={line}>{line}</span>
             ))}

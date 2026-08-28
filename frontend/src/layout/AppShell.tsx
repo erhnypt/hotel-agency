@@ -12,7 +12,10 @@ export function AppShell({ panelTitleKey, menu }: { panelTitleKey: string; menu:
   return (
     <div className="app-shell">
       <aside className="app-shell__sidebar">
-        <div className="app-shell__brand">{t('shell.tagline')}</div>
+        <div className="app-shell__brand">
+          Travel Sites
+          <small>{t('shell.tagline')}</small>
+        </div>
         <nav className="app-shell__nav">
           {menu.map((item) => (
             <NavLink

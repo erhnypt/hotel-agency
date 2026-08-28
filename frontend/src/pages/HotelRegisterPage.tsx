@@ -76,7 +76,8 @@ export function HotelRegisterPage() {
         <LanguageSwitcher />
       </div>
       <form className="login-card" onSubmit={handleSubmit}>
-        <BrandMark size={40} className="login-card__mark" />
+        <BrandMark size={44} className="login-card__mark" />
+        <h1 className="login-card__brand">Travel Sites</h1>
         <p className="login-card__subtitle">{t('register.subtitle')}</p>
 
         <label className="login-field">

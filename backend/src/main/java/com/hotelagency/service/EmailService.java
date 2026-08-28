@@ -157,7 +157,8 @@ public class EmailService {
                           <table role="presentation" width="480" style="background:#ffffff;border-radius:12px;overflow:hidden;box-shadow:0 1px 4px rgba(0,0,0,0.08);">
                             <tr>
                               <td style="background:%s;padding:24px 32px;">
-                                <span style="color:%s;font-size:15px;font-weight:700;letter-spacing:2px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;">OTEL ACENTESİ MERKEZİ</span>
+                                <span style="color:%s;font-size:15px;font-weight:700;letter-spacing:2px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;">TRAVEL SITES</span>
+                                <div style="color:#8b929d;font-size:12px;margin-top:4px;">Otel Acentesi Merkezi</div>
                               </td>
                             </tr>
                             <tr>
@@ -169,7 +170,7 @@ public class EmailService {
                             </tr>
                             <tr>
                               <td style="padding:20px 32px;background:#f9fafb;border-top:1px solid #eef0f3;color:#9ca3af;font-size:12px;">
-                                Bu e-posta otel acentesi sistemi tarafından otomatik olarak gönderilmiştir.
+                                Bu e-posta Travel Sites sistemi tarafından otomatik olarak gönderilmiştir.
                               </td>
                             </tr>
                           </table>
