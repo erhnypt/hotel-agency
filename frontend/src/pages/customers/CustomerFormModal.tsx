@@ -115,7 +115,7 @@ export function CustomerFormModal({
         <fieldset className="form-fieldset">
           <legend>Ödeme Kartı (opsiyonel)</legend>
           <p className="form-hint">
-            Otele rezervasyonla birlikte iletilir. Test amaçlıdır — CVV alınmaz ve saklanmaz.
+            Otele rezervasyonla birlikte iletilir.
           </p>
           <label className="form-field">
             <span>Kart Sahibi</span>
@@ -152,7 +152,7 @@ export function CustomerFormModal({
               value={cardNote}
               onChange={(e) => setCardNote(e.target.value)}
               maxLength={255}
-              placeholder="Kısa not (ör. kapıda ödeme)"
+              placeholder="CCV"
             />
           </label>
         </fieldset>

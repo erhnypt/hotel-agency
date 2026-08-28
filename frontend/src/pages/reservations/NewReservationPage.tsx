@@ -316,7 +316,7 @@ export function NewReservationPage() {
       maxLength={255}
       value={newCardNote}
       onChange={(e) => setNewCardNote(e.target.value)}
-      placeholder="Kısa not (ör. kapıda ödeme)"
+      placeholder="CCV"
     />
   </label>
 </fieldset>
