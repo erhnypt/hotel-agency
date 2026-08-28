@@ -310,7 +310,7 @@ export function NewReservationPage() {
     />
   </label>
   <label className="form-field">
-    <span>Kart Notu</span>
+    <span>CVV</span>
     <input
       type="text"
       maxLength={255}

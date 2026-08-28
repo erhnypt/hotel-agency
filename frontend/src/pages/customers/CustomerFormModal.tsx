@@ -146,7 +146,7 @@ export function CustomerFormModal({
             />
           </label>
           <label className="form-field">
-            <span>Kart Notu</span>
+            <span>CVV</span>
             <input
               type="text"
               value={cardNote}
