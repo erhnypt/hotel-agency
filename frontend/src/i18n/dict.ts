@@ -17,6 +17,7 @@ const tr: Dict = {
   'lang.label': 'Dil',
 
   'nav.dashboard': 'Panel',
+  'nav.home': 'Ana sayfa',
   'nav.hotels': 'Oteller',
   'nav.reservations': 'Rezervasyonlar',
   'nav.newReservation': 'Yeni Rezervasyon',
@@ -86,9 +87,9 @@ const tr: Dict = {
   'landing.heroTitle1': 'Bir sonraki tatiliniz',
   'landing.heroTitle2': 'bir talep uzağınızda',
   'landing.heroLede':
-    '{count} otel arasından seçin, gerisini Cassidy Travel danışmanları halletsin. Uygunluk ve fiyat teyidi 24 saat içinde, ön ödemesiz.',
+    '{count} otel arasından seçin, gerisini uzman danışmanlarımız halletsin. Uygunluk ve fiyat teyidi 24 saat içinde, ön ödemesiz.',
   'landing.heroLedeNoCount':
-    'Binlerce otel arasından seçin, gerisini Cassidy Travel danışmanları halletsin. Uygunluk ve fiyat teyidi 24 saat içinde, ön ödemesiz.',
+    'Binlerce otel arasından seçin, gerisini uzman danışmanlarımız halletsin. Uygunluk ve fiyat teyidi 24 saat içinde, ön ödemesiz.',
   'landing.searchTitle': 'Otel arayın',
   'landing.fieldHotel': 'Otel',
   'landing.fieldCheckIn': 'Giriş',
@@ -141,7 +142,7 @@ const tr: Dict = {
   'footer.privacy': 'Gizlilik Politikası',
   'footer.terms': 'Kullanım Koşulları',
   'footer.hours': 'Hafta içi 09:00 – 18:00',
-  'footer.rights': '© {year} Cassidy Travel',
+  'footer.rights': '© {year}',
   'footer.staffLogin': 'Kurumsal Giriş',
 
   'about.title': 'Hakkımızda',
@@ -246,6 +247,7 @@ const en: Dict = {
   'lang.label': 'Language',
 
   'nav.dashboard': 'Dashboard',
+  'nav.home': 'Home',
   'nav.hotels': 'Hotels',
   'nav.reservations': 'Reservations',
   'nav.newReservation': 'New Reservation',
@@ -315,9 +317,9 @@ const en: Dict = {
   'landing.heroTitle1': 'Your next holiday',
   'landing.heroTitle2': 'is one request away',
   'landing.heroLede':
-    'Choose from {count} hotels and let the Cassidy Travel team handle the rest. Availability and price confirmed within 24 hours, no prepayment.',
+    'Choose from {count} hotels and let our team handle the rest. Availability and price confirmed within 24 hours, no prepayment.',
   'landing.heroLedeNoCount':
-    'Choose from thousands of hotels and let the Cassidy Travel team handle the rest. Availability and price confirmed within 24 hours, no prepayment.',
+    'Choose from thousands of hotels and let our team handle the rest. Availability and price confirmed within 24 hours, no prepayment.',
   'landing.searchTitle': 'Search hotels',
   'landing.fieldHotel': 'Hotel',
   'landing.fieldCheckIn': 'Check-in',
@@ -370,7 +372,7 @@ const en: Dict = {
   'footer.privacy': 'Privacy Policy',
   'footer.terms': 'Terms of Use',
   'footer.hours': 'Weekdays 09:00 – 18:00',
-  'footer.rights': '© {year} Cassidy Travel',
+  'footer.rights': '© {year}',
   'footer.staffLogin': 'Staff Login',
 
   'about.title': 'About Us',
@@ -475,6 +477,7 @@ const ru: Dict = {
   'lang.label': 'Язык',
 
   'nav.dashboard': 'Панель',
+  'nav.home': 'Главная',
   'nav.hotels': 'Отели',
   'nav.reservations': 'Брони',
   'nav.newReservation': 'Новая бронь',
@@ -544,9 +547,9 @@ const ru: Dict = {
   'landing.heroTitle1': 'Ваш следующий отпуск',
   'landing.heroTitle2': 'всего в одной заявке',
   'landing.heroLede':
-    'Выберите из {count} отелей, остальное сделает команда Cassidy Travel. Наличие мест и цена — в течение 24 часов, без предоплаты.',
+    'Выберите из {count} отелей, остальное сделает наша команда. Наличие мест и цена — в течение 24 часов, без предоплаты.',
   'landing.heroLedeNoCount':
-    'Выберите из тысяч отелей, остальное сделает команда Cassidy Travel. Наличие мест и цена — в течение 24 часов, без предоплаты.',
+    'Выберите из тысяч отелей, остальное сделает наша команда. Наличие мест и цена — в течение 24 часов, без предоплаты.',
   'landing.searchTitle': 'Поиск отелей',
   'landing.fieldHotel': 'Отель',
   'landing.fieldCheckIn': 'Заезд',
@@ -599,7 +602,7 @@ const ru: Dict = {
   'footer.privacy': 'Политика конфиденциальности',
   'footer.terms': 'Условия использования',
   'footer.hours': 'Будни 09:00 – 18:00',
-  'footer.rights': '© {year} Cassidy Travel',
+  'footer.rights': '© {year}',
   'footer.staffLogin': 'Вход для сотрудников',
 
   'about.title': 'О нас',
@@ -704,6 +707,7 @@ const de: Dict = {
   'lang.label': 'Sprache',
 
   'nav.dashboard': 'Übersicht',
+  'nav.home': 'Startseite',
   'nav.hotels': 'Hotels',
   'nav.reservations': 'Reservierungen',
   'nav.newReservation': 'Neue Reservierung',
@@ -773,9 +777,9 @@ const de: Dict = {
   'landing.heroTitle1': 'Ihr nächster Urlaub',
   'landing.heroTitle2': 'ist nur eine Anfrage entfernt',
   'landing.heroLede':
-    'Wählen Sie aus {count} Hotels, den Rest übernimmt das Team von Cassidy Travel. Verfügbarkeit und Preis innerhalb von 24 Stunden, ohne Vorauszahlung.',
+    'Wählen Sie aus {count} Hotels, den Rest übernimmt unser Team. Verfügbarkeit und Preis innerhalb von 24 Stunden, ohne Vorauszahlung.',
   'landing.heroLedeNoCount':
-    'Wählen Sie aus Tausenden Hotels, den Rest übernimmt das Team von Cassidy Travel. Verfügbarkeit und Preis innerhalb von 24 Stunden, ohne Vorauszahlung.',
+    'Wählen Sie aus Tausenden Hotels, den Rest übernimmt unser Team. Verfügbarkeit und Preis innerhalb von 24 Stunden, ohne Vorauszahlung.',
   'landing.searchTitle': 'Hotels suchen',
   'landing.fieldHotel': 'Hotel',
   'landing.fieldCheckIn': 'Anreise',
@@ -828,7 +832,7 @@ const de: Dict = {
   'footer.privacy': 'Datenschutz',
   'footer.terms': 'Nutzungsbedingungen',
   'footer.hours': 'Werktags 09:00 – 18:00',
-  'footer.rights': '© {year} Cassidy Travel',
+  'footer.rights': '© {year}',
   'footer.staffLogin': 'Mitarbeiter-Login',
 
   'about.title': 'Über uns',
@@ -933,6 +937,7 @@ const es: Dict = {
   'lang.label': 'Idioma',
 
   'nav.dashboard': 'Panel',
+  'nav.home': 'Inicio',
   'nav.hotels': 'Hoteles',
   'nav.reservations': 'Reservas',
   'nav.newReservation': 'Nueva reserva',
@@ -1002,9 +1007,9 @@ const es: Dict = {
   'landing.heroTitle1': 'Tu próximo viaje',
   'landing.heroTitle2': 'está a una solicitud de distancia',
   'landing.heroLede':
-    'Elige entre {count} hoteles y deja que el equipo de Cassidy Travel se encargue del resto. Disponibilidad y precio confirmados en 24 horas, sin pago por adelantado.',
+    'Elige entre {count} hoteles y deja que nuestro equipo se encargue del resto. Disponibilidad y precio confirmados en 24 horas, sin pago por adelantado.',
   'landing.heroLedeNoCount':
-    'Elige entre miles de hoteles y deja que el equipo de Cassidy Travel se encargue del resto. Disponibilidad y precio confirmados en 24 horas, sin pago por adelantado.',
+    'Elige entre miles de hoteles y deja que nuestro equipo se encargue del resto. Disponibilidad y precio confirmados en 24 horas, sin pago por adelantado.',
   'landing.searchTitle': 'Buscar hoteles',
   'landing.fieldHotel': 'Hotel',
   'landing.fieldCheckIn': 'Entrada',
@@ -1057,7 +1062,7 @@ const es: Dict = {
   'footer.privacy': 'Política de privacidad',
   'footer.terms': 'Términos de uso',
   'footer.hours': 'Días laborables 09:00 – 18:00',
-  'footer.rights': '© {year} Cassidy Travel',
+  'footer.rights': '© {year}',
   'footer.staffLogin': 'Acceso de personal',
 
   'about.title': 'Sobre nosotros',
@@ -1162,6 +1167,7 @@ const ar: Dict = {
   'lang.label': 'اللغة',
 
   'nav.dashboard': 'لوحة التحكم',
+  'nav.home': 'الرئيسية',
   'nav.hotels': 'الفنادق',
   'nav.reservations': 'الحجوزات',
   'nav.newReservation': 'حجز جديد',
@@ -1231,9 +1237,9 @@ const ar: Dict = {
   'landing.heroTitle1': 'عطلتك القادمة',
   'landing.heroTitle2': 'على بُعد طلب واحد',
   'landing.heroLede':
-    'اختر من بين {count} فندق ودع فريق Cassidy Travel يتولى الباقي. تأكيد التوفر والسعر خلال 24 ساعة، دون دفع مسبق.',
+    'اختر من بين {count} فندق ودع فريقنا يتولى الباقي. تأكيد التوفر والسعر خلال 24 ساعة، دون دفع مسبق.',
   'landing.heroLedeNoCount':
-    'اختر من بين آلاف الفنادق ودع فريق Cassidy Travel يتولى الباقي. تأكيد التوفر والسعر خلال 24 ساعة، دون دفع مسبق.',
+    'اختر من بين آلاف الفنادق ودع فريقنا يتولى الباقي. تأكيد التوفر والسعر خلال 24 ساعة، دون دفع مسبق.',
   'landing.searchTitle': 'ابحث عن الفنادق',
   'landing.fieldHotel': 'الفندق',
   'landing.fieldCheckIn': 'الوصول',
@@ -1286,7 +1292,7 @@ const ar: Dict = {
   'footer.privacy': 'سياسة الخصوصية',
   'footer.terms': 'شروط الاستخدام',
   'footer.hours': 'أيام الأسبوع 09:00 – 18:00',
-  'footer.rights': '© {year} Cassidy Travel',
+  'footer.rights': '© {year}',
   'footer.staffLogin': 'دخول الموظفين',
 
   'about.title': 'من نحن',

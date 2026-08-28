@@ -8,16 +8,15 @@ export const CONTACT = {
   address: ['Levent Mah. Büyükdere Cad. No: 000', 'Kat 5, Şişli / İstanbul'],
   phone: '+90 212 555 0 100',
   phoneHref: 'tel:+902125550100',
-  email: 'merhaba@cassidy-travel.com',
+  email: 'hello@travellsites.com',
 }
 
 export function PublicHeader() {
   const { t } = useT()
   return (
     <header className="lp-header">
-      <Link to="/" className="lp-brand" aria-label="Cassidy Travel">
+      <Link to="/" className="lp-brand" aria-label={t('nav.home')}>
         <BrandMark size={24} className="lp-brand__mark" />
-        <span className="lp-brand__name">Cassidy Travel</span>
       </Link>
       <div className="lp-header__right">
         <LanguageSwitcher variant="light" />
@@ -53,7 +52,6 @@ export function PublicFooter() {
         <div className="lp-footer__brand">
           <div className="lp-brand lp-brand--footer">
             <BrandMark size={20} className="lp-brand__mark" />
-            <span className="lp-brand__name">Cassidy Travel</span>
           </div>
           <p className="lp-footer__blurb">{t('footer.blurb')}</p>
           <address className="lp-footer__address">
