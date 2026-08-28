@@ -5,9 +5,10 @@ import { useT } from '../../i18n/useT'
 import '../landing/LandingPage.css'
 
 export const CONTACT = {
-  address: ['Levent Mah. Büyükdere Cad. No: 000', 'Kat 5, Şişli / İstanbul'],
-  phone: '+90 212 555 0 100',
-  phoneHref: 'tel:+902125550100',
+  name: 'Travel Sites',
+  street: ['204 Alano Plaza', 'San Antonio, TX 78205'],
+  whatsapp: '+1 512 318177',
+  whatsappHref: 'https://wa.me/1512318177',
   email: 'hello@travellsites.com',
 }
 
@@ -55,9 +56,13 @@ export function PublicFooter() {
           </div>
           <p className="lp-footer__blurb">{t('footer.blurb')}</p>
           <address className="lp-footer__address">
-            {CONTACT.address.map((line) => (
+            <span>
+              <strong>{CONTACT.name}</strong>
+            </span>
+            {CONTACT.street.map((line) => (
               <span key={line}>{line}</span>
             ))}
+            <span>{t('contact.country')}</span>
           </address>
         </div>
 
@@ -76,7 +81,9 @@ export function PublicFooter() {
 
         <div className="lp-footer__col">
           <h3>{t('footer.contact')}</h3>
-          <a href={CONTACT.phoneHref}>{CONTACT.phone}</a>
+          <a href={CONTACT.whatsappHref} target="_blank" rel="noopener noreferrer">
+            WhatsApp: {CONTACT.whatsapp}
+          </a>
           <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>
           <span className="lp-footer__muted">{t('footer.hours')}</span>
           <div className="lp-footer__social">

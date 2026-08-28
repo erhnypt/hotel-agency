@@ -11,9 +11,13 @@ export function ContactPage() {
         <div className="lp-contact__card">
           <h2>{t('contact.office')}</h2>
           <address>
-            {CONTACT.address.map((line) => (
+            <span>
+              <strong>{CONTACT.name}</strong>
+            </span>
+            {CONTACT.street.map((line) => (
               <span key={line}>{line}</span>
             ))}
+            <span>{t('contact.country')}</span>
           </address>
           <p className="lp-page__lead" style={{ marginTop: '10px' }}>
             {t('footer.hours')}
@@ -26,7 +30,9 @@ export function ContactPage() {
             <div>
               <dt>{t('contact.phone')}</dt>
               <dd>
-                <a href={CONTACT.phoneHref}>{CONTACT.phone}</a>
+                <a href={CONTACT.whatsappHref} target="_blank" rel="noopener noreferrer">
+                  {CONTACT.whatsapp}
+                </a>
               </dd>
             </div>
             <div>

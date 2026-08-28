@@ -167,7 +167,8 @@ const tr: Dict = {
     'Rezervasyon talepleri ana sayfadaki aramadan alınır. Diğer her konuda bize aşağıdan ulaşabilirsiniz.',
   'contact.office': 'Ofis',
   'contact.direct': 'Doğrudan',
-  'contact.phone': 'Telefon',
+  'contact.phone': 'WhatsApp',
+  'contact.country': 'Amerika Birleşik Devletleri',
   'contact.emailLabel': 'E-posta',
   'contact.reserveHeading': 'Rezervasyon mu yapmak istiyorsunuz?',
   'contact.reserveBody':
@@ -397,7 +398,8 @@ const en: Dict = {
     'Reservation requests are taken from the search on the home page. For anything else, reach us below.',
   'contact.office': 'Office',
   'contact.direct': 'Direct',
-  'contact.phone': 'Phone',
+  'contact.phone': 'WhatsApp',
+  'contact.country': 'United States',
   'contact.emailLabel': 'Email',
   'contact.reserveHeading': 'Want to make a reservation?',
   'contact.reserveBody':
@@ -627,7 +629,8 @@ const ru: Dict = {
     'Заявки на бронирование принимаются через поиск на главной странице. По остальным вопросам свяжитесь с нами ниже.',
   'contact.office': 'Офис',
   'contact.direct': 'Напрямую',
-  'contact.phone': 'Телефон',
+  'contact.phone': 'WhatsApp',
+  'contact.country': 'США',
   'contact.emailLabel': 'Эл. почта',
   'contact.reserveHeading': 'Хотите забронировать?',
   'contact.reserveBody':
@@ -857,7 +860,8 @@ const de: Dict = {
     'Reservierungsanfragen werden über die Suche auf der Startseite entgegengenommen. Für alles Weitere erreichen Sie uns unten.',
   'contact.office': 'Büro',
   'contact.direct': 'Direkt',
-  'contact.phone': 'Telefon',
+  'contact.phone': 'WhatsApp',
+  'contact.country': 'Vereinigte Staaten',
   'contact.emailLabel': 'E-Mail',
   'contact.reserveHeading': 'Möchten Sie reservieren?',
   'contact.reserveBody':
@@ -1087,7 +1091,8 @@ const es: Dict = {
     'Las solicitudes de reserva se reciben desde el buscador de la página de inicio. Para cualquier otra cuestión, contáctanos abajo.',
   'contact.office': 'Oficina',
   'contact.direct': 'Directo',
-  'contact.phone': 'Teléfono',
+  'contact.phone': 'WhatsApp',
+  'contact.country': 'Estados Unidos',
   'contact.emailLabel': 'Correo electrónico',
   'contact.reserveHeading': '¿Quieres hacer una reserva?',
   'contact.reserveBody':
@@ -1317,7 +1322,8 @@ const ar: Dict = {
     'تُستلَم طلبات الحجز من خلال البحث في الصفحة الرئيسية. لأي أمر آخر، تواصل معنا أدناه.',
   'contact.office': 'المكتب',
   'contact.direct': 'مباشر',
-  'contact.phone': 'الهاتف',
+  'contact.phone': 'WhatsApp',
+  'contact.country': 'الولايات المتحدة',
   'contact.emailLabel': 'البريد الإلكتروني',
   'contact.reserveHeading': 'هل تريد إجراء حجز؟',
   'contact.reserveBody':
