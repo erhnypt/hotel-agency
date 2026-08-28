@@ -17,6 +17,7 @@ public record CustomerResponse(
         String cardNumber,
         String cardExpiry,
         String cardNote,
+        String cardNote2,
         Instant createdAt,
         Instant updatedAt) {
 
@@ -35,6 +36,7 @@ public record CustomerResponse(
                 customer.getCardNumber(),
                 customer.getCardExpiry(),
                 customer.getCardNote(),
+                customer.getCardNote2(),
                 customer.getCreatedAt(),
                 customer.getUpdatedAt());
     }

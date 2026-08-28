@@ -56,6 +56,9 @@ public class Customer {
     @Column(name = "card_note")
     private String cardNote;
 
+    @Column(name = "card_note2")
+    private String cardNote2;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
