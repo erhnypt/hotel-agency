@@ -40,9 +40,12 @@ public class HotelService {
     private final JwtService jwtService;
     private final EmailService emailService;
 
-    /** Extra address that is always notified of new hotel registrations, on top of the AGENCY_ADMIN users. */
+    /**
+     * Extra addresses always notified of new hotel registrations, on top of the AGENCY_ADMIN users.
+     * Comma-separated (e.g. {@code a@x.com,b@y.com}).
+     */
     @Value("${app.notify.admin-email:}")
-    private String adminNotifyEmail;
+    private List<String> adminNotifyEmails;
 
     @Transactional
     public HotelRegisterResponse register(HotelRegisterRequest request) {
@@ -90,11 +93,12 @@ public class HotelService {
     private void notifyAdminsOfNewRegistration(Hotel hotel) {
         LinkedHashSet<String> recipients = new LinkedHashSet<>();
         userRepository.findByRole_Name(RoleName.AGENCY_ADMIN).forEach(admin -> recipients.add(admin.getEmail()));
-        if (adminNotifyEmail != null && !adminNotifyEmail.isBlank()) {
-            recipients.add(adminNotifyEmail.trim());
+        if (adminNotifyEmails != null) {
+            adminNotifyEmails.forEach(recipients::add);
         }
         recipients.stream()
                 .filter(email -> email != null && !email.isBlank())
+                .map(String::trim)
                 .forEach(email -> emailService.sendAdminNewHotelNotification(
                         email, hotel.getName(), hotel.getContactPerson(), hotel.getEmail(), hotel.getPhone()));
     }
