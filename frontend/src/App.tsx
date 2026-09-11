@@ -20,6 +20,8 @@ import { HotelAgreementPage } from './pages/public/HotelAgreementPage'
 import { HotelProfilePage } from './pages/hotelProfile/HotelProfilePage'
 import { HotelsPage } from './pages/hotels/HotelsPage'
 import { LoginPage } from './pages/LoginPage'
+import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
+import { ResetPasswordPage } from './pages/ResetPasswordPage'
 import { HotelRegisterPage } from './pages/HotelRegisterPage'
 import { PricesPage } from './pages/prices/PricesPage'
 import { NewReservationPage } from './pages/reservations/NewReservationPage'
@@ -39,6 +41,8 @@ function App() {
         <Route path="/kosullar" element={<TermsPage />} />
         <Route path="/otel-sozlesmesi" element={<HotelAgreementPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
+        <Route path="/reset-password" element={<ResetPasswordPage />} />
         <Route path="/register" element={<HotelRegisterPage />} />
 
         <Route element={<ProtectedRoute />}>

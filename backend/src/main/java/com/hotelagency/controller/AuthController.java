@@ -1,9 +1,11 @@
 package com.hotelagency.controller;
 
 import com.hotelagency.dto.auth.AuthResponse;
+import com.hotelagency.dto.auth.ForgotPasswordRequest;
 import com.hotelagency.dto.auth.LoginRequest;
 import com.hotelagency.dto.auth.RefreshRequest;
 import com.hotelagency.dto.auth.RegisterRequest;
+import com.hotelagency.dto.auth.ResetPasswordRequest;
 import com.hotelagency.dto.auth.UpdateProfileRequest;
 import com.hotelagency.dto.auth.UserSummary;
 import com.hotelagency.security.CustomUserDetails;
@@ -40,6 +42,18 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request) {
         return ResponseEntity.ok(authService.refresh(request));
+    }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<Void> forgotPassword(@Valid @RequestBody ForgotPasswordRequest request) {
+        authService.forgotPassword(request);
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<Void> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        authService.resetPassword(request);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/me")

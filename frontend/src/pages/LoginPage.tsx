@@ -68,6 +68,10 @@ export function LoginPage() {
           />
         </label>
 
+        <p className="login-card__forgot">
+          <Link to="/forgot-password">{t('login.forgotPassword')}</Link>
+        </p>
+
         {error && (
           <p className="login-card__error" role="alert">
             {error}

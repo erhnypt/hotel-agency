@@ -72,6 +72,21 @@ public class EmailService {
     }
 
     @Async
+    public void sendPasswordResetEmail(String toEmail, String resetLink) {
+        String body = wrapCorporateTemplate(
+                "Şifre Sıfırlama Talebi",
+                """
+                <p>Merhaba,</p>
+                <p>Hesabınız için bir şifre sıfırlama talebi aldık. Yeni bir şifre belirlemek için aşağıdaki
+                butona tıklayabilirsiniz. Bu bağlantı 30 dakika süreyle geçerlidir.</p>
+                <p>Bu talebi siz oluşturmadıysanız bu e-postayı dikkate almayabilirsiniz; şifreniz
+                değiştirilmeyecektir.</p>
+                """,
+                new CallToAction("Şifreyi Sıfırla", resetLink));
+        send(toEmail, "Şifre Sıfırlama Talebi", body, "password reset");
+    }
+
+    @Async
     public void sendAdminNewHotelNotification(
             String adminEmail, String hotelName, String contactPerson, String hotelEmail, String phone) {
         String body = wrapCorporateTemplate(

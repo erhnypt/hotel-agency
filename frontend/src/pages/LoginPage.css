@@ -155,6 +155,21 @@
   text-decoration: underline;
 }
 
+.login-card__forgot {
+  margin: -6px 0 18px;
+  text-align: right;
+  font-size: 13px;
+}
+
+.login-card__forgot a {
+  color: var(--signal);
+  text-decoration: none;
+}
+
+.login-card__forgot a:hover {
+  text-decoration: underline;
+}
+
 .login-card__error {
   margin: 0 0 16px;
   padding: 10px 12px;
@@ -163,6 +178,17 @@
   border: 1px solid var(--danger-border);
   color: var(--danger);
   font-size: 13.5px;
+}
+
+.login-card__success {
+  margin: 0 0 16px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  background: var(--status-ok-bg);
+  border: 1px solid var(--status-ok-border);
+  color: var(--success);
+  font-size: 13.5px;
+  text-align: center;
 }
 
 .login-card__submit {

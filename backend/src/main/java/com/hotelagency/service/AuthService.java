@@ -1,21 +1,33 @@
 package com.hotelagency.service;
 
 import com.hotelagency.dto.auth.AuthResponse;
+import com.hotelagency.dto.auth.ForgotPasswordRequest;
 import com.hotelagency.dto.auth.LoginRequest;
 import com.hotelagency.dto.auth.RefreshRequest;
 import com.hotelagency.dto.auth.RegisterRequest;
+import com.hotelagency.dto.auth.ResetPasswordRequest;
 import com.hotelagency.dto.auth.UpdateProfileRequest;
 import com.hotelagency.dto.auth.UserSummary;
+import com.hotelagency.entity.PasswordResetToken;
 import com.hotelagency.entity.Role;
 import com.hotelagency.entity.User;
 import com.hotelagency.exception.DuplicateResourceException;
 import com.hotelagency.exception.InvalidTokenException;
 import com.hotelagency.exception.ResourceNotFoundException;
+import com.hotelagency.repository.PasswordResetTokenRepository;
 import com.hotelagency.repository.RoleRepository;
 import com.hotelagency.repository.UserRepository;
 import com.hotelagency.security.JwtService;
 import io.jsonwebtoken.Claims;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Base64;
+import java.util.HexFormat;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -26,11 +38,19 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class AuthService {
 
+    private static final int RESET_TOKEN_VALIDITY_MINUTES = 30;
+    private static final SecureRandom SECURE_RANDOM = new SecureRandom();
+
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
+    private final EmailService emailService;
+
+    @Value("${app.frontend-url:http://localhost:5173}")
+    private String frontendUrl;
 
     @Transactional
     public AuthResponse register(RegisterRequest request) {
@@ -87,6 +107,55 @@ public class AuthService {
         }
 
         return UserSummary.from(userRepository.save(user));
+    }
+
+    @Transactional
+    public void forgotPassword(ForgotPasswordRequest request) {
+        userRepository.findByEmail(request.email()).ifPresent(user -> {
+            String rawToken = generateRawToken();
+            PasswordResetToken resetToken = new PasswordResetToken();
+            resetToken.setUser(user);
+            resetToken.setTokenHash(hashToken(rawToken));
+            resetToken.setExpiresAt(Instant.now().plus(RESET_TOKEN_VALIDITY_MINUTES, ChronoUnit.MINUTES));
+            passwordResetTokenRepository.save(resetToken);
+
+            String resetLink = frontendUrl + "/reset-password?token=" + rawToken;
+            emailService.sendPasswordResetEmail(user.getEmail(), resetLink);
+        });
+        // Always return silently, whether or not the email is registered, so the
+        // endpoint can't be used to enumerate which addresses have an account.
+    }
+
+    @Transactional
+    public void resetPassword(ResetPasswordRequest request) {
+        PasswordResetToken resetToken = passwordResetTokenRepository.findByTokenHash(hashToken(request.token()))
+                .orElseThrow(() -> new InvalidTokenException("Şifre sıfırlama bağlantısı geçersiz"));
+
+        if (resetToken.getUsedAt() != null || resetToken.getExpiresAt().isBefore(Instant.now())) {
+            throw new InvalidTokenException("Şifre sıfırlama bağlantısının süresi dolmuş");
+        }
+
+        User user = resetToken.getUser();
+        user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        userRepository.save(user);
+
+        resetToken.setUsedAt(Instant.now());
+        passwordResetTokenRepository.save(resetToken);
+    }
+
+    private String generateRawToken() {
+        byte[] bytes = new byte[32];
+        SECURE_RANDOM.nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+    }
+
+    private String hashToken(String rawToken) {
+        try {
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            return HexFormat.of().formatHex(digest.digest(rawToken.getBytes()));
+        } catch (NoSuchAlgorithmException e) {
+            throw new IllegalStateException("SHA-256 not available", e);
+        }
     }
 
     private AuthResponse buildAuthResponse(User user) {
