@@ -106,6 +106,50 @@ public class EmailService {
         send(adminEmail, "Yeni Otel Başvurusu - Onayınızı Bekliyor", body, "admin notification");
     }
 
+    @Async
+    public void sendRoomTypeCreatedEmail(String toEmail, String hotelName, String roomTypeName) {
+        String body = wrapCorporateTemplate(
+                "Yeni Oda Tipi Eklendi",
+                """
+                <p>Merhaba,</p>
+                <p><strong>%s</strong> için <strong>%s</strong> adlı yeni bir oda tipi eklendi.</p>
+                """.formatted(escape(hotelName), escape(roomTypeName)),
+                new CallToAction("Panele Giriş Yap", frontendUrl + "/login"));
+        send(toEmail, "Yeni Oda Tipi Eklendi - " + hotelName, body, "room type created");
+    }
+
+    @Async
+    public void sendNewReservationEmail(
+            String toEmail,
+            String hotelName,
+            String reservationNumber,
+            String roomTypeName,
+            String customerName,
+            String checkIn,
+            String checkOut) {
+        String body = wrapCorporateTemplate(
+                "Yeni Rezervasyon",
+                """
+                <p>Merhaba,</p>
+                <p><strong>%s</strong> için yeni bir rezervasyon oluşturuldu.</p>
+                <table style="width:100%%;border-collapse:collapse;margin:16px 0;">
+                  <tr><td style="padding:6px 0;color:#6b7280;width:140px;">Rezervasyon No</td><td style="padding:6px 0;font-weight:600;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Oda Tipi</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Müşteri</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Giriş</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Çıkış</td><td style="padding:6px 0;">%s</td></tr>
+                </table>
+                """.formatted(
+                        escape(hotelName),
+                        escape(reservationNumber),
+                        escape(roomTypeName),
+                        escape(customerName),
+                        escape(checkIn),
+                        escape(checkOut)),
+                new CallToAction("Panele Giriş Yap", frontendUrl + "/login"));
+        send(toEmail, "Yeni Rezervasyon - " + reservationNumber, body, "new reservation");
+    }
+
     private record CallToAction(String label, String url) {
     }
 

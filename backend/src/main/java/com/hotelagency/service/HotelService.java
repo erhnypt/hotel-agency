@@ -21,6 +21,8 @@ import com.hotelagency.repository.UserRepository;
 import com.hotelagency.security.JwtService;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.access.AccessDeniedException;
@@ -91,16 +93,29 @@ public class HotelService {
     }
 
     private void notifyAdminsOfNewRegistration(Hotel hotel) {
+        resolveAgencyAdminEmails().forEach(email -> emailService.sendAdminNewHotelNotification(
+                email, hotel.getName(), hotel.getContactPerson(), hotel.getEmail(), hotel.getPhone()));
+    }
+
+    /** Every AGENCY_ADMIN user's email, plus any extra addresses configured via {@code ADMIN_NOTIFY_EMAIL}. */
+    public Set<String> resolveAgencyAdminEmails() {
         LinkedHashSet<String> recipients = new LinkedHashSet<>();
         userRepository.findByRole_Name(RoleName.AGENCY_ADMIN).forEach(admin -> recipients.add(admin.getEmail()));
         if (adminNotifyEmails != null) {
             adminNotifyEmails.forEach(recipients::add);
         }
-        recipients.stream()
+        return recipients.stream()
                 .filter(email -> email != null && !email.isBlank())
                 .map(String::trim)
-                .forEach(email -> emailService.sendAdminNewHotelNotification(
-                        email, hotel.getName(), hotel.getContactPerson(), hotel.getEmail(), hotel.getPhone()));
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
+    /** The email(s) of the HOTEL_ADMIN user(s) linked to the given hotel. */
+    public List<String> resolveHotelOwnerEmails(Hotel hotel) {
+        return hotelUserRepository.findByHotelId(hotel.getId()).stream()
+                .map(link -> link.getUser().getEmail())
+                .filter(email -> email != null && !email.isBlank())
+                .toList();
     }
 
     public List<HotelResponse> findAll(User requester) {

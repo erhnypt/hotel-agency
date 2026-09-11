@@ -41,6 +41,8 @@ class RoomTypeServiceTest {
     private RoomImageRepository roomImageRepository;
     @Mock
     private HotelService hotelService;
+    @Mock
+    private EmailService emailService;
 
     private RoomTypeService roomTypeService;
 
@@ -49,7 +51,7 @@ class RoomTypeServiceTest {
 
     @BeforeEach
     void setUp() {
-        roomTypeService = new RoomTypeService(roomTypeRepository, roomImageRepository, hotelService);
+        roomTypeService = new RoomTypeService(roomTypeRepository, roomImageRepository, hotelService, emailService);
 
         Role hotelAdminRole = new Role(RoleName.HOTEL_ADMIN);
         hotelAdminRole.setId(3L);

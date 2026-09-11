@@ -20,6 +20,8 @@ import com.hotelagency.repository.RoomTypeRepository;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class ReservationService {
 
     private static final long RESERVATION_NUMBER_OFFSET = 100_000L;
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd.MM.yyyy");
 
     /** Statuses that hold a room and therefore count against availability. */
     private static final List<ReservationStatus> ACTIVE_STATUSES =
@@ -44,6 +47,7 @@ public class ReservationService {
     private final CustomerService customerService;
     private final HotelService hotelService;
     private final InvoiceService invoiceService;
+    private final EmailService emailService;
 
     @Transactional
     public ReservationResponse create(ReservationCreateRequest request, User requester) {
@@ -86,8 +90,25 @@ public class ReservationService {
         reservationRepository.save(reservation);
 
         recordHistory(reservation, ReservationStatus.PENDING);
+        notifyNewReservation(reservation);
 
         return ReservationResponse.from(reservation);
+    }
+
+    private void notifyNewReservation(Reservation reservation) {
+        LinkedHashSet<String> recipients = new LinkedHashSet<>();
+        recipients.addAll(hotelService.resolveHotelOwnerEmails(reservation.getHotel()));
+        recipients.addAll(hotelService.resolveAgencyAdminEmails());
+
+        String customerName = reservation.getCustomer().getFirstName() + " " + reservation.getCustomer().getLastName();
+        recipients.forEach(email -> emailService.sendNewReservationEmail(
+                email,
+                reservation.getHotel().getName(),
+                reservation.getReservationNumber(),
+                reservation.getRoomType().getName(),
+                customerName,
+                DATE_FMT.format(reservation.getCheckIn()),
+                DATE_FMT.format(reservation.getCheckOut())));
     }
 
     public List<AvailableRoomResponse> searchAvailableRooms(

@@ -11,6 +11,7 @@ import com.hotelagency.entity.User;
 import com.hotelagency.exception.ResourceNotFoundException;
 import com.hotelagency.repository.RoomImageRepository;
 import com.hotelagency.repository.RoomTypeRepository;
+import java.util.LinkedHashSet;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class RoomTypeService {
     private final RoomTypeRepository roomTypeRepository;
     private final RoomImageRepository roomImageRepository;
     private final HotelService hotelService;
+    private final EmailService emailService;
 
     @Transactional
     public RoomTypeResponse create(Long hotelId, RoomTypeRequest request, User requester) {
@@ -35,7 +37,18 @@ public class RoomTypeService {
         applyRequest(roomType, request);
         roomTypeRepository.save(roomType);
 
+        notifyRoomTypeCreated(hotel, roomType, requester);
+
         return RoomTypeResponse.from(roomType, List.of());
+    }
+
+    private void notifyRoomTypeCreated(Hotel hotel, RoomType roomType, User requester) {
+        LinkedHashSet<String> recipients = new LinkedHashSet<>();
+        if (requester.getEmail() != null && !requester.getEmail().isBlank()) {
+            recipients.add(requester.getEmail());
+        }
+        recipients.addAll(hotelService.resolveAgencyAdminEmails());
+        recipients.forEach(email -> emailService.sendRoomTypeCreatedEmail(email, hotel.getName(), roomType.getName()));
     }
 
     public List<RoomTypeResponse> listByHotel(Long hotelId, User requester) {
