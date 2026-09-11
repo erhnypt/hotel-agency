@@ -13,6 +13,7 @@ import com.hotelagency.entity.Role;
 import com.hotelagency.entity.RoleName;
 import com.hotelagency.entity.User;
 import com.hotelagency.exception.DuplicateResourceException;
+import com.hotelagency.repository.PasswordResetTokenRepository;
 import com.hotelagency.repository.RoleRepository;
 import com.hotelagency.repository.UserRepository;
 import com.hotelagency.security.JwtService;
@@ -35,9 +36,13 @@ class AuthServiceTest {
     @Mock
     private RoleRepository roleRepository;
     @Mock
+    private PasswordResetTokenRepository passwordResetTokenRepository;
+    @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
     private AuthenticationManager authenticationManager;
+    @Mock
+    private EmailService emailService;
 
     private AuthService authService;
 
@@ -46,7 +51,14 @@ class AuthServiceTest {
     @BeforeEach
     void setUp() {
         JwtService jwtService = new JwtService("test-secret-key-for-jwt-signing-must-be-long-enough", 3_600_000L, 604_800_000L);
-        authService = new AuthService(userRepository, roleRepository, passwordEncoder, authenticationManager, jwtService);
+        authService = new AuthService(
+                userRepository,
+                roleRepository,
+                passwordResetTokenRepository,
+                passwordEncoder,
+                authenticationManager,
+                jwtService,
+                emailService);
 
         staffRole = new Role(RoleName.AGENCY_STAFF);
         staffRole.setId(2L);
