@@ -7,7 +7,9 @@ import com.hotelagency.dto.hotel.HotelRegisterResponse;
 import com.hotelagency.dto.hotel.HotelResponse;
 import com.hotelagency.dto.hotel.HotelSetupReminderLogResponse;
 import com.hotelagency.dto.hotel.HotelUpdateRequest;
+import com.hotelagency.dto.hotel.IncompleteHotelSetupResponse;
 import com.hotelagency.entity.Hotel;
+import com.hotelagency.entity.HotelSetupReminderLog;
 import com.hotelagency.entity.HotelStatus;
 import com.hotelagency.entity.HotelUser;
 import com.hotelagency.entity.Role;
@@ -19,6 +21,7 @@ import com.hotelagency.repository.HotelRepository;
 import com.hotelagency.repository.HotelSetupReminderLogRepository;
 import com.hotelagency.repository.HotelUserRepository;
 import com.hotelagency.repository.RoleRepository;
+import com.hotelagency.repository.RoomTypeRepository;
 import com.hotelagency.repository.UserRepository;
 import com.hotelagency.security.JwtService;
 import java.time.Instant;
@@ -45,6 +48,7 @@ public class HotelService {
     private final JwtService jwtService;
     private final EmailService emailService;
     private final HotelSetupReminderLogRepository hotelSetupReminderLogRepository;
+    private final RoomTypeRepository roomTypeRepository;
 
     /**
      * Extra addresses always notified of new hotel registrations, on top of the AGENCY_ADMIN users.
@@ -127,6 +131,51 @@ public class HotelService {
         return hotelSetupReminderLogRepository.findAllByOrderBySentAtDesc().stream()
                 .map(HotelSetupReminderLogResponse::from)
                 .toList();
+    }
+
+    /** True once a hotel has at least one room type with a nightly price set, i.e. it can take a booking. */
+    public boolean hasCompletedSetup(Hotel hotel) {
+        return roomTypeRepository.existsByHotelIdAndBasePriceIsNotNull(hotel.getId());
+    }
+
+    @Transactional(readOnly = true)
+    public List<IncompleteHotelSetupResponse> listIncompleteHotels() {
+        return hotelRepository.findByStatus(HotelStatus.ACTIVE).stream()
+                .filter(hotel -> !hasCompletedSetup(hotel))
+                .map(IncompleteHotelSetupResponse::from)
+                .toList();
+    }
+
+    /** Manually re-sends the setup reminder for a hotel, regardless of the usual 12h cadence. */
+    @Transactional
+    public void sendManualSetupReminder(Long hotelId) {
+        Hotel hotel = getHotelOrThrow(hotelId);
+        if (hotel.getStatus() != HotelStatus.ACTIVE) {
+            throw new IllegalArgumentException("Sadece onaylanmış oteller için hatırlatma gönderilebilir");
+        }
+        if (hasCompletedSetup(hotel)) {
+            throw new IllegalArgumentException("Bu otel kurulumunu zaten tamamlamış");
+        }
+        sendSetupReminder(hotel);
+    }
+
+    /** Emails the hotel owner and agency admins a setup reminder, and logs it. */
+    @Transactional
+    public void sendSetupReminder(Hotel hotel) {
+        Instant now = Instant.now();
+        LinkedHashSet<String> recipients = new LinkedHashSet<>();
+
+        resolveHotelOwnerEmails(hotel).forEach(email -> {
+            recipients.add(email);
+            emailService.sendHotelSetupReminderEmail(email, hotel.getName());
+        });
+        resolveAgencyAdminEmails().forEach(email -> {
+            recipients.add(email);
+            emailService.sendHotelSetupReminderAdminNotification(email, hotel.getName());
+        });
+
+        hotel.setSetupReminderSentAt(now);
+        hotelSetupReminderLogRepository.save(new HotelSetupReminderLog(hotel, String.join(", ", recipients), now));
     }
 
     public List<HotelResponse> findAll(User requester) {

@@ -21,6 +21,7 @@ import com.hotelagency.repository.HotelRepository;
 import com.hotelagency.repository.HotelSetupReminderLogRepository;
 import com.hotelagency.repository.HotelUserRepository;
 import com.hotelagency.repository.RoleRepository;
+import com.hotelagency.repository.RoomTypeRepository;
 import com.hotelagency.repository.UserRepository;
 import com.hotelagency.security.JwtService;
 import java.util.List;
@@ -51,6 +52,8 @@ class HotelServiceTest {
     private EmailService emailService;
     @Mock
     private HotelSetupReminderLogRepository hotelSetupReminderLogRepository;
+    @Mock
+    private RoomTypeRepository roomTypeRepository;
 
     private HotelService hotelService;
 
@@ -63,7 +66,7 @@ class HotelServiceTest {
         JwtService jwtService = new JwtService("test-secret-key-for-jwt-signing-must-be-long-enough", 3_600_000L, 604_800_000L);
         hotelService = new HotelService(
                 hotelRepository, hotelUserRepository, userRepository, roleRepository,
-                passwordEncoder, jwtService, emailService, hotelSetupReminderLogRepository);
+                passwordEncoder, jwtService, emailService, hotelSetupReminderLogRepository, roomTypeRepository);
 
         hotelAdminRole = new Role(RoleName.HOTEL_ADMIN);
         hotelAdminRole.setId(3L);
@@ -312,5 +315,79 @@ class HotelServiceTest {
         Hotel result = hotelService.getOwnedHotel(1L, hotelAdmin);
 
         assertThat(result.getId()).isEqualTo(1L);
+    }
+
+    @Test
+    void listIncompleteHotelsExcludesHotelsWithAPricedRoomType() {
+        Hotel incomplete = new Hotel();
+        incomplete.setId(1L);
+        incomplete.setName("Incomplete Hotel");
+        incomplete.setStatus(HotelStatus.ACTIVE);
+
+        Hotel complete = new Hotel();
+        complete.setId(2L);
+        complete.setName("Complete Hotel");
+        complete.setStatus(HotelStatus.ACTIVE);
+
+        when(hotelRepository.findByStatus(HotelStatus.ACTIVE)).thenReturn(List.of(incomplete, complete));
+        when(roomTypeRepository.existsByHotelIdAndBasePriceIsNotNull(1L)).thenReturn(false);
+        when(roomTypeRepository.existsByHotelIdAndBasePriceIsNotNull(2L)).thenReturn(true);
+
+        List<com.hotelagency.dto.hotel.IncompleteHotelSetupResponse> result = hotelService.listIncompleteHotels();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).hotelId()).isEqualTo(1L);
+    }
+
+    @Test
+    void sendManualSetupReminderRejectsAlreadyCompletedHotel() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        hotel.setStatus(HotelStatus.ACTIVE);
+
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+        when(roomTypeRepository.existsByHotelIdAndBasePriceIsNotNull(1L)).thenReturn(true);
+
+        assertThatThrownBy(() -> hotelService.sendManualSetupReminder(1L))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void sendManualSetupReminderRejectsNonActiveHotel() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        hotel.setStatus(HotelStatus.PENDING);
+
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+
+        assertThatThrownBy(() -> hotelService.sendManualSetupReminder(1L))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void sendManualSetupReminderEmailsOwnerAndAdminsAndLogsIt() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        hotel.setName("Grand Hotel");
+        hotel.setStatus(HotelStatus.ACTIVE);
+
+        User owner = new User();
+        owner.setId(20L);
+        owner.setEmail("owner@hotel.test");
+
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+        when(roomTypeRepository.existsByHotelIdAndBasePriceIsNotNull(1L)).thenReturn(false);
+        when(hotelUserRepository.findByHotelId(1L)).thenReturn(List.of(new HotelUser(hotel, owner)));
+        when(userRepository.findByRole_Name(RoleName.AGENCY_ADMIN)).thenReturn(List.of());
+
+        hotelService.sendManualSetupReminder(1L);
+
+        verify(emailService).sendHotelSetupReminderEmail("owner@hotel.test", "Grand Hotel");
+        assertThat(hotel.getSetupReminderSentAt()).isNotNull();
+
+        ArgumentCaptor<com.hotelagency.entity.HotelSetupReminderLog> logCaptor =
+                ArgumentCaptor.forClass(com.hotelagency.entity.HotelSetupReminderLog.class);
+        verify(hotelSetupReminderLogRepository).save(logCaptor.capture());
+        assertThat(logCaptor.getValue().getRecipients()).contains("owner@hotel.test");
     }
 }

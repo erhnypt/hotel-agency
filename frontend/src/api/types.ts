@@ -8,6 +8,14 @@ export interface HotelSetupReminderLogResponse {
   sentAt: string
 }
 
+export interface IncompleteHotelSetupResponse {
+  hotelId: number
+  hotelName: string
+  hotelEmail: string
+  approvedAt: string | null
+  lastReminderSentAt: string | null
+}
+
 export interface StaffResponse {
   id: number
   fullName: string
