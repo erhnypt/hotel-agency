@@ -162,6 +162,12 @@
   font-size: 12px;
 }
 
+.data-table__paid {
+  color: var(--success);
+  font-weight: 600;
+  font-size: 12.5px;
+}
+
 .data-table__wrap {
   max-width: 220px;
   white-space: normal;

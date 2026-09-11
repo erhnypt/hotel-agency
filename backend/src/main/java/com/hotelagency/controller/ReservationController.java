@@ -7,7 +7,9 @@ import com.hotelagency.service.ReservationService;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -62,5 +64,29 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> cancel(
             @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(reservationService.cancel(id, principal.getUser()));
+    }
+
+    @PostMapping("/{id}/mark-paid")
+    @PreAuthorize("hasRole('HOTEL_ADMIN')")
+    public ResponseEntity<ReservationResponse> markPaid(
+            @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
+        return ResponseEntity.ok(reservationService.markPaid(id, principal.getUser()));
+    }
+
+    @PostMapping("/{id}/unmark-paid")
+    @PreAuthorize("hasRole('HOTEL_ADMIN')")
+    public ResponseEntity<ReservationResponse> unmarkPaid(
+            @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
+        return ResponseEntity.ok(reservationService.unmarkPaid(id, principal.getUser()));
+    }
+
+    @GetMapping("/{id}/invoice")
+    public ResponseEntity<byte[]> invoice(
+            @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
+        ReservationService.InvoiceFile invoice = reservationService.generateInvoice(id, principal.getUser());
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + invoice.filename() + "\"")
+                .body(invoice.bytes());
     }
 }

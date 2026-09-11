@@ -26,6 +26,28 @@ export async function cancelReservation(id: number): Promise<ReservationResponse
   return response.data
 }
 
+export async function markReservationPaid(id: number): Promise<ReservationResponse> {
+  const response = await apiClient.post<ReservationResponse>(`/reservations/${id}/mark-paid`)
+  return response.data
+}
+
+export async function unmarkReservationPaid(id: number): Promise<ReservationResponse> {
+  const response = await apiClient.post<ReservationResponse>(`/reservations/${id}/unmark-paid`)
+  return response.data
+}
+
+export async function downloadReservationInvoice(id: number, filename: string): Promise<void> {
+  const response = await apiClient.get(`/reservations/${id}/invoice`, { responseType: 'blob' })
+  const url = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  document.body.appendChild(link)
+  link.click()
+  link.remove()
+  URL.revokeObjectURL(url)
+}
+
 export async function searchAvailableRooms(
   hotelId: number,
   checkIn: string,

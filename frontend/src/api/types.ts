@@ -228,6 +228,8 @@ export interface ReservationResponse {
   totalPrice: number
   currency: string
   status: ReservationStatus
+  paid: boolean
+  paidAt: string | null
   createdByUserId: number
   createdAt: string
   updatedAt: string

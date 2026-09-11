@@ -18,6 +18,7 @@ import com.hotelagency.repository.ReservationRepository;
 import com.hotelagency.repository.ReservationStatusHistoryRepository;
 import com.hotelagency.repository.RoomTypeRepository;
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -42,6 +43,7 @@ public class ReservationService {
     private final CustomerRepository customerRepository;
     private final CustomerService customerService;
     private final HotelService hotelService;
+    private final InvoiceService invoiceService;
 
     @Transactional
     public ReservationResponse create(ReservationCreateRequest request, User requester) {
@@ -173,6 +175,46 @@ public class ReservationService {
         recordHistory(reservation, ReservationStatus.CANCELLED);
 
         return ReservationResponse.from(reservation);
+    }
+
+    @Transactional
+    public ReservationResponse markPaid(Long id, User requester) {
+        Reservation reservation = getReservationOrThrow(id);
+        assertHotelOwnership(reservation, requester);
+        if (reservation.getStatus() != ReservationStatus.CONFIRMED) {
+            throw new InvalidReservationException("Only confirmed reservations can be marked as paid");
+        }
+
+        reservation.setPaid(true);
+        reservation.setPaidAt(Instant.now());
+
+        return ReservationResponse.from(reservation);
+    }
+
+    @Transactional
+    public ReservationResponse unmarkPaid(Long id, User requester) {
+        Reservation reservation = getReservationOrThrow(id);
+        assertHotelOwnership(reservation, requester);
+
+        reservation.setPaid(false);
+        reservation.setPaidAt(null);
+
+        return ReservationResponse.from(reservation);
+    }
+
+    @Transactional(readOnly = true)
+    public InvoiceFile generateInvoice(Long id, User requester) {
+        Reservation reservation = getReservationOrThrow(id);
+        assertCanView(reservation, requester);
+        if (!reservation.isPaid()) {
+            throw new InvalidReservationException("Fatura oluşturmak için önce ödeme alınmış olmalı");
+        }
+
+        byte[] pdf = invoiceService.generate(reservation);
+        return new InvoiceFile(pdf, "fatura-" + reservation.getReservationNumber() + ".pdf");
+    }
+
+    public record InvoiceFile(byte[] bytes, String filename) {
     }
 
     private Customer resolveCustomer(ReservationCreateRequest request) {

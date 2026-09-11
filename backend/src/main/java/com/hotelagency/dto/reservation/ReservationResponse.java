@@ -21,6 +21,8 @@ public record ReservationResponse(
         BigDecimal totalPrice,
         String currency,
         ReservationStatus status,
+        boolean paid,
+        Instant paidAt,
         Long createdByUserId,
         Instant createdAt,
         Instant updatedAt) {
@@ -40,6 +42,8 @@ public record ReservationResponse(
                 reservation.getTotalPrice(),
                 reservation.getCurrency(),
                 reservation.getStatus(),
+                reservation.isPaid(),
+                reservation.getPaidAt(),
                 reservation.getCreatedBy().getId(),
                 reservation.getCreatedAt(),
                 reservation.getUpdatedAt());

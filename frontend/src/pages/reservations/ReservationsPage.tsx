@@ -1,6 +1,14 @@
 import axios from 'axios'
 import { useMemo, useState } from 'react'
-import { cancelReservation, confirmReservation, listReservations, rejectReservation } from '../../api/reservations'
+import {
+  cancelReservation,
+  confirmReservation,
+  downloadReservationInvoice,
+  listReservations,
+  markReservationPaid,
+  rejectReservation,
+  unmarkReservationPaid,
+} from '../../api/reservations'
 import type { ReservationResponse, ReservationStatus } from '../../api/types'
 import type { ApiErrorResponse } from '../../auth/types'
 import { useAuth } from '../../auth/useAuth'
@@ -79,6 +87,22 @@ export function ReservationsPage() {
     }
   }
 
+  const handleDownloadInvoice = async (r: ReservationResponse) => {
+    setError(null)
+    setBusyId(r.id)
+    try {
+      await downloadReservationInvoice(r.id, `fatura-${r.reservationNumber}.pdf`)
+    } catch (err) {
+      if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
+        setError(err.response.data.message)
+      } else {
+        setError('Fatura indirilemedi.')
+      }
+    } finally {
+      setBusyId(null)
+    }
+  }
+
   const emptyMessage =
     statusFilter === 'ALL' ? 'Bu otelde rezervasyon yok.' : `"${STATUS_LABELS[statusFilter]}" durumunda rezervasyon yok.`
 
@@ -96,6 +120,7 @@ export function ReservationsPage() {
             <th>Misafir</th>
             <th>Toplam</th>
             <th>Durum</th>
+            <th>Ödeme</th>
             <th></th>
           </tr>
         </thead>
@@ -132,7 +157,52 @@ export function ReservationsPage() {
                 <StatusBadge status={r.status} />
               </td>
               <td>
+                {r.paid ? (
+                  <span className="data-table__paid">
+                    Ödendi
+                    {r.paidAt && (
+                      <>
+                        <br />
+                        <span className="data-table__muted">{new Date(r.paidAt).toLocaleDateString('tr-TR')}</span>
+                      </>
+                    )}
+                  </span>
+                ) : (
+                  <span className="data-table__muted">—</span>
+                )}
+              </td>
+              <td>
                 <div className="data-table__actions">
+                  {user?.role === 'HOTEL_ADMIN' && r.status === 'CONFIRMED' && !r.paid && (
+                    <button
+                      type="button"
+                      className="btn btn--small"
+                      disabled={busyId === r.id}
+                      onClick={() => handleAction(r.id, markReservationPaid)}
+                    >
+                      Ödeme Alındı
+                    </button>
+                  )}
+                  {user?.role === 'HOTEL_ADMIN' && r.paid && (
+                    <button
+                      type="button"
+                      className="btn btn--small"
+                      disabled={busyId === r.id}
+                      onClick={() => handleAction(r.id, unmarkReservationPaid)}
+                    >
+                      Ödemeyi Geri Al
+                    </button>
+                  )}
+                  {r.paid && (
+                    <button
+                      type="button"
+                      className="btn btn--small btn--primary"
+                      disabled={busyId === r.id}
+                      onClick={() => handleDownloadInvoice(r)}
+                    >
+                      Faturayı İndir
+                    </button>
+                  )}
                   {user?.role === 'HOTEL_ADMIN' && r.status === 'PENDING' && (
                     <>
                       <button
@@ -171,7 +241,7 @@ export function ReservationsPage() {
           ))}
           {items.length === 0 && (
             <tr>
-              <td colSpan={10} className="data-table__empty">
+              <td colSpan={11} className="data-table__empty">
                 {emptyMessage}
               </td>
             </tr>

@@ -59,6 +59,12 @@ public class Reservation {
     @Column(name = "status", nullable = false, length = 20)
     private ReservationStatus status = ReservationStatus.PENDING;
 
+    @Column(name = "paid", nullable = false)
+    private boolean paid = false;
+
+    @Column(name = "paid_at")
+    private Instant paidAt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;
