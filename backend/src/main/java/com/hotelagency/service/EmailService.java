@@ -182,6 +182,22 @@ public class EmailService {
         send(toEmail, "Rezervasyon Onaylandı - " + reservationNumber, body, "reservation confirmed");
     }
 
+    @Async
+    public void sendHotelSetupReminderEmail(String toEmail, String hotelName) {
+        String body = wrapCorporateTemplate(
+                "Otel Kurulumunuzu Tamamlayın",
+                """
+                <p>Merhaba,</p>
+                <p><strong>%s</strong> onaylandı, ancak rezervasyon alabilmeniz için henüz oda tipi ve
+                gecelik fiyat girişi tamamlanmamış görünüyor.</p>
+                <p>Otel yönetim panelinizden en az bir oda tipi ekleyip gecelik fiyatını girerek
+                otelinizi rezervasyona açabilirsiniz. Tamamlanana kadar bu hatırlatmayı periyodik olarak
+                almaya devam edeceksiniz.</p>
+                """.formatted(escape(hotelName)),
+                new CallToAction("Panele Giriş Yap", frontendUrl + "/login"));
+        send(toEmail, "Otel Kurulumunuzu Tamamlayın - " + hotelName, body, "setup reminder");
+    }
+
     private record CallToAction(String label, String url) {
     }
 

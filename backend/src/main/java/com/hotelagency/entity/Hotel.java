@@ -50,6 +50,12 @@ public class Hotel {
     @Column(name = "status", nullable = false, length = 20)
     private HotelStatus status = HotelStatus.PENDING;
 
+    @Column(name = "approved_at")
+    private Instant approvedAt;
+
+    @Column(name = "setup_reminder_sent_at")
+    private Instant setupReminderSentAt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

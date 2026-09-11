@@ -19,6 +19,7 @@ import com.hotelagency.repository.HotelUserRepository;
 import com.hotelagency.repository.RoleRepository;
 import com.hotelagency.repository.UserRepository;
 import com.hotelagency.security.JwtService;
+import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -183,6 +184,7 @@ public class HotelService {
     public HotelResponse approve(Long id) {
         Hotel hotel = getHotelOrThrow(id);
         hotel.setStatus(HotelStatus.ACTIVE);
+        hotel.setApprovedAt(Instant.now());
         emailService.sendHotelApprovalEmail(hotel.getEmail(), hotel.getName());
         return HotelResponse.from(hotel);
     }
