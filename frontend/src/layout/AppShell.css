@@ -173,7 +173,7 @@
 
 .app-shell__content {
   padding: 32px;
-  animation: rise-in 440ms var(--ease) both;
+  animation: rise-in 440ms var(--ease);
 }
 
 @media (max-width: 760px) {
