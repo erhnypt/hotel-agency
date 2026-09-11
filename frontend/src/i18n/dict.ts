@@ -75,6 +75,15 @@ const tr: Dict = {
     '{name} için otel başvurunuz alınmıştır. Başvurunuz acente ekibimiz tarafından incelenmektedir; onay durumu {email} adresine e-posta ile bildirilecektir.',
   'register.doneFooterPre': 'Onaylandıktan sonra belirlediğiniz şifre ile',
   'register.doneFooterLink': 'giriş yapabilirsiniz',
+  'register.agreementPre': '',
+  'register.agreementLink': 'Otel İş Ortaklığı ve Listeleme Sözleşmesi',
+  'register.agreementPost': "'ni okudum ve kabul ediyorum.",
+  'register.agreementRequired': 'Devam etmek için sözleşmeyi kabul etmelisiniz.',
+  'hotelAgreement.title': 'Otel İş Ortaklığı ve Listeleme Sözleşmesi',
+  'hotelAgreement.lead':
+    'Bu sözleşme, otelinizin Travel Sites platformunda listelenmesine ilişkin karşılıklı hak ve yükümlülükleri düzenler. Kayıt sırasında kabul edilmesi gerekir.',
+  'hotelAgreement.version': 'Sürüm 1.0',
+  'footer.hotelAgreement': 'Otel Sözleşmesi',
 
   'gate.pendingTitle': 'Başvurunuz İnceleniyor',
   'gate.pendingBody':
@@ -306,6 +315,10 @@ const en: Dict = {
     'Your application for {name} has been received. Our agency team is reviewing it; the outcome will be emailed to {email}.',
   'register.doneFooterPre': 'Once approved, you can',
   'register.doneFooterLink': 'sign in with the password you chose',
+  'register.agreementPre': 'I have read and accept the ',
+  'register.agreementLink': 'Hotel Partnership and Listing Agreement',
+  'register.agreementPost': '.',
+  'register.agreementRequired': 'You must accept the agreement to continue.',
 
   'gate.pendingTitle': 'Application Under Review',
   'gate.pendingBody':
@@ -537,6 +550,10 @@ const ru: Dict = {
     'Ваша заявка на отель «{name}» принята. Команда агентства рассматривает её; о результате сообщим на адрес {email}.',
   'register.doneFooterPre': 'После одобрения вы сможете',
   'register.doneFooterLink': 'войти с выбранным паролем',
+  'register.agreementPre': 'Я прочитал(а) и принимаю ',
+  'register.agreementLink': 'Соглашение о партнёрстве и размещении отеля',
+  'register.agreementPost': '.',
+  'register.agreementRequired': 'Чтобы продолжить, необходимо принять соглашение.',
 
   'gate.pendingTitle': 'Заявка на рассмотрении',
   'gate.pendingBody':
@@ -768,6 +785,10 @@ const de: Dict = {
     'Ihr Hotelantrag für {name} ist eingegangen. Unser Agenturteam prüft ihn; das Ergebnis wird an {email} per E-Mail mitgeteilt.',
   'register.doneFooterPre': 'Nach der Freigabe können Sie sich',
   'register.doneFooterLink': 'mit dem gewählten Passwort anmelden',
+  'register.agreementPre': 'Ich habe die ',
+  'register.agreementLink': 'Vereinbarung über Hotelpartnerschaft und Listung',
+  'register.agreementPost': ' gelesen und akzeptiere sie.',
+  'register.agreementRequired': 'Sie müssen die Vereinbarung akzeptieren, um fortzufahren.',
 
   'gate.pendingTitle': 'Antrag in Prüfung',
   'gate.pendingBody':
@@ -999,6 +1020,10 @@ const es: Dict = {
     'Se ha recibido tu solicitud de hotel para {name}. Nuestro equipo de agencia la está revisando; el resultado se comunicará por correo a {email}.',
   'register.doneFooterPre': 'Una vez aprobada, podrás',
   'register.doneFooterLink': 'iniciar sesión con la contraseña que elegiste',
+  'register.agreementPre': 'He leído y acepto el ',
+  'register.agreementLink': 'Acuerdo de Colaboración y Publicación de Hoteles',
+  'register.agreementPost': '.',
+  'register.agreementRequired': 'Debes aceptar el acuerdo para continuar.',
 
   'gate.pendingTitle': 'Solicitud en revisión',
   'gate.pendingBody':
@@ -1230,6 +1255,10 @@ const ar: Dict = {
     'تم استلام طلب فندقك الخاص بـ {name}. يقوم فريق الوكالة بمراجعته؛ وسيتم إبلاغ النتيجة عبر البريد إلى {email}.',
   'register.doneFooterPre': 'بعد الموافقة يمكنك',
   'register.doneFooterLink': 'تسجيل الدخول بكلمة المرور التي اخترتها',
+  'register.agreementPre': 'لقد قرأت وأوافق على ',
+  'register.agreementLink': 'اتفاقية شراكة وإدراج الفندق',
+  'register.agreementPost': '.',
+  'register.agreementRequired': 'يجب قبول الاتفاقية للمتابعة.',
 
   'gate.pendingTitle': 'الطلب قيد المراجعة',
   'gate.pendingBody':

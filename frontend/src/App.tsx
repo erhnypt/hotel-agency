@@ -16,6 +16,7 @@ import { ContactPage } from './pages/public/ContactPage'
 import { FaqPage } from './pages/public/FaqPage'
 import { PrivacyPage } from './pages/public/PrivacyPage'
 import { TermsPage } from './pages/public/TermsPage'
+import { HotelAgreementPage } from './pages/public/HotelAgreementPage'
 import { HotelProfilePage } from './pages/hotelProfile/HotelProfilePage'
 import { HotelsPage } from './pages/hotels/HotelsPage'
 import { LoginPage } from './pages/LoginPage'
@@ -36,6 +37,7 @@ function App() {
         <Route path="/sss" element={<FaqPage />} />
         <Route path="/gizlilik" element={<PrivacyPage />} />
         <Route path="/kosullar" element={<TermsPage />} />
+        <Route path="/otel-sozlesmesi" element={<HotelAgreementPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<HotelRegisterPage />} />
 

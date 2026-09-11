@@ -5,6 +5,8 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   server: {
+    // Allow importing the canonical legal text from repo-root docs/ (see HotelAgreementPage).
+    fs: { allow: ['..'] },
     proxy: {
       '/api': {
         target: 'http://localhost:8080',

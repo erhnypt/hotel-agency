@@ -7,8 +7,8 @@ import '../landing/LandingPage.css'
 export const CONTACT = {
   name: 'Travel Sites',
   street: ['204 Alano Plaza', 'San Antonio, TX 78205'],
-  whatsapp: '+1 512 318177',
-  whatsappHref: 'https://wa.me/1512318177',
+  whatsapp: '+1 512 3185177',
+  whatsappHref: 'https://wa.me/15123185177',
   email: 'hello@travellsites.com',
 }
 
@@ -76,6 +76,7 @@ export function PublicFooter() {
           <h3>{t('footer.legal')}</h3>
           <Link to="/gizlilik">{t('footer.privacy')}</Link>
           <Link to="/kosullar">{t('footer.terms')}</Link>
+          <Link to="/otel-sozlesmesi">{t('footer.hotelAgreement')}</Link>
         </nav>
 
         <div className="lp-footer__col">

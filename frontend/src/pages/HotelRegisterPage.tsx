@@ -24,6 +24,7 @@ export function HotelRegisterPage() {
     description: '',
   })
 
+  const [agreementAccepted, setAgreementAccepted] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
   const [registered, setRegistered] = useState(false)
@@ -40,10 +41,16 @@ export function HotelRegisterPage() {
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setError(null)
+
+    if (!agreementAccepted) {
+      setError(t('register.agreementRequired'))
+      return
+    }
+
     setSubmitting(true)
 
     try {
-      await apiClient.post('/hotels', formData)
+      await apiClient.post('/hotels', { ...formData, agreementAccepted })
       setRegistered(true)
     } catch (err: unknown) {
       const axiosError = err as { response?: { data?: { message?: string } }; message?: string }
@@ -167,6 +174,22 @@ export function HotelRegisterPage() {
             rows={3}
             placeholder={t('register.descriptionPlaceholder')}
           />
+        </label>
+
+        <label className="login-check">
+          <input
+            type="checkbox"
+            name="agreementAccepted"
+            checked={agreementAccepted}
+            onChange={(event) => setAgreementAccepted(event.target.checked)}
+          />
+          <span>
+            {t('register.agreementPre')}
+            <Link to="/otel-sozlesmesi" target="_blank" rel="noopener noreferrer">
+              {t('register.agreementLink')}
+            </Link>
+            {t('register.agreementPost')}
+          </span>
         </label>
 
         {error && (
