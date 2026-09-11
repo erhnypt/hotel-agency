@@ -47,6 +47,8 @@ export interface HotelUpdateRequest {
   contactPerson: string
 }
 
+export const MAX_ROOM_IMAGES = 3
+
 export interface RoomImageResponse {
   id: number
   roomTypeId: number

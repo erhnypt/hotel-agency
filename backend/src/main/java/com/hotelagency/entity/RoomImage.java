@@ -22,7 +22,7 @@ public class RoomImage {
     @JoinColumn(name = "room_type_id", nullable = false)
     private RoomType roomType;
 
-    @Column(name = "image_url", nullable = false)
+    @Column(name = "image_url", nullable = false, columnDefinition = "TEXT")
     private String imageUrl;
 
     @CreationTimestamp

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { getMyHotel, listRoomTypes } from '../../api/hotels'
-import { createRoomType, deleteRoomType, updateRoomType } from '../../api/roomTypes'
+import { addRoomImage, createRoomType, deleteRoomType, updateRoomType } from '../../api/roomTypes'
 import type { RoomTypeRequest, RoomTypeResponse } from '../../api/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
@@ -25,8 +25,11 @@ export function RoomTypesPage() {
   if (hotel.loading) return <LoadingState />
   if (hotel.error) return <ErrorState message={hotel.error} />
 
-  const handleCreate = async (request: RoomTypeRequest) => {
-    await createRoomType(hotel.data!.id, request)
+  const handleCreate = async (request: RoomTypeRequest, imageDataUrls?: string[]) => {
+    const created = await createRoomType(hotel.data!.id, request)
+    for (const dataUrl of imageDataUrls ?? []) {
+      await addRoomImage(created.id, dataUrl)
+    }
     setShowCreateModal(false)
     refresh()
   }

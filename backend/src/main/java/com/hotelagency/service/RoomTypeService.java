@@ -20,6 +20,8 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RoomTypeService {
 
+    private static final int MAX_IMAGES_PER_ROOM_TYPE = 3;
+
     private final RoomTypeRepository roomTypeRepository;
     private final RoomImageRepository roomImageRepository;
     private final HotelService hotelService;
@@ -64,6 +66,11 @@ public class RoomTypeService {
     @Transactional
     public RoomImageResponse addImage(Long roomTypeId, RoomImageRequest request, User requester) {
         RoomType roomType = getOwnedRoomType(roomTypeId, requester);
+
+        if (roomImageRepository.findByRoomTypeId(roomTypeId).size() >= MAX_IMAGES_PER_ROOM_TYPE) {
+            throw new IllegalArgumentException(
+                    "Bir oda tipi için en fazla " + MAX_IMAGES_PER_ROOM_TYPE + " görsel eklenebilir");
+        }
 
         RoomImage image = roomImageRepository.save(new RoomImage(roomType, request.imageUrl()));
         return RoomImageResponse.from(image);

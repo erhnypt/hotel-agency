@@ -2,6 +2,7 @@ import axios from 'axios'
 import { useState, type FormEvent } from 'react'
 import type { ApiErrorResponse } from '../../auth/types'
 import { Modal } from '../../components/Modal'
+import { ImageUploadField } from '../../components/ImageUploadField'
 import type { RoomTypeRequest, RoomTypeResponse } from '../../api/types'
 import '../../components/crud.css'
 
@@ -12,7 +13,7 @@ export function RoomTypeFormModal({
 }: {
   roomType: RoomTypeResponse | null
   onClose: () => void
-  onSave: (request: RoomTypeRequest) => Promise<void>
+  onSave: (request: RoomTypeRequest, imageDataUrls?: string[]) => Promise<void>
 }) {
   const [name, setName] = useState(roomType?.name ?? '')
   const [description, setDescription] = useState(roomType?.description ?? '')
@@ -20,6 +21,7 @@ export function RoomTypeFormModal({
   const [numberOfRooms, setNumberOfRooms] = useState(String(roomType?.numberOfRooms ?? 1))
   const [bedType, setBedType] = useState(roomType?.bedType ?? '')
   const [roomSize, setRoomSize] = useState(roomType?.roomSize != null ? String(roomType.roomSize) : '')
+  const [stagedImages, setStagedImages] = useState<{ key: string; url: string }[]>([])
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -28,14 +30,17 @@ export function RoomTypeFormModal({
     setError(null)
     setSubmitting(true)
     try {
-      await onSave({
-        name,
-        description: description || null,
-        capacity: Number(capacity),
-        numberOfRooms: Number(numberOfRooms),
-        bedType,
-        roomSize: roomSize ? Number(roomSize) : null,
-      })
+      await onSave(
+        {
+          name,
+          description: description || null,
+          capacity: Number(capacity),
+          numberOfRooms: Number(numberOfRooms),
+          bedType,
+          roomSize: roomSize ? Number(roomSize) : null,
+        },
+        roomType ? undefined : stagedImages.map((image) => image.url),
+      )
     } catch (err) {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
@@ -80,6 +85,19 @@ export function RoomTypeFormModal({
           <span>Oda Büyüklüğü (m²)</span>
           <input type="number" min={0} step="0.1" value={roomSize} onChange={(e) => setRoomSize(e.target.value)} />
         </label>
+
+        {!roomType && (
+          <label className="form-field">
+            <span>Fotoğraflar</span>
+            <ImageUploadField
+              images={stagedImages}
+              onAdd={(dataUrl) =>
+                setStagedImages((prev) => [...prev, { key: crypto.randomUUID(), url: dataUrl }])
+              }
+              onRemove={(key) => setStagedImages((prev) => prev.filter((image) => image.key !== key))}
+            />
+          </label>
+        )}
 
         {error && <p className="form-error">{error}</p>}
 
