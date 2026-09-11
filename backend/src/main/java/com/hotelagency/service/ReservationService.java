@@ -164,8 +164,21 @@ public class ReservationService {
 
         reservation.setStatus(ReservationStatus.CONFIRMED);
         recordHistory(reservation, ReservationStatus.CONFIRMED);
+        notifyReservationConfirmed(reservation);
 
         return ReservationResponse.from(reservation);
+    }
+
+    private void notifyReservationConfirmed(Reservation reservation) {
+        String customerName = reservation.getCustomer().getFirstName() + " " + reservation.getCustomer().getLastName();
+        hotelService.resolveAgencyAdminEmails().forEach(email -> emailService.sendReservationConfirmedEmail(
+                email,
+                reservation.getHotel().getName(),
+                reservation.getReservationNumber(),
+                reservation.getRoomType().getName(),
+                customerName,
+                DATE_FMT.format(reservation.getCheckIn()),
+                DATE_FMT.format(reservation.getCheckOut())));
     }
 
     @Transactional

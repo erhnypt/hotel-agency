@@ -150,6 +150,38 @@ public class EmailService {
         send(toEmail, "Yeni Rezervasyon - " + reservationNumber, body, "new reservation");
     }
 
+    @Async
+    public void sendReservationConfirmedEmail(
+            String toEmail,
+            String hotelName,
+            String reservationNumber,
+            String roomTypeName,
+            String customerName,
+            String checkIn,
+            String checkOut) {
+        String body = wrapCorporateTemplate(
+                "Rezervasyon Onaylandı",
+                """
+                <p>Merhaba,</p>
+                <p><strong>%s</strong> otel tarafından bir rezervasyon onaylandı.</p>
+                <table style="width:100%%;border-collapse:collapse;margin:16px 0;">
+                  <tr><td style="padding:6px 0;color:#6b7280;width:140px;">Rezervasyon No</td><td style="padding:6px 0;font-weight:600;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Oda Tipi</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Müşteri</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Giriş</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Çıkış</td><td style="padding:6px 0;">%s</td></tr>
+                </table>
+                """.formatted(
+                        escape(hotelName),
+                        escape(reservationNumber),
+                        escape(roomTypeName),
+                        escape(customerName),
+                        escape(checkIn),
+                        escape(checkOut)),
+                new CallToAction("Panele Giriş Yap", frontendUrl + "/login"));
+        send(toEmail, "Rezervasyon Onaylandı - " + reservationNumber, body, "reservation confirmed");
+    }
+
     private record CallToAction(String label, String url) {
     }
 
