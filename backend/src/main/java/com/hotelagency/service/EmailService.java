@@ -198,6 +198,20 @@ public class EmailService {
         send(toEmail, "Otel Kurulumunuzu Tamamlayın - " + hotelName, body, "setup reminder");
     }
 
+    @Async
+    public void sendHotelSetupReminderAdminNotification(String adminEmail, String hotelName) {
+        String body = wrapCorporateTemplate(
+                "Otel Kurulumu Hala Tamamlanmadı",
+                """
+                <p>Merhaba,</p>
+                <p><strong>%s</strong> otelinin onayının üzerinden belirli bir süre geçmesine rağmen
+                henüz oda tipi ve gecelik fiyat girişini tamamlamadığı tespit edildi. Otele bir
+                hatırlatma e-postası gönderildi.</p>
+                """.formatted(escape(hotelName)),
+                new CallToAction("Otelleri Görüntüle", frontendUrl + "/admin/hotels"));
+        send(adminEmail, "Otel Kurulumu Tamamlanmadı - " + hotelName, body, "setup reminder admin notice");
+    }
+
     private record CallToAction(String label, String url) {
     }
 

@@ -1,11 +1,14 @@
 package com.hotelagency.service;
 
 import com.hotelagency.entity.Hotel;
+import com.hotelagency.entity.HotelSetupReminderLog;
 import com.hotelagency.entity.HotelStatus;
 import com.hotelagency.repository.HotelRepository;
+import com.hotelagency.repository.HotelSetupReminderLogRepository;
 import com.hotelagency.repository.RoomTypeRepository;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.LinkedHashSet;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -28,6 +31,7 @@ public class HotelSetupReminderScheduler {
     private final RoomTypeRepository roomTypeRepository;
     private final HotelService hotelService;
     private final EmailService emailService;
+    private final HotelSetupReminderLogRepository hotelSetupReminderLogRepository;
 
     @Scheduled(fixedRate = 60 * 60 * 1000)
     @Transactional
@@ -47,9 +51,19 @@ public class HotelSetupReminderScheduler {
                 continue;
             }
 
-            hotelService.resolveHotelOwnerEmails(hotel)
-                    .forEach(email -> emailService.sendHotelSetupReminderEmail(email, hotel.getName()));
+            LinkedHashSet<String> recipients = new LinkedHashSet<>();
+            hotelService.resolveHotelOwnerEmails(hotel).forEach(email -> {
+                recipients.add(email);
+                emailService.sendHotelSetupReminderEmail(email, hotel.getName());
+            });
+            hotelService.resolveAgencyAdminEmails().forEach(email -> {
+                recipients.add(email);
+                emailService.sendHotelSetupReminderAdminNotification(email, hotel.getName());
+            });
+
             hotel.setSetupReminderSentAt(now);
+            hotelSetupReminderLogRepository.save(
+                    new HotelSetupReminderLog(hotel, String.join(", ", recipients), now));
         }
     }
 }

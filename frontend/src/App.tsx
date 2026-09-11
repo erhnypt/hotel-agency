@@ -28,6 +28,7 @@ import { NewReservationPage } from './pages/reservations/NewReservationPage'
 import { ReservationsPage } from './pages/reservations/ReservationsPage'
 import { RoomTypesPage } from './pages/roomTypes/RoomTypesPage'
 import { ServicesPage } from './pages/services/ServicesPage'
+import { HotelSetupReminderLogsPage } from './pages/hotelSetupReminders/HotelSetupReminderLogsPage'
 
 function App() {
   return (
@@ -54,6 +55,7 @@ function App() {
             <Route path="booking-requests" element={<BookingRequestsPage />} />
             <Route path="customers" element={<CustomersPage />} />
             <Route path="staff" element={<StaffPage />} />
+            <Route path="setup-reminders" element={<HotelSetupReminderLogsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 

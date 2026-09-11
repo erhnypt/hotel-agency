@@ -5,6 +5,7 @@ import com.hotelagency.dto.auth.UserSummary;
 import com.hotelagency.dto.hotel.HotelRegisterRequest;
 import com.hotelagency.dto.hotel.HotelRegisterResponse;
 import com.hotelagency.dto.hotel.HotelResponse;
+import com.hotelagency.dto.hotel.HotelSetupReminderLogResponse;
 import com.hotelagency.dto.hotel.HotelUpdateRequest;
 import com.hotelagency.entity.Hotel;
 import com.hotelagency.entity.HotelStatus;
@@ -15,6 +16,7 @@ import com.hotelagency.entity.User;
 import com.hotelagency.exception.DuplicateResourceException;
 import com.hotelagency.exception.ResourceNotFoundException;
 import com.hotelagency.repository.HotelRepository;
+import com.hotelagency.repository.HotelSetupReminderLogRepository;
 import com.hotelagency.repository.HotelUserRepository;
 import com.hotelagency.repository.RoleRepository;
 import com.hotelagency.repository.UserRepository;
@@ -42,6 +44,7 @@ public class HotelService {
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final EmailService emailService;
+    private final HotelSetupReminderLogRepository hotelSetupReminderLogRepository;
 
     /**
      * Extra addresses always notified of new hotel registrations, on top of the AGENCY_ADMIN users.
@@ -116,6 +119,13 @@ public class HotelService {
         return hotelUserRepository.findByHotelId(hotel.getId()).stream()
                 .map(link -> link.getUser().getEmail())
                 .filter(email -> email != null && !email.isBlank())
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<HotelSetupReminderLogResponse> listSetupReminderLogs() {
+        return hotelSetupReminderLogRepository.findAllByOrderBySentAtDesc().stream()
+                .map(HotelSetupReminderLogResponse::from)
                 .toList();
     }
 

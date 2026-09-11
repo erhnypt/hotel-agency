@@ -12,6 +12,7 @@ export const ADMIN_MENU: MenuItem[] = [
   { labelKey: 'nav.requests', path: '/admin/booking-requests' },
   { labelKey: 'nav.customers', path: '/admin/customers' },
   { labelKey: 'nav.staff', path: '/admin/staff' },
+  { labelKey: 'nav.setupReminders', path: '/admin/setup-reminders' },
   { labelKey: 'nav.settings', path: '/admin/settings' },
 ]
 

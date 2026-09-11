@@ -18,6 +18,7 @@ import com.hotelagency.entity.User;
 import com.hotelagency.exception.DuplicateResourceException;
 import com.hotelagency.exception.ResourceNotFoundException;
 import com.hotelagency.repository.HotelRepository;
+import com.hotelagency.repository.HotelSetupReminderLogRepository;
 import com.hotelagency.repository.HotelUserRepository;
 import com.hotelagency.repository.RoleRepository;
 import com.hotelagency.repository.UserRepository;
@@ -48,6 +49,8 @@ class HotelServiceTest {
     private PasswordEncoder passwordEncoder;
     @Mock
     private EmailService emailService;
+    @Mock
+    private HotelSetupReminderLogRepository hotelSetupReminderLogRepository;
 
     private HotelService hotelService;
 
@@ -58,7 +61,9 @@ class HotelServiceTest {
     @BeforeEach
     void setUp() {
         JwtService jwtService = new JwtService("test-secret-key-for-jwt-signing-must-be-long-enough", 3_600_000L, 604_800_000L);
-        hotelService = new HotelService(hotelRepository, hotelUserRepository, userRepository, roleRepository, passwordEncoder, jwtService, emailService);
+        hotelService = new HotelService(
+                hotelRepository, hotelUserRepository, userRepository, roleRepository,
+                passwordEncoder, jwtService, emailService, hotelSetupReminderLogRepository);
 
         hotelAdminRole = new Role(RoleName.HOTEL_ADMIN);
         hotelAdminRole.setId(3L);

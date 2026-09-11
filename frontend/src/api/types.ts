@@ -1,5 +1,13 @@
 export type HotelStatus = 'PENDING' | 'ACTIVE' | 'REJECTED'
 
+export interface HotelSetupReminderLogResponse {
+  id: number
+  hotelId: number
+  hotelName: string
+  recipients: string
+  sentAt: string
+}
+
 export interface StaffResponse {
   id: number
   fullName: string
