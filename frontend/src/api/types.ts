@@ -1,5 +1,15 @@
 export type HotelStatus = 'PENDING' | 'ACTIVE' | 'REJECTED'
 
+export interface SupportMessageResponse {
+  id: number
+  hotelId: number
+  senderId: number
+  senderName: string
+  senderRole: 'HOTEL_ADMIN' | 'AGENCY_ADMIN' | 'AGENCY_STAFF'
+  body: string
+  createdAt: string
+}
+
 export interface HotelSetupReminderLogResponse {
   id: number
   hotelId: number

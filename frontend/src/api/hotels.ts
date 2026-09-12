@@ -11,6 +11,11 @@ export async function getMyHotel(): Promise<HotelResponse> {
   return response.data
 }
 
+export async function getHotel(id: number): Promise<HotelResponse> {
+  const response = await apiClient.get<HotelResponse>(`/hotels/${id}`)
+  return response.data
+}
+
 export async function updateHotel(id: number, request: HotelUpdateRequest): Promise<HotelResponse> {
   const response = await apiClient.put<HotelResponse>(`/hotels/${id}`, request)
   return response.data

@@ -29,6 +29,8 @@ import { ReservationsPage } from './pages/reservations/ReservationsPage'
 import { RoomTypesPage } from './pages/roomTypes/RoomTypesPage'
 import { ServicesPage } from './pages/services/ServicesPage'
 import { HotelSetupReminderLogsPage } from './pages/hotelSetupReminders/HotelSetupReminderLogsPage'
+import { HotelSupportPage } from './pages/support/HotelSupportPage'
+import { AgencyHotelSupportPage } from './pages/support/AgencyHotelSupportPage'
 
 function App() {
   return (
@@ -50,6 +52,7 @@ function App() {
           <Route path="/admin" element={<RoleShell role="AGENCY_ADMIN" panelTitleKey="panel.admin" menu={ADMIN_MENU} />}>
             <Route index element={<AgencyAdminDashboard />} />
             <Route path="hotels" element={<HotelsPage />} />
+            <Route path="hotels/:hotelId/support" element={<AgencyHotelSupportPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
             <Route path="reservations/new" element={<NewReservationPage />} />
             <Route path="booking-requests" element={<BookingRequestsPage />} />
@@ -62,6 +65,7 @@ function App() {
           <Route path="/staff" element={<RoleShell role="AGENCY_STAFF" panelTitleKey="panel.staff" menu={STAFF_MENU} />}>
             <Route index element={<AgencyStaffDashboard />} />
             <Route path="hotels" element={<HotelsPage />} />
+            <Route path="hotels/:hotelId/support" element={<AgencyHotelSupportPage />} />
             <Route path="customers" element={<CustomersPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
             <Route path="reservations/new" element={<NewReservationPage />} />
@@ -76,6 +80,7 @@ function App() {
             <Route path="services" element={<ServicesPage />} />
             <Route path="prices" element={<PricesPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
+            <Route path="support" element={<HotelSupportPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
         </Route>

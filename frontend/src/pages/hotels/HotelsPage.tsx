@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { approveHotel, listHotels, rejectHotel } from '../../api/hotels'
 import type { ApiErrorResponse } from '../../auth/types'
 import { useAuth } from '../../auth/useAuth'
@@ -17,6 +18,7 @@ export function HotelsPage() {
   const [error, setError] = useState<string | null>(null)
 
   const hotels = useAsync(listHotels, [refreshKey])
+  const supportBasePath = isAdmin ? '/admin/hotels' : '/staff/hotels'
 
   const handleDecision = async (id: number, decide: (id: number) => Promise<unknown>) => {
     setError(null)
@@ -53,7 +55,7 @@ export function HotelsPage() {
               <th>Şehir</th>
               <th>İletişim</th>
               <th>Durum</th>
-              {isAdmin && <th></th>}
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -67,10 +69,10 @@ export function HotelsPage() {
                 <td>
                   <StatusBadge status={hotel.status} />
                 </td>
-                {isAdmin && (
-                  <td>
-                    {hotel.status === 'PENDING' && (
-                      <div className="data-table__actions">
+                <td>
+                  <div className="data-table__actions">
+                    {isAdmin && hotel.status === 'PENDING' && (
+                      <>
                         <button
                           type="button"
                           className="btn btn--small"
@@ -87,15 +89,18 @@ export function HotelsPage() {
                         >
                           Reddet
                         </button>
-                      </div>
+                      </>
                     )}
-                  </td>
-                )}
+                    <Link to={`${supportBasePath}/${hotel.id}/support`} className="btn btn--small">
+                      Destek
+                    </Link>
+                  </div>
+                </td>
               </tr>
             ))}
             {hotels.data.length === 0 && (
               <tr>
-                <td colSpan={isAdmin ? 5 : 4} className="data-table__empty">
+                <td colSpan={5} className="data-table__empty">
                   Henüz otel yok.
                 </td>
               </tr>

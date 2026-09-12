@@ -33,5 +33,6 @@ export const HOTEL_MENU: MenuItem[] = [
   { labelKey: 'nav.services', path: '/hotel/services' },
   { labelKey: 'nav.prices', path: '/hotel/prices' },
   { labelKey: 'nav.reservations', path: '/hotel/reservations' },
+  { labelKey: 'nav.support', path: '/hotel/support' },
   { labelKey: 'nav.settings', path: '/hotel/settings' },
 ]

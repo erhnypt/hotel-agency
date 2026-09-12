@@ -212,6 +212,19 @@ public class EmailService {
         send(adminEmail, "Otel Kurulumu Tamamlanmadı - " + hotelName, body, "setup reminder admin notice");
     }
 
+    @Async
+    public void sendSupportMessageNotification(String toEmail, String hotelName, String senderName) {
+        String body = wrapCorporateTemplate(
+                "Yeni Destek Mesajı",
+                """
+                <p>Merhaba,</p>
+                <p><strong>%s</strong> ile ilgili destek sohbetinde <strong>%s</strong> tarafından yeni bir mesaj
+                gönderildi.</p>
+                """.formatted(escape(hotelName), escape(senderName)),
+                new CallToAction("Mesajı Görüntüle", frontendUrl + "/login"));
+        send(toEmail, "Yeni Destek Mesajı - " + hotelName, body, "support message");
+    }
+
     private record CallToAction(String label, String url) {
     }
 
