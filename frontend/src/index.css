@@ -113,6 +113,7 @@
 
 body {
   margin: 0;
+  overflow-x: hidden;
   background: var(--bg);
   background-image:
     radial-gradient(760px 520px at 12% -8%, rgba(109, 118, 245, 0.12), transparent 70%),
