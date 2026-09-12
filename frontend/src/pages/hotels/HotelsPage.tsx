@@ -27,7 +27,7 @@ export function HotelsPage() {
 
   const hotels = useAsync(listHotels, [refreshKey])
   const { unreadHotelIds } = useSupportUnread()
-  const supportBasePath = isAdmin ? '/admin/hotels' : '/staff/hotels'
+  const hotelsBasePath = isAdmin ? '/admin/hotels' : '/staff/hotels'
 
   const handleDecision = async (id: number, decide: (id: number) => Promise<unknown>) => {
     setError(null)
@@ -87,6 +87,9 @@ export function HotelsPage() {
                 </td>
                 <td>
                   <div className="data-table__actions">
+                    <Link to={`${hotelsBasePath}/${hotel.id}`} className="btn btn--small">
+                      Detay
+                    </Link>
                     {isAdmin && hotel.status === 'PENDING' && (
                       <>
                         <button
@@ -137,7 +140,7 @@ export function HotelsPage() {
                         Sil
                       </button>
                     )}
-                    <Link to={`${supportBasePath}/${hotel.id}/support`} className="btn btn--small">
+                    <Link to={`${hotelsBasePath}/${hotel.id}/support`} className="btn btn--small">
                       Destek
                       {unreadHotelIds.includes(hotel.id) && <span className="badge-dot" aria-label="Yeni mesaj" />}
                     </Link>

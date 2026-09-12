@@ -19,6 +19,7 @@ import { TermsPage } from './pages/public/TermsPage'
 import { HotelAgreementPage } from './pages/public/HotelAgreementPage'
 import { HotelProfilePage } from './pages/hotelProfile/HotelProfilePage'
 import { HotelsPage } from './pages/hotels/HotelsPage'
+import { HotelDetailPage } from './pages/hotels/HotelDetailPage'
 import { LoginPage } from './pages/LoginPage'
 import { ForgotPasswordPage } from './pages/ForgotPasswordPage'
 import { ResetPasswordPage } from './pages/ResetPasswordPage'
@@ -52,6 +53,7 @@ function App() {
           <Route path="/admin" element={<RoleShell role="AGENCY_ADMIN" panelTitleKey="panel.admin" menu={ADMIN_MENU} />}>
             <Route index element={<AgencyAdminDashboard />} />
             <Route path="hotels" element={<HotelsPage />} />
+            <Route path="hotels/:hotelId" element={<HotelDetailPage />} />
             <Route path="hotels/:hotelId/support" element={<AgencyHotelSupportPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
             <Route path="reservations/new" element={<NewReservationPage />} />
@@ -65,6 +67,7 @@ function App() {
           <Route path="/staff" element={<RoleShell role="AGENCY_STAFF" panelTitleKey="panel.staff" menu={STAFF_MENU} />}>
             <Route index element={<AgencyStaffDashboard />} />
             <Route path="hotels" element={<HotelsPage />} />
+            <Route path="hotels/:hotelId" element={<HotelDetailPage />} />
             <Route path="hotels/:hotelId/support" element={<AgencyHotelSupportPage />} />
             <Route path="customers" element={<CustomersPage />} />
             <Route path="reservations" element={<ReservationsPage />} />
