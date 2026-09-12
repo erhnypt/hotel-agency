@@ -53,6 +53,34 @@
   -webkit-text-fill-color: var(--text-dim);
 }
 
+.app-shell__sidebar-bar {
+  display: contents;
+}
+
+.app-shell__nav-toggle {
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.app-shell__nav-toggle span {
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: var(--text-h);
+  border-radius: 1px;
+}
+
 .app-shell__nav {
   display: flex;
   flex-direction: column;
@@ -186,8 +214,7 @@
     box-sizing: border-box;
     padding: 14px 16px;
     display: flex;
-    align-items: center;
-    gap: 16px;
+    flex-direction: column;
     background: linear-gradient(90deg, var(--bg-panel-2), var(--bg-panel));
   }
 
@@ -201,23 +228,38 @@
     background: linear-gradient(90deg, transparent, var(--signal) 30%, var(--c-violet) 70%, transparent);
   }
 
+  .app-shell__sidebar-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    width: 100%;
+  }
+
   .app-shell__brand {
     flex-shrink: 0;
-    padding: 0 16px 0 0;
+    padding: 0;
     margin: 0;
     border-bottom: none;
-    border-right: 1px solid var(--border);
+  }
+
+  .app-shell__nav-toggle {
+    display: flex;
   }
 
   .app-shell__nav {
-    flex-direction: row;
-    flex: 1;
-    min-width: 0;
-    overflow-x: auto;
+    display: none;
+    flex-direction: column;
+    width: 100%;
+    margin-top: 14px;
+  }
+
+  .app-shell__nav--open {
+    display: flex;
   }
 
   .app-shell__nav-item {
-    flex-shrink: 0;
+    padding: 12px;
   }
 
   .app-shell__nav-item:hover {
@@ -230,7 +272,22 @@
     row-gap: 10px;
   }
 
+  .app-shell__user {
+    flex-wrap: wrap;
+    row-gap: 8px;
+  }
+
   .app-shell__content {
-    padding: 20px;
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .app-shell__title {
+    font-size: 17px;
+  }
+
+  .app-shell__user span {
+    display: none;
   }
 }

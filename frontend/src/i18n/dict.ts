@@ -38,6 +38,7 @@ const tr: Dict = {
 
   'shell.tagline': 'Otel Acentesi Merkezi',
   'shell.logout': 'Çıkış Yap',
+  'shell.menu': 'Menü',
 
   'common.save': 'Kaydet',
   'common.saving': 'Kaydediliyor...',
@@ -300,6 +301,7 @@ const en: Dict = {
 
   'shell.tagline': 'Hotel Agency Hub',
   'shell.logout': 'Log out',
+  'shell.menu': 'Menu',
 
   'common.save': 'Save',
   'common.saving': 'Saving…',
@@ -557,6 +559,7 @@ const ru: Dict = {
 
   'shell.tagline': 'Центр отельного агентства',
   'shell.logout': 'Выйти',
+  'shell.menu': 'Меню',
 
   'common.save': 'Сохранить',
   'common.saving': 'Сохранение…',
@@ -814,6 +817,7 @@ const de: Dict = {
 
   'shell.tagline': 'Hotelagentur-Zentrale',
   'shell.logout': 'Abmelden',
+  'shell.menu': 'Menü',
 
   'common.save': 'Speichern',
   'common.saving': 'Wird gespeichert…',
@@ -1071,6 +1075,7 @@ const es: Dict = {
 
   'shell.tagline': 'Centro de agencia hotelera',
   'shell.logout': 'Cerrar sesión',
+  'shell.menu': 'Menú',
 
   'common.save': 'Guardar',
   'common.saving': 'Guardando…',
@@ -1328,6 +1333,7 @@ const ar: Dict = {
 
   'shell.tagline': 'مركز وكالة الفنادق',
   'shell.logout': 'تسجيل الخروج',
+  'shell.menu': 'القائمة',
 
   'common.save': 'حفظ',
   'common.saving': 'جارٍ الحفظ…',

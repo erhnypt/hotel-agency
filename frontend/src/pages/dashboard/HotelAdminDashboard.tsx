@@ -27,17 +27,19 @@ export function HotelAdminDashboard() {
     <div>
       <h2 className="hotel-dashboard__hotel-name">{hotel.data?.name}</h2>
       <div className="stat-grid">
-        <StatCard label="Oda Tipi Sayısı" value={roomTypeList.length} />
-        <StatCard label="Toplam Oda" value={totalRooms} />
+        <StatCard label="Oda Tipi Sayısı" value={roomTypeList.length} to="/hotel/rooms" />
+        <StatCard label="Toplam Oda" value={totalRooms} to="/hotel/rooms" />
         <StatCard
           label="Bekleyen Rezervasyon"
           value={reservationList.filter((r) => r.status === 'PENDING').length}
+          to="/hotel/reservations"
         />
         <StatCard
           label="Onaylanan Rezervasyon"
           value={reservationList.filter((r) => r.status === 'CONFIRMED').length}
+          to="/hotel/reservations"
         />
-        <StatCard label="Yaklaşan Rezervasyon" value={upcoming} />
+        <StatCard label="Yaklaşan Rezervasyon" value={upcoming} to="/hotel/reservations" />
       </div>
     </div>
   )

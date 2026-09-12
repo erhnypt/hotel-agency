@@ -17,17 +17,27 @@ export function AgencyAdminDashboard() {
 
   return (
     <div className="stat-grid">
-      <StatCard label="Toplam Otel" value={hotelList.length} />
-      <StatCard label="Aktif Otel" value={hotelList.filter((h) => h.status === 'ACTIVE').length} />
-      <StatCard label="Bekleyen Otel" value={hotelList.filter((h) => h.status === 'PENDING').length} />
-      <StatCard label="Toplam Rezervasyon" value={reservationList.length} />
+      <StatCard label="Toplam Otel" value={hotelList.length} to="/admin/hotels" />
+      <StatCard
+        label="Aktif Otel"
+        value={hotelList.filter((h) => h.status === 'ACTIVE').length}
+        to="/admin/hotels"
+      />
+      <StatCard
+        label="Bekleyen Otel"
+        value={hotelList.filter((h) => h.status === 'PENDING').length}
+        to="/admin/hotels"
+      />
+      <StatCard label="Toplam Rezervasyon" value={reservationList.length} to="/admin/reservations" />
       <StatCard
         label="Bekleyen Rezervasyon"
         value={reservationList.filter((r) => r.status === 'PENDING').length}
+        to="/admin/reservations"
       />
       <StatCard
         label="Onaylanan Rezervasyon"
         value={reservationList.filter((r) => r.status === 'CONFIRMED').length}
+        to="/admin/reservations"
       />
     </div>
   )

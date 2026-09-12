@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
 import { useSupportUnread } from '../hooks/useSupportUnread'
 import { LanguageSwitcher } from '../i18n/LanguageSwitcher'
@@ -10,15 +11,34 @@ export function AppShell({ panelTitleKey, menu }: { panelTitleKey: string; menu:
   const { user, logout } = useAuth()
   const { t } = useT()
   const { hotelUnread, unreadHotelIds } = useSupportUnread()
+  const location = useLocation()
+  const [navOpen, setNavOpen] = useState(false)
+
+  useEffect(() => {
+    setNavOpen(false)
+  }, [location.pathname])
 
   return (
     <div className="app-shell">
       <aside className="app-shell__sidebar">
-        <div className="app-shell__brand">
-          Travel Sites
-          <small>{t('shell.tagline')}</small>
+        <div className="app-shell__sidebar-bar">
+          <div className="app-shell__brand">
+            Travel Sites
+            <small>{t('shell.tagline')}</small>
+          </div>
+          <button
+            type="button"
+            className="app-shell__nav-toggle"
+            aria-label={t('shell.menu')}
+            aria-expanded={navOpen}
+            onClick={() => setNavOpen((open) => !open)}
+          >
+            <span />
+            <span />
+            <span />
+          </button>
         </div>
-        <nav className="app-shell__nav">
+        <nav className={'app-shell__nav' + (navOpen ? ' app-shell__nav--open' : '')}>
           {menu.map((item) => {
             const showBadge =
               (item.path.endsWith('/support') && hotelUnread) ||

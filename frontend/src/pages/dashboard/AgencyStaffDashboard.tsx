@@ -20,18 +20,21 @@ export function AgencyStaffDashboard() {
       </Link>
 
       <div className="stat-grid">
-        <StatCard label="Toplam Rezervasyonum" value={reservationList.length} />
+        <StatCard label="Toplam Rezervasyonum" value={reservationList.length} to="/staff/reservations" />
         <StatCard
           label="Bekleyen"
           value={reservationList.filter((r) => r.status === 'PENDING').length}
+          to="/staff/reservations"
         />
         <StatCard
           label="Onaylanan"
           value={reservationList.filter((r) => r.status === 'CONFIRMED').length}
+          to="/staff/reservations"
         />
         <StatCard
           label="İptal Edilen"
           value={reservationList.filter((r) => r.status === 'CANCELLED').length}
+          to="/staff/reservations"
         />
       </div>
     </div>
