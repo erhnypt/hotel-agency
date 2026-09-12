@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { getMySupportUnread, listHotelsWithUnreadSupport } from '../api/supportMessages'
 import { useAuth } from '../auth/useAuth'
+import { onSupportRead } from './supportEvents'
 
 const POLL_INTERVAL_MS = 20_000
 
@@ -29,9 +30,11 @@ export function useSupportUnread() {
 
     poll()
     const interval = setInterval(poll, POLL_INTERVAL_MS)
+    const unsubscribe = onSupportRead(poll)
     return () => {
       cancelled = true
       clearInterval(interval)
+      unsubscribe()
     }
   }, [user])
 

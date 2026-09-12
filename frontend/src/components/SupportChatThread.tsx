@@ -4,6 +4,7 @@ import { listSupportMessages, sendSupportMessage } from '../api/supportMessages'
 import type { ApiErrorResponse } from '../auth/types'
 import { useAuth } from '../auth/useAuth'
 import { useAsync } from '../hooks/useAsync'
+import { notifySupportRead } from '../hooks/supportEvents'
 import { ErrorState, LoadingState } from './PageState'
 import './SupportChatThread.css'
 
@@ -25,6 +26,9 @@ export function SupportChatThread({ hotelId }: { hotelId: number }) {
     if (fetched.data) {
       setMessages(fetched.data)
       setHasLoadedOnce(true)
+      // The backend marks the thread read as a side effect of this fetch —
+      // tell the nav/list unread badges to re-check now instead of on their next poll.
+      notifySupportRead()
     }
   }, [fetched.data])
 
