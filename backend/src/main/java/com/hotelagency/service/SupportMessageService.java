@@ -38,9 +38,10 @@ public class SupportMessageService {
         SupportMessage message = new SupportMessage(hotel, requester, request.body());
         supportMessageRepository.save(message);
 
-        notifyNewMessage(hotel, requester, request.body());
+        SupportMessageResponse response = SupportMessageResponse.from(message);
+        notifyNewMessage(hotel, requester, request.body(), response.senderName());
 
-        return SupportMessageResponse.from(message);
+        return response;
     }
 
     @Transactional(readOnly = true)
@@ -84,15 +85,15 @@ public class SupportMessageService {
                 .isPresent();
     }
 
-    private void notifyNewMessage(Hotel hotel, User sender, String messageBody) {
+    private void notifyNewMessage(Hotel hotel, User sender, String messageBody, String senderDisplayName) {
         if (sender.getRole().getName() == RoleName.HOTEL_ADMIN) {
             hotelService.resolveAgencyAdminEmails()
                     .forEach(email -> emailService.sendSupportMessageNotification(
-                            email, hotel.getName(), sender.getFullName(), messageBody));
+                            email, hotel.getName(), senderDisplayName, messageBody));
         } else {
             hotelService.resolveHotelOwnerEmails(hotel)
                     .forEach(email -> emailService.sendSupportMessageNotification(
-                            email, hotel.getName(), sender.getFullName(), messageBody));
+                            email, hotel.getName(), senderDisplayName, messageBody));
         }
     }
 }

@@ -40,6 +40,7 @@ class SupportMessageServiceTest {
     private Hotel hotel;
     private User hotelAdmin;
     private User agencyAdmin;
+    private User agencyStaff;
 
     @BeforeEach
     void setUp() {
@@ -62,6 +63,13 @@ class SupportMessageServiceTest {
         agencyAdmin.setId(20L);
         agencyAdmin.setFullName("Agency Admin");
         agencyAdmin.setRole(agencyAdminRole);
+
+        Role agencyStaffRole = new Role(RoleName.AGENCY_STAFF);
+        agencyStaffRole.setId(2L);
+        agencyStaff = new User();
+        agencyStaff.setId(21L);
+        agencyStaff.setFullName("Some Staff Member");
+        agencyStaff.setRole(agencyStaffRole);
     }
 
     @Test
@@ -162,7 +170,30 @@ class SupportMessageServiceTest {
         supportMessageService.send(1L, new SupportMessageCreateRequest("Merhaba, size nasıl yardımcı olabiliriz?"), agencyAdmin);
 
         verify(emailService).sendSupportMessageNotification(
-                eq("owner@hotel.test"), eq("Grand Hotel"), eq("Agency Admin"), eq("Merhaba, size nasıl yardımcı olabiliriz?"));
+                eq("owner@hotel.test"), eq("Grand Hotel"), eq("Admin"), eq("Merhaba, size nasıl yardımcı olabiliriz?"));
         verify(hotelService, never()).resolveAgencyAdminEmails();
+    }
+
+    @Test
+    void hotelSeesGenericLabelsInsteadOfAgencyStaffNamesForBothRoles() {
+        when(hotelService.getViewableHotel(1L, agencyAdmin)).thenReturn(hotel);
+        SupportMessageResponse fromAdmin = supportMessageService.send(
+                1L, new SupportMessageCreateRequest("Merhaba"), agencyAdmin);
+        assertThat(fromAdmin.senderName()).isEqualTo("Admin");
+
+        when(hotelService.getViewableHotel(1L, agencyStaff)).thenReturn(hotel);
+        SupportMessageResponse fromStaff = supportMessageService.send(
+                1L, new SupportMessageCreateRequest("Merhaba"), agencyStaff);
+        assertThat(fromStaff.senderName()).isEqualTo("Personel");
+    }
+
+    @Test
+    void hotelSenderNameIsKeptAsIs() {
+        when(hotelService.getViewableHotel(1L, hotelAdmin)).thenReturn(hotel);
+
+        SupportMessageResponse response = supportMessageService.send(
+                1L, new SupportMessageCreateRequest("Merhaba"), hotelAdmin);
+
+        assertThat(response.senderName()).isEqualTo("Hotel Owner");
     }
 }
