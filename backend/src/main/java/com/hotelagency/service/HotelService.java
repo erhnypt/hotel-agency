@@ -8,6 +8,7 @@ import com.hotelagency.dto.hotel.HotelResponse;
 import com.hotelagency.dto.hotel.HotelSetupReminderLogResponse;
 import com.hotelagency.dto.hotel.HotelUpdateRequest;
 import com.hotelagency.dto.hotel.IncompleteHotelSetupResponse;
+import com.hotelagency.dto.hotel.PublicHotelResponse;
 import com.hotelagency.entity.Hotel;
 import com.hotelagency.entity.HotelSetupReminderLog;
 import com.hotelagency.entity.HotelStatus;
@@ -33,6 +34,7 @@ import com.hotelagency.security.JwtService;
 import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -154,6 +156,17 @@ public class HotelService {
         return hotelRepository.findByStatus(HotelStatus.ACTIVE).stream()
                 .filter(hotel -> !hasCompletedSetup(hotel))
                 .map(IncompleteHotelSetupResponse::from)
+                .toList();
+    }
+
+    /** Active hotels that have finished setup, for the public landing-page search — unauthenticated. */
+    @Transactional(readOnly = true)
+    public List<PublicHotelResponse> listPublicCatalog() {
+        return hotelRepository.findByStatus(HotelStatus.ACTIVE).stream()
+                .map(hotel -> roomTypeRepository
+                        .findFirstByHotelIdAndBasePriceIsNotNullOrderByBasePriceAsc(hotel.getId())
+                        .map(cheapestRoomType -> PublicHotelResponse.from(hotel, cheapestRoomType)))
+                .flatMap(Optional::stream)
                 .toList();
     }
 

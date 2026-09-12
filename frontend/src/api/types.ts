@@ -202,6 +202,16 @@ export interface ReservationCreateRequest {
   newCustomer?: CustomerRequest | null
 }
 
+export interface PublicHotelResponse {
+  id: number
+  name: string
+  city: string
+  country: string
+  description: string | null
+  priceFrom: number
+  currency: string
+}
+
 export type BookingRequestStatus = 'NEW' | 'IN_PROGRESS' | 'CLOSED'
 
 export interface BookingRequestCreateRequest {

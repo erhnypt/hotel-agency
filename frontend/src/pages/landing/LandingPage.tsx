@@ -280,7 +280,7 @@ export function LandingPage() {
                     getKey={(h) => h.id}
                     getLabel={(h) => h.name}
                     getMeta={(h) =>
-                      `${h.city}, ${h.country}${h.stars ? ` · ${starLabel(h.stars)}` : ''} · ${fromPrice(h.priceFrom, catalog.currency)}`
+                      `${h.city}, ${h.country}${h.stars ? ` · ${starLabel(h.stars)}` : ''} · ${fromPrice(h.priceFrom, h.currency ?? catalog.currency)}`
                     }
                     getSearchText={(h) => `${h.name} ${h.city} ${h.country}`}
                     placeholder={t('landing.searchPlaceholder')}
@@ -312,7 +312,7 @@ export function LandingPage() {
                 <p className="lp-estimate">
                   <span>{t('landing.estimate')}</span>
                   <strong>
-                    ~{estimate.toLocaleString(lang)} {catalog?.currency}
+                    ~{estimate.toLocaleString(lang)} {hotel?.currency ?? catalog?.currency}
                   </strong>
                   <span className="lp-estimate__note">{t('landing.estimateNote', { nights })}</span>
                 </p>

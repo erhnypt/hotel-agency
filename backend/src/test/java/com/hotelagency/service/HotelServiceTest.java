@@ -357,6 +357,38 @@ class HotelServiceTest {
     }
 
     @Test
+    void listPublicCatalogOnlyIncludesActiveHotelsWithAPricedRoomType() {
+        Hotel noSetup = new Hotel();
+        noSetup.setId(1L);
+        noSetup.setStatus(HotelStatus.ACTIVE);
+
+        Hotel ready = new Hotel();
+        ready.setId(2L);
+        ready.setName("Grand Hotel");
+        ready.setCity("Istanbul");
+        ready.setCountry("Turkey");
+        ready.setStatus(HotelStatus.ACTIVE);
+
+        com.hotelagency.entity.RoomType cheapest = new com.hotelagency.entity.RoomType();
+        cheapest.setBasePrice(new java.math.BigDecimal("50.00"));
+        cheapest.setCurrency("EUR");
+
+        when(hotelRepository.findByStatus(HotelStatus.ACTIVE)).thenReturn(List.of(noSetup, ready));
+        when(roomTypeRepository.findFirstByHotelIdAndBasePriceIsNotNullOrderByBasePriceAsc(1L))
+                .thenReturn(Optional.empty());
+        when(roomTypeRepository.findFirstByHotelIdAndBasePriceIsNotNullOrderByBasePriceAsc(2L))
+                .thenReturn(Optional.of(cheapest));
+
+        List<com.hotelagency.dto.hotel.PublicHotelResponse> result = hotelService.listPublicCatalog();
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).id()).isEqualTo(2L);
+        assertThat(result.get(0).name()).isEqualTo("Grand Hotel");
+        assertThat(result.get(0).priceFrom()).isEqualByComparingTo("50.00");
+        assertThat(result.get(0).currency()).isEqualTo("EUR");
+    }
+
+    @Test
     void sendManualSetupReminderRejectsAlreadyCompletedHotel() {
         Hotel hotel = new Hotel();
         hotel.setId(1L);
