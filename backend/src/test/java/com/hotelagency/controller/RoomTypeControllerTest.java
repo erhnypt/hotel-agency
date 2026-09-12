@@ -72,6 +72,18 @@ class RoomTypeControllerTest {
     }
 
     @Test
+    @WithMockCustomUser(role = RoleName.AGENCY_ADMIN)
+    void createAsAgencyAdminReturns201() throws Exception {
+        when(roomTypeService.create(eq(1L), any(), any())).thenReturn(sampleResponse());
+
+        mockMvc.perform(post("/api/hotels/1/rooms")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(sampleRequest())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.name").value("Deluxe Room"));
+    }
+
+    @Test
     @WithMockCustomUser(role = RoleName.AGENCY_STAFF)
     void createAsAgencyStaffReturns403() throws Exception {
         mockMvc.perform(post("/api/hotels/1/rooms")

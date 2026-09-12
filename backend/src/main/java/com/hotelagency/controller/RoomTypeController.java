@@ -32,7 +32,7 @@ public class RoomTypeController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('HOTEL_ADMIN')")
+    @PreAuthorize("hasAnyRole('HOTEL_ADMIN', 'AGENCY_ADMIN')")
     public ResponseEntity<RoomTypeResponse> create(
             @PathVariable Long hotelId,
             @Valid @RequestBody RoomTypeRequest request,

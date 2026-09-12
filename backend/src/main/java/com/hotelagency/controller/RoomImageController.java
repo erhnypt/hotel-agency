@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/room-images")
 @RequiredArgsConstructor
-@PreAuthorize("hasRole('HOTEL_ADMIN')")
+@PreAuthorize("hasAnyRole('HOTEL_ADMIN', 'AGENCY_ADMIN')")
 public class RoomImageController {
 
     private final RoomTypeService roomTypeService;

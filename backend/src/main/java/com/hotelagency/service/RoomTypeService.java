@@ -5,6 +5,7 @@ import com.hotelagency.dto.room.RoomImageResponse;
 import com.hotelagency.dto.room.RoomTypeRequest;
 import com.hotelagency.dto.room.RoomTypeResponse;
 import com.hotelagency.entity.Hotel;
+import com.hotelagency.entity.RoleName;
 import com.hotelagency.entity.RoomImage;
 import com.hotelagency.entity.RoomType;
 import com.hotelagency.entity.User;
@@ -30,7 +31,7 @@ public class RoomTypeService {
 
     @Transactional
     public RoomTypeResponse create(Long hotelId, RoomTypeRequest request, User requester) {
-        Hotel hotel = hotelService.getOwnedHotel(hotelId, requester);
+        Hotel hotel = resolveManageableHotel(hotelId, requester);
 
         RoomType roomType = new RoomType();
         roomType.setHotel(hotel);
@@ -93,19 +94,30 @@ public class RoomTypeService {
     public void removeImage(Long imageId, User requester) {
         RoomImage image = roomImageRepository.findById(imageId)
                 .orElseThrow(() -> new ResourceNotFoundException("Room image not found: " + imageId));
-        hotelService.getOwnedHotel(image.getRoomType().getHotel().getId(), requester);
+        resolveManageableHotel(image.getRoomType().getHotel().getId(), requester);
 
         roomImageRepository.delete(image);
     }
 
     /**
-     * Loads a room type while enforcing hotel-admin ownership, for services that
+     * Loads a room type while enforcing management rights, for services that
      * manage a room type's sub-resources (prices, availability, ...).
      */
     public RoomType getOwnedRoomType(Long roomTypeId, User requester) {
         RoomType roomType = getRoomTypeOrThrow(roomTypeId);
-        hotelService.getOwnedHotel(roomType.getHotel().getId(), requester);
+        resolveManageableHotel(roomType.getHotel().getId(), requester);
         return roomType;
+    }
+
+    /**
+     * A hotel-admin may only manage their own (active) hotel; an agency admin may
+     * manage any hotel's room types on its behalf, regardless of status — e.g. to
+     * help a hotel finish setup.
+     */
+    private Hotel resolveManageableHotel(Long hotelId, User requester) {
+        return requester.getRole().getName() == RoleName.AGENCY_ADMIN
+                ? hotelService.getViewableHotel(hotelId, requester)
+                : hotelService.getOwnedHotel(hotelId, requester);
     }
 
     /**

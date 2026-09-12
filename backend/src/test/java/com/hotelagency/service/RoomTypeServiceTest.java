@@ -48,6 +48,7 @@ class RoomTypeServiceTest {
 
     private Hotel hotel;
     private User hotelAdmin;
+    private User agencyAdmin;
 
     @BeforeEach
     void setUp() {
@@ -56,12 +57,19 @@ class RoomTypeServiceTest {
         Role hotelAdminRole = new Role(RoleName.HOTEL_ADMIN);
         hotelAdminRole.setId(3L);
 
+        Role agencyAdminRole = new Role(RoleName.AGENCY_ADMIN);
+        agencyAdminRole.setId(1L);
+
         hotel = new Hotel();
         hotel.setId(1L);
 
         hotelAdmin = new User();
         hotelAdmin.setId(10L);
         hotelAdmin.setRole(hotelAdminRole);
+
+        agencyAdmin = new User();
+        agencyAdmin.setId(20L);
+        agencyAdmin.setRole(agencyAdminRole);
     }
 
     private RoomTypeRequest sampleRequest() {
@@ -81,6 +89,16 @@ class RoomTypeServiceTest {
         assertThat(saved.getName()).isEqualTo("Deluxe Room");
         assertThat(saved.getCapacity()).isEqualTo(3);
         assertThat(response.hotelId()).isEqualTo(1L);
+    }
+
+    @Test
+    void createAllowsAgencyAdminOnAnyHotelRegardlessOfStatus() {
+        when(hotelService.getViewableHotel(1L, agencyAdmin)).thenReturn(hotel);
+
+        RoomTypeResponse response = roomTypeService.create(1L, sampleRequest(), agencyAdmin);
+
+        assertThat(response.hotelId()).isEqualTo(1L);
+        verify(hotelService, never()).getOwnedHotel(any(), any());
     }
 
     @Test
@@ -162,5 +180,20 @@ class RoomTypeServiceTest {
 
         assertThat(response.imageUrl()).isEqualTo("https://example.com/a.jpg");
         assertThat(response.roomTypeId()).isEqualTo(5L);
+    }
+
+    @Test
+    void addImageAllowsAgencyAdminOnAnyHotel() {
+        RoomType roomType = new RoomType();
+        roomType.setId(5L);
+        roomType.setHotel(hotel);
+        when(roomTypeRepository.findById(5L)).thenReturn(Optional.of(roomType));
+        when(hotelService.getViewableHotel(1L, agencyAdmin)).thenReturn(hotel);
+        when(roomImageRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+
+        var response = roomTypeService.addImage(5L, new RoomImageRequest("https://example.com/a.jpg"), agencyAdmin);
+
+        assertThat(response.imageUrl()).isEqualTo("https://example.com/a.jpg");
+        verify(hotelService, never()).getOwnedHotel(any(), any());
     }
 }
