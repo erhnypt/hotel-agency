@@ -11,6 +11,17 @@ import type { PublicHotelResponse } from '../api/types'
  * so they stay distinguishable from the seed entries (`seed-...`).
  */
 
+export interface CatalogRoom {
+  id: string
+  name: string
+  capacity: number
+  bedType: string
+  roomSize?: number
+  price: number
+  currency: string
+  images: string[]
+}
+
 export interface CatalogHotel {
   id: string
   name: string
@@ -22,6 +33,7 @@ export interface CatalogHotel {
   currency?: string
   lat: number | null
   lon: number | null
+  rooms?: CatalogRoom[]
 }
 
 export interface CatalogCity {

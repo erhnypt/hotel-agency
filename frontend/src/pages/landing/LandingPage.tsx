@@ -3,7 +3,6 @@ import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import { submitBookingRequest } from '../../api/bookingRequests'
 import { listPublicHotelRooms } from '../../api/publicHotels'
-import type { RoomTypeResponse } from '../../api/types'
 import type { ApiErrorResponse } from '../../auth/types'
 import { roleHomePath } from '../../auth/roleHome'
 import { useAuth } from '../../auth/useAuth'
@@ -16,6 +15,17 @@ import './LandingPage.css'
 const REAL_HOTEL_PREFIX = 'hotel-'
 const isRealHotel = (h: CatalogHotel) => h.id.startsWith(REAL_HOTEL_PREFIX)
 const realHotelId = (h: CatalogHotel) => Number(h.id.slice(REAL_HOTEL_PREFIX.length))
+
+/** A room offered for the currently selected hotel — from the live API (real hotels) or embedded in the seed catalog (demo hotels). */
+interface DisplayRoom {
+  id: string | number
+  name: string
+  capacity: number
+  bedType: string
+  price: number
+  currency: string
+  images: string[]
+}
 
 const today = new Date().toISOString().slice(0, 10)
 const starLabel = (n: number | null) => (n ? '★'.repeat(n) : '')
@@ -91,10 +101,10 @@ export function LandingPage() {
   const [guests, setGuests] = useState('2')
   const [step, setStep] = useState<'search' | 'room' | 'contact'>('search')
 
-  const [rooms, setRooms] = useState<RoomTypeResponse[] | null>(null)
+  const [rooms, setRooms] = useState<DisplayRoom[] | null>(null)
   const [roomsLoading, setRoomsLoading] = useState(false)
   const [roomsError, setRoomsError] = useState<string | null>(null)
-  const [selectedRoom, setSelectedRoom] = useState<RoomTypeResponse | null>(null)
+  const [selectedRoom, setSelectedRoom] = useState<DisplayRoom | null>(null)
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -138,7 +148,7 @@ export function LandingPage() {
   const nights = datesValid
     ? Math.round((Date.parse(checkOut) - Date.parse(checkIn)) / 86_400_000)
     : 0
-  const effectivePrice = selectedRoom ? Number(selectedRoom.basePrice) : hotel?.priceFrom
+  const effectivePrice = selectedRoom ? selectedRoom.price : hotel?.priceFrom
   const effectiveCurrency = selectedRoom?.currency ?? hotel?.currency ?? catalog?.currency
   const estimate = nights > 0 && effectivePrice != null ? effectivePrice * nights : null
 
@@ -165,12 +175,37 @@ export function LandingPage() {
       setRoomsLoading(true)
       try {
         const list = await listPublicHotelRooms(realHotelId(hotel))
-        setRooms(list)
+        setRooms(
+          list.map((r) => ({
+            id: r.id,
+            name: r.name,
+            capacity: r.capacity,
+            bedType: r.bedType,
+            price: Number(r.basePrice),
+            currency: r.currency,
+            images: r.images.map((image) => image.imageUrl),
+          })),
+        )
       } catch {
         setRoomsError(t('landing.roomError'))
       } finally {
         setRoomsLoading(false)
       }
+    } else if (hotel.rooms && hotel.rooms.length > 0) {
+      setSelectedRoom(null)
+      setRoomsError(null)
+      setRooms(
+        hotel.rooms.map((r) => ({
+          id: r.id,
+          name: r.name,
+          capacity: r.capacity,
+          bedType: r.bedType,
+          price: r.price,
+          currency: r.currency,
+          images: r.images,
+        })),
+      )
+      setStep('room')
     } else {
       setStep('contact')
     }
@@ -189,7 +224,7 @@ export function LandingPage() {
         propertyCity: hotel.city,
         countryCode: hotel.iso2,
         countryName: hotel.country,
-        roomTypeId: selectedRoom?.id ?? null,
+        roomTypeId: typeof selectedRoom?.id === 'number' ? selectedRoom.id : null,
         roomTypeName: selectedRoom?.name ?? null,
         checkIn,
         checkOut,
@@ -388,16 +423,14 @@ export function LandingPage() {
                       onClick={() => setSelectedRoom(room)}
                     >
                       {room.images[0] && (
-                        <img className="lp-room-option__img" src={room.images[0].imageUrl} alt="" loading="lazy" />
+                        <img className="lp-room-option__img" src={room.images[0]} alt="" loading="lazy" />
                       )}
                       <span className="lp-room-option__body">
                         <span className="lp-room-option__name">{room.name}</span>
                         <span className="lp-room-option__meta">
                           {room.capacity} {t('landing.roomCapacityUnit')} · {room.bedType}
                         </span>
-                        <span className="lp-room-option__price">
-                          {fromPrice(Number(room.basePrice), room.currency)}
-                        </span>
+                        <span className="lp-room-option__price">{fromPrice(room.price, room.currency)}</span>
                       </span>
                     </button>
                   ))}
