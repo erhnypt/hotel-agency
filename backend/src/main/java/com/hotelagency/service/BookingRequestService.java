@@ -31,6 +31,8 @@ public class BookingRequestService {
         entity.setPropertyCity(blankToNull(request.propertyCity()));
         entity.setCountryCode(blankToNull(request.countryCode()));
         entity.setCountryName(blankToNull(request.countryName()));
+        entity.setRoomTypeId(request.roomTypeId());
+        entity.setRoomTypeName(blankToNull(request.roomTypeName()));
         entity.setCheckIn(request.checkIn());
         entity.setCheckOut(request.checkOut());
         entity.setGuests(request.guests());

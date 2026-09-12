@@ -42,6 +42,13 @@ public class BookingRequest {
     @Column(name = "country_name", length = 128)
     private String countryName;
 
+    /** Set only for real registered hotels, whose landing-page search offers a room-selection step. */
+    @Column(name = "room_type_id")
+    private Long roomTypeId;
+
+    @Column(name = "room_type_name")
+    private String roomTypeName;
+
     @Column(name = "check_in", nullable = false)
     private LocalDate checkIn;
 

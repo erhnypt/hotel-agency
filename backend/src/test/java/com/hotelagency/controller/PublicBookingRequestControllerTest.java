@@ -62,7 +62,7 @@ class PublicBookingRequestControllerTest {
 
     private BookingRequestResponse sampleResponse() {
         return new BookingRequestResponse(
-                1L, "n123", "Grand Lisboa Hotel", "Hotel", "Lizbon", "PT", "Portekiz",
+                1L, "n123", "Grand Lisboa Hotel", "Hotel", "Lizbon", "PT", "Portekiz", null, null,
                 LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 13), 2,
                 "Jane Doe", "jane@example.com", "+351 555 111", null,
                 BookingRequestStatus.NEW, Instant.now(), Instant.now());

@@ -1,11 +1,13 @@
 package com.hotelagency.controller;
 
 import com.hotelagency.dto.hotel.PublicHotelResponse;
+import com.hotelagency.dto.room.RoomTypeResponse;
 import com.hotelagency.service.HotelService;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -20,5 +22,10 @@ public class PublicHotelController {
     @GetMapping
     public ResponseEntity<List<PublicHotelResponse>> list() {
         return ResponseEntity.ok(hotelService.listPublicCatalog());
+    }
+
+    @GetMapping("/{id}/rooms")
+    public ResponseEntity<List<RoomTypeResponse>> listRooms(@PathVariable Long id) {
+        return ResponseEntity.ok(hotelService.listPublicRoomTypes(id));
     }
 }

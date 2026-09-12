@@ -389,6 +389,49 @@ class HotelServiceTest {
     }
 
     @Test
+    void listPublicRoomTypesOnlyIncludesPricedRoomTypesWithImages() {
+        Hotel hotel = new Hotel();
+        hotel.setId(2L);
+        hotel.setStatus(HotelStatus.ACTIVE);
+
+        com.hotelagency.entity.RoomType priced = new com.hotelagency.entity.RoomType();
+        priced.setId(4L);
+        priced.setHotel(hotel);
+        priced.setName("3 KİŞİLİK");
+        priced.setBasePrice(new java.math.BigDecimal("300.00"));
+        priced.setCurrency("EUR");
+
+        com.hotelagency.entity.RoomType unpriced = new com.hotelagency.entity.RoomType();
+        unpriced.setId(5L);
+        unpriced.setName("Unpriced Room");
+
+        com.hotelagency.entity.RoomImage image = new com.hotelagency.entity.RoomImage(priced, "data:image/jpeg;base64,xyz");
+        image.setId(9L);
+
+        when(hotelRepository.findById(2L)).thenReturn(Optional.of(hotel));
+        when(roomTypeRepository.findByHotelId(2L)).thenReturn(List.of(priced, unpriced));
+        when(roomImageRepository.findByRoomTypeId(4L)).thenReturn(List.of(image));
+
+        List<com.hotelagency.dto.room.RoomTypeResponse> result = hotelService.listPublicRoomTypes(2L);
+
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).id()).isEqualTo(4L);
+        assertThat(result.get(0).images()).hasSize(1);
+        assertThat(result.get(0).images().get(0).imageUrl()).isEqualTo("data:image/jpeg;base64,xyz");
+    }
+
+    @Test
+    void listPublicRoomTypesThrowsWhenHotelNotActive() {
+        Hotel hotel = new Hotel();
+        hotel.setId(2L);
+        hotel.setStatus(HotelStatus.PENDING);
+        when(hotelRepository.findById(2L)).thenReturn(Optional.of(hotel));
+
+        assertThatThrownBy(() -> hotelService.listPublicRoomTypes(2L))
+                .isInstanceOf(ResourceNotFoundException.class);
+    }
+
+    @Test
     void sendManualSetupReminderRejectsAlreadyCompletedHotel() {
         Hotel hotel = new Hotel();
         hotel.setId(1L);

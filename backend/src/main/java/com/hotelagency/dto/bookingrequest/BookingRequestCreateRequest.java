@@ -14,6 +14,8 @@ public record BookingRequestCreateRequest(
         @Size(max = 128) String propertyCity,
         @Size(max = 3) String countryCode,
         @Size(max = 128) String countryName,
+        Long roomTypeId,
+        @Size(max = 255) String roomTypeName,
         @NotNull LocalDate checkIn,
         @NotNull LocalDate checkOut,
         @NotNull @Min(1) Integer guests,

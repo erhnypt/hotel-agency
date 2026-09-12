@@ -2,6 +2,8 @@ import axios from 'axios'
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Navigate } from 'react-router-dom'
 import { submitBookingRequest } from '../../api/bookingRequests'
+import { listPublicHotelRooms } from '../../api/publicHotels'
+import type { RoomTypeResponse } from '../../api/types'
 import type { ApiErrorResponse } from '../../auth/types'
 import { roleHomePath } from '../../auth/roleHome'
 import { useAuth } from '../../auth/useAuth'
@@ -10,6 +12,10 @@ import { useT } from '../../i18n/useT'
 import { PublicFooter, PublicHeader } from '../public/PublicChrome'
 import { loadCatalog, type CatalogHotel, type HotelCatalog } from '../../data/catalog'
 import './LandingPage.css'
+
+const REAL_HOTEL_PREFIX = 'hotel-'
+const isRealHotel = (h: CatalogHotel) => h.id.startsWith(REAL_HOTEL_PREFIX)
+const realHotelId = (h: CatalogHotel) => Number(h.id.slice(REAL_HOTEL_PREFIX.length))
 
 const today = new Date().toISOString().slice(0, 10)
 const starLabel = (n: number | null) => (n ? '★'.repeat(n) : '')
@@ -83,7 +89,12 @@ export function LandingPage() {
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
   const [guests, setGuests] = useState('2')
-  const [step, setStep] = useState<'search' | 'contact'>('search')
+  const [step, setStep] = useState<'search' | 'room' | 'contact'>('search')
+
+  const [rooms, setRooms] = useState<RoomTypeResponse[] | null>(null)
+  const [roomsLoading, setRoomsLoading] = useState(false)
+  const [roomsError, setRoomsError] = useState<string | null>(null)
+  const [selectedRoom, setSelectedRoom] = useState<RoomTypeResponse | null>(null)
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
@@ -127,7 +138,9 @@ export function LandingPage() {
   const nights = datesValid
     ? Math.round((Date.parse(checkOut) - Date.parse(checkIn)) / 86_400_000)
     : 0
-  const estimate = hotel && nights > 0 ? hotel.priceFrom * nights : null
+  const effectivePrice = selectedRoom ? Number(selectedRoom.basePrice) : hotel?.priceFrom
+  const effectiveCurrency = selectedRoom?.currency ?? hotel?.currency ?? catalog?.currency
+  const estimate = nights > 0 && effectivePrice != null ? effectivePrice * nights : null
 
   const focusSearch = () => {
     searchRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
@@ -139,10 +152,28 @@ export function LandingPage() {
     focusSearch()
   }
 
-  const handleContinue = (event: FormEvent) => {
+  const handleContinue = async (event: FormEvent) => {
     event.preventDefault()
     setError(null)
-    if (canContinue) setStep('contact')
+    if (!canContinue || !hotel) return
+
+    if (isRealHotel(hotel)) {
+      setStep('room')
+      setSelectedRoom(null)
+      setRooms(null)
+      setRoomsError(null)
+      setRoomsLoading(true)
+      try {
+        const list = await listPublicHotelRooms(realHotelId(hotel))
+        setRooms(list)
+      } catch {
+        setRoomsError(t('landing.roomError'))
+      } finally {
+        setRoomsLoading(false)
+      }
+    } else {
+      setStep('contact')
+    }
   }
 
   const handleSubmit = async (event: FormEvent) => {
@@ -158,6 +189,8 @@ export function LandingPage() {
         propertyCity: hotel.city,
         countryCode: hotel.iso2,
         countryName: hotel.country,
+        roomTypeId: selectedRoom?.id ?? null,
+        roomTypeName: selectedRoom?.name ?? null,
         checkIn,
         checkOut,
         guests: Number(guests),
@@ -185,6 +218,9 @@ export function LandingPage() {
     setCheckOut('')
     setGuests('2')
     setStep('search')
+    setRooms(null)
+    setRoomsError(null)
+    setSelectedRoom(null)
     setName('')
     setEmail('')
     setPhone('')
@@ -194,7 +230,7 @@ export function LandingPage() {
   }
 
   const summary = hotel
-    ? `${hotel.name} · ${hotel.city} · ${checkIn} → ${checkOut} · ${guests}`
+    ? `${hotel.name}${selectedRoom ? ' · ' + selectedRoom.name : ''} · ${hotel.city} · ${checkIn} → ${checkOut} · ${guests}`
     : ''
   const fromPrice = (price: number, currency: string) => t('landing.fromPrice', { price, currency })
 
@@ -312,7 +348,7 @@ export function LandingPage() {
                 <p className="lp-estimate">
                   <span>{t('landing.estimate')}</span>
                   <strong>
-                    ~{estimate.toLocaleString(lang)} {hotel?.currency ?? catalog?.currency}
+                    ~{estimate.toLocaleString(lang)} {effectiveCurrency}
                   </strong>
                   <span className="lp-estimate__note">{t('landing.estimateNote', { nights })}</span>
                 </p>
@@ -324,13 +360,66 @@ export function LandingPage() {
                 {t('landing.continue')}
               </button>
             </form>
+          ) : step === 'room' ? (
+            <div className="lp-form">
+              <button type="button" className="lp-back" onClick={() => setStep('search')}>
+                {t('landing.backToSearch')}
+              </button>
+              <div className="lp-form__head">
+                <h2>{t('landing.roomStepTitle')}</h2>
+              </div>
+              <p className="lp-form__summary">{hotel?.name}</p>
+
+              {roomsLoading && <span className="lp-loading">{t('landing.roomLoading')}</span>}
+              {roomsError && <p className="lp-inline-error">{roomsError}</p>}
+              {rooms && rooms.length === 0 && !roomsLoading && (
+                <p className="lp-loading">{t('landing.roomEmpty')}</p>
+              )}
+
+              {rooms && rooms.length > 0 && (
+                <div className="lp-room-options">
+                  {rooms.map((room) => (
+                    <button
+                      type="button"
+                      key={room.id}
+                      className={
+                        'lp-room-option' + (selectedRoom?.id === room.id ? ' lp-room-option--selected' : '')
+                      }
+                      onClick={() => setSelectedRoom(room)}
+                    >
+                      {room.images[0] && (
+                        <img className="lp-room-option__img" src={room.images[0].imageUrl} alt="" loading="lazy" />
+                      )}
+                      <span className="lp-room-option__body">
+                        <span className="lp-room-option__name">{room.name}</span>
+                        <span className="lp-room-option__meta">
+                          {room.capacity} {t('landing.roomCapacityUnit')} · {room.bedType}
+                        </span>
+                        <span className="lp-room-option__price">
+                          {fromPrice(Number(room.basePrice), room.currency)}
+                        </span>
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              )}
+
+              <button
+                type="button"
+                className="lp-btn lp-btn--block"
+                disabled={!selectedRoom}
+                onClick={() => setStep('contact')}
+              >
+                {t('landing.continue')}
+              </button>
+            </div>
           ) : (
             <form className="lp-form" onSubmit={handleSubmit}>
               <button
                 type="button"
                 className="lp-back"
                 onClick={() => {
-                  setStep('search')
+                  setStep(selectedRoom ? 'room' : 'search')
                   setError(null)
                 }}
               >

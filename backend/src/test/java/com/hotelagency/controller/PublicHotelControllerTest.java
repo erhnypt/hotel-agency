@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import com.hotelagency.config.SecurityConfig;
 import com.hotelagency.dto.hotel.PublicHotelResponse;
+import com.hotelagency.dto.room.RoomTypeResponse;
 import com.hotelagency.security.CustomUserDetailsService;
 import com.hotelagency.security.JwtAuthenticationFilter;
 import com.hotelagency.security.JwtService;
@@ -49,5 +50,17 @@ class PublicHotelControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].name").value("Grand Hotel"))
                 .andExpect(jsonPath("$[0].currency").value("EUR"));
+    }
+
+    @Test
+    void listRoomsReturnsRoomTypesWithoutAuthentication() throws Exception {
+        when(hotelService.listPublicRoomTypes(2L)).thenReturn(List.of(
+                new RoomTypeResponse(4L, 2L, "3 KİŞİLİK", "desc", 3, 15, "Queen", new BigDecimal("28.0"),
+                        new BigDecimal("300.00"), "EUR", List.of(), null, null)));
+
+        mockMvc.perform(get("/api/public/hotels/2/rooms"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].name").value("3 KİŞİLİK"))
+                .andExpect(jsonPath("$[0].basePrice").value(300.00));
     }
 }

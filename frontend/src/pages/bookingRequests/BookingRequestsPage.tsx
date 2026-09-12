@@ -65,6 +65,12 @@ export function BookingRequestsPage() {
                     {r.propertyName}
                     <br />
                     <span className="data-table__muted">{r.hotelType}</span>
+                    {r.roomTypeName && (
+                      <>
+                        <br />
+                        <span className="data-table__muted">{r.roomTypeName}</span>
+                      </>
+                    )}
                   </td>
                   <td>
                     {r.propertyCity ?? '—'}

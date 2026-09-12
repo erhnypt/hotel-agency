@@ -9,6 +9,8 @@ import com.hotelagency.dto.hotel.HotelSetupReminderLogResponse;
 import com.hotelagency.dto.hotel.HotelUpdateRequest;
 import com.hotelagency.dto.hotel.IncompleteHotelSetupResponse;
 import com.hotelagency.dto.hotel.PublicHotelResponse;
+import com.hotelagency.dto.room.RoomImageResponse;
+import com.hotelagency.dto.room.RoomTypeResponse;
 import com.hotelagency.entity.Hotel;
 import com.hotelagency.entity.HotelSetupReminderLog;
 import com.hotelagency.entity.HotelStatus;
@@ -167,6 +169,23 @@ public class HotelService {
                         .findFirstByHotelIdAndBasePriceIsNotNullOrderByBasePriceAsc(hotel.getId())
                         .map(cheapestRoomType -> PublicHotelResponse.from(hotel, cheapestRoomType)))
                 .flatMap(Optional::stream)
+                .toList();
+    }
+
+    /** A public, active hotel's bookable (priced) room types, for the landing-page room-selection step. */
+    @Transactional(readOnly = true)
+    public List<RoomTypeResponse> listPublicRoomTypes(Long hotelId) {
+        Hotel hotel = hotelRepository.findById(hotelId)
+                .filter(h -> h.getStatus() == HotelStatus.ACTIVE)
+                .orElseThrow(() -> new ResourceNotFoundException("Hotel not found: " + hotelId));
+
+        return roomTypeRepository.findByHotelId(hotel.getId()).stream()
+                .filter(roomType -> roomType.getBasePrice() != null)
+                .map(roomType -> RoomTypeResponse.from(
+                        roomType,
+                        roomImageRepository.findByRoomTypeId(roomType.getId()).stream()
+                                .map(RoomImageResponse::from)
+                                .toList()))
                 .toList();
     }
 

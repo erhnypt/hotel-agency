@@ -221,6 +221,8 @@ export interface BookingRequestCreateRequest {
   propertyCity?: string | null
   countryCode?: string | null
   countryName?: string | null
+  roomTypeId?: number | null
+  roomTypeName?: string | null
   checkIn: string
   checkOut: string
   guests: number
@@ -238,6 +240,8 @@ export interface BookingRequestResponse {
   propertyCity: string | null
   countryCode: string | null
   countryName: string | null
+  roomTypeId: number | null
+  roomTypeName: string | null
   checkIn: string
   checkOut: string
   guests: number

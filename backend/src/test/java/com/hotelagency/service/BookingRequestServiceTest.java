@@ -38,7 +38,7 @@ class BookingRequestServiceTest {
 
     private BookingRequestCreateRequest sampleRequest() {
         return new BookingRequestCreateRequest(
-                "n123", "Grand Lisboa Hotel", "Hotel", "Lizbon", "PT", "Portekiz",
+                "n123", "Grand Lisboa Hotel", "Hotel", "Lizbon", "PT", "Portekiz", null, null,
                 LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 13), 2,
                 "Jane Doe", "jane@example.com", "+351 555 111", "  Late arrival  ");
     }
@@ -61,9 +61,25 @@ class BookingRequestServiceTest {
     }
 
     @Test
+    void createPersistsRoomTypeSelectionWhenPresent() {
+        when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
+        BookingRequestCreateRequest req = new BookingRequestCreateRequest(
+                "hotel-33", "Cemgül Otel", "Hotel", "Balıkesir", null, "Türkiye", 4L, "3 KİŞİLİK",
+                LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 13), 2,
+                "Jane Doe", "jane@example.com", "+351 555 111", null);
+
+        service.create(req);
+
+        ArgumentCaptor<BookingRequest> captor = ArgumentCaptor.forClass(BookingRequest.class);
+        verify(repository).save(captor.capture());
+        assertThat(captor.getValue().getRoomTypeId()).isEqualTo(4L);
+        assertThat(captor.getValue().getRoomTypeName()).isEqualTo("3 KİŞİLİK");
+    }
+
+    @Test
     void createRejectsWhenCheckOutNotAfterCheckIn() {
         BookingRequestCreateRequest bad = new BookingRequestCreateRequest(
-                "n123", "Grand Lisboa Hotel", "Hotel", "Lizbon", null, null,
+                "n123", "Grand Lisboa Hotel", "Hotel", "Lizbon", null, null, null, null,
                 LocalDate.of(2026, 9, 13), LocalDate.of(2026, 9, 13), 2,
                 "Jane Doe", "jane@example.com", "+351 555 111", null);
 
@@ -75,7 +91,7 @@ class BookingRequestServiceTest {
     void createBlanksOptionalCountryToNull() {
         when(repository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         BookingRequestCreateRequest req = new BookingRequestCreateRequest(
-                "w456", "Seaside Resort", "Hotel", "  ", "  ", "",
+                "w456", "Seaside Resort", "Hotel", "  ", "  ", "", null, null,
                 LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 12), 3,
                 "A B", "a@b.com", "123", "   ");
 
