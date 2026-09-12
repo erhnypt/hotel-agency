@@ -14,6 +14,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     List<Reservation> findByHotelId(Long hotelId);
 
+    boolean existsByHotelId(Long hotelId);
+
     /**
      * Counts reservations for a room type whose stay overlaps [checkIn, checkOut)
      * and whose status is one of the given (active) statuses. Two date ranges

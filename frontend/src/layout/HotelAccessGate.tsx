@@ -18,7 +18,18 @@ export function HotelAccessGate({ panelTitleKey, menu }: { panelTitleKey: string
   if (hotel.error) return <ErrorState message={hotel.error} />
 
   if (hotel.data && hotel.data.status !== 'ACTIVE') {
-    const rejected = hotel.data.status === 'REJECTED'
+    const titleKey =
+      hotel.data.status === 'REJECTED'
+        ? 'gate.rejectedTitle'
+        : hotel.data.status === 'INACTIVE'
+          ? 'gate.inactiveTitle'
+          : 'gate.pendingTitle'
+    const bodyKey =
+      hotel.data.status === 'REJECTED'
+        ? 'gate.rejectedBody'
+        : hotel.data.status === 'INACTIVE'
+          ? 'gate.inactiveBody'
+          : 'gate.pendingBody'
     return (
       <div className="login-page">
         <div className="login-page__lang">
@@ -26,8 +37,8 @@ export function HotelAccessGate({ panelTitleKey, menu }: { panelTitleKey: string
         </div>
         <div className="login-card">
           <BrandMark size={40} className="login-card__mark" />
-          <h1 className="login-card__title">{t(rejected ? 'gate.rejectedTitle' : 'gate.pendingTitle')}</h1>
-          <p className="login-card__subtitle">{t(rejected ? 'gate.rejectedBody' : 'gate.pendingBody')}</p>
+          <h1 className="login-card__title">{t(titleKey)}</h1>
+          <p className="login-card__subtitle">{t(bodyKey)}</p>
           <button type="button" className="login-card__submit" onClick={logout}>
             {t('shell.logout')}
           </button>

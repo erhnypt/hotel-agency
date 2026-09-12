@@ -1,4 +1,4 @@
-export type HotelStatus = 'PENDING' | 'ACTIVE' | 'REJECTED'
+export type HotelStatus = 'PENDING' | 'ACTIVE' | 'REJECTED' | 'INACTIVE'
 
 export interface SupportMessageResponse {
   id: number

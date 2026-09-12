@@ -7,6 +7,7 @@ const CONFIG: Record<string, { label: string; tone: Tone }> = {
   CONFIRMED: { label: 'Onaylandı', tone: 'live' },
   PENDING: { label: 'Bekliyor', tone: 'hold' },
   REJECTED: { label: 'Reddedildi', tone: 'break' },
+  INACTIVE: { label: 'Pasif', tone: 'hold' },
   CANCELLED: { label: 'İptal Edildi', tone: 'pulled' },
   NEW: { label: 'Yeni', tone: 'hold' },
   IN_PROGRESS: { label: 'İşlemde', tone: 'live' },

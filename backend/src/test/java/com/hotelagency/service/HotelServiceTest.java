@@ -17,11 +17,16 @@ import com.hotelagency.entity.RoleName;
 import com.hotelagency.entity.User;
 import com.hotelagency.exception.DuplicateResourceException;
 import com.hotelagency.exception.ResourceNotFoundException;
+import com.hotelagency.repository.AmenityRepository;
 import com.hotelagency.repository.HotelRepository;
 import com.hotelagency.repository.HotelSetupReminderLogRepository;
 import com.hotelagency.repository.HotelUserRepository;
+import com.hotelagency.repository.PasswordResetTokenRepository;
+import com.hotelagency.repository.ReservationRepository;
 import com.hotelagency.repository.RoleRepository;
+import com.hotelagency.repository.RoomImageRepository;
 import com.hotelagency.repository.RoomTypeRepository;
+import com.hotelagency.repository.SupportMessageRepository;
 import com.hotelagency.repository.UserRepository;
 import com.hotelagency.security.JwtService;
 import java.util.List;
@@ -54,6 +59,16 @@ class HotelServiceTest {
     private HotelSetupReminderLogRepository hotelSetupReminderLogRepository;
     @Mock
     private RoomTypeRepository roomTypeRepository;
+    @Mock
+    private RoomImageRepository roomImageRepository;
+    @Mock
+    private AmenityRepository amenityRepository;
+    @Mock
+    private SupportMessageRepository supportMessageRepository;
+    @Mock
+    private ReservationRepository reservationRepository;
+    @Mock
+    private PasswordResetTokenRepository passwordResetTokenRepository;
 
     private HotelService hotelService;
 
@@ -66,7 +81,9 @@ class HotelServiceTest {
         JwtService jwtService = new JwtService("test-secret-key-for-jwt-signing-must-be-long-enough", 3_600_000L, 604_800_000L);
         hotelService = new HotelService(
                 hotelRepository, hotelUserRepository, userRepository, roleRepository,
-                passwordEncoder, jwtService, emailService, hotelSetupReminderLogRepository, roomTypeRepository);
+                passwordEncoder, jwtService, emailService, hotelSetupReminderLogRepository, roomTypeRepository,
+                roomImageRepository, amenityRepository, supportMessageRepository, reservationRepository,
+                passwordResetTokenRepository);
 
         hotelAdminRole = new Role(RoleName.HOTEL_ADMIN);
         hotelAdminRole.setId(3L);
@@ -389,5 +406,93 @@ class HotelServiceTest {
                 ArgumentCaptor.forClass(com.hotelagency.entity.HotelSetupReminderLog.class);
         verify(hotelSetupReminderLogRepository).save(logCaptor.capture());
         assertThat(logCaptor.getValue().getRecipients()).contains("owner@hotel.test");
+    }
+
+    @Test
+    void deactivateSetsStatusInactive() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        hotel.setStatus(HotelStatus.ACTIVE);
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+
+        hotelService.deactivate(1L);
+
+        assertThat(hotel.getStatus()).isEqualTo(HotelStatus.INACTIVE);
+    }
+
+    @Test
+    void deactivateRejectsNonActiveHotel() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        hotel.setStatus(HotelStatus.PENDING);
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+
+        assertThatThrownBy(() -> hotelService.deactivate(1L))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void reactivateSetsStatusActive() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        hotel.setStatus(HotelStatus.INACTIVE);
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+
+        hotelService.reactivate(1L);
+
+        assertThat(hotel.getStatus()).isEqualTo(HotelStatus.ACTIVE);
+    }
+
+    @Test
+    void reactivateRejectsNonInactiveHotel() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        hotel.setStatus(HotelStatus.ACTIVE);
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+
+        assertThatThrownBy(() -> hotelService.reactivate(1L))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @Test
+    void deleteRejectsHotelWithReservations() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+        when(reservationRepository.existsByHotelId(1L)).thenReturn(true);
+
+        assertThatThrownBy(() -> hotelService.delete(1L))
+                .isInstanceOf(IllegalArgumentException.class);
+
+        verify(hotelRepository, org.mockito.Mockito.never()).delete(any());
+    }
+
+    @Test
+    void deleteCascadesThroughOwnedResourcesThenTheHotel() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+        when(reservationRepository.existsByHotelId(1L)).thenReturn(false);
+
+        com.hotelagency.entity.RoomType roomType = new com.hotelagency.entity.RoomType();
+        roomType.setId(5L);
+        when(roomTypeRepository.findByHotelId(1L)).thenReturn(List.of(roomType));
+        when(roomImageRepository.findByRoomTypeId(5L)).thenReturn(List.of());
+
+        User owner = new User();
+        owner.setId(10L);
+        HotelUser link = new HotelUser(hotel, owner);
+        when(hotelUserRepository.findByHotelId(1L)).thenReturn(List.of(link));
+        when(passwordResetTokenRepository.findByUserId(10L)).thenReturn(List.of());
+
+        hotelService.delete(1L);
+
+        verify(supportMessageRepository).deleteAll(any());
+        verify(hotelSetupReminderLogRepository).deleteAll(any());
+        verify(roomTypeRepository).deleteAll(List.of(roomType));
+        verify(amenityRepository).deleteAll(any());
+        verify(hotelUserRepository).delete(link);
+        verify(userRepository).delete(owner);
+        verify(hotelRepository).delete(hotel);
     }
 }

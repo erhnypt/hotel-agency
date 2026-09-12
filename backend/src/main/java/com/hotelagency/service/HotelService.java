@@ -15,13 +15,19 @@ import com.hotelagency.entity.HotelUser;
 import com.hotelagency.entity.Role;
 import com.hotelagency.entity.RoleName;
 import com.hotelagency.entity.User;
+import com.hotelagency.entity.RoomType;
 import com.hotelagency.exception.DuplicateResourceException;
 import com.hotelagency.exception.ResourceNotFoundException;
+import com.hotelagency.repository.AmenityRepository;
 import com.hotelagency.repository.HotelRepository;
 import com.hotelagency.repository.HotelSetupReminderLogRepository;
 import com.hotelagency.repository.HotelUserRepository;
+import com.hotelagency.repository.PasswordResetTokenRepository;
+import com.hotelagency.repository.ReservationRepository;
 import com.hotelagency.repository.RoleRepository;
+import com.hotelagency.repository.RoomImageRepository;
 import com.hotelagency.repository.RoomTypeRepository;
+import com.hotelagency.repository.SupportMessageRepository;
 import com.hotelagency.repository.UserRepository;
 import com.hotelagency.security.JwtService;
 import java.time.Instant;
@@ -49,6 +55,11 @@ public class HotelService {
     private final EmailService emailService;
     private final HotelSetupReminderLogRepository hotelSetupReminderLogRepository;
     private final RoomTypeRepository roomTypeRepository;
+    private final RoomImageRepository roomImageRepository;
+    private final AmenityRepository amenityRepository;
+    private final SupportMessageRepository supportMessageRepository;
+    private final ReservationRepository reservationRepository;
+    private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     /**
      * Extra addresses always notified of new hotel registrations, on top of the AGENCY_ADMIN users.
@@ -256,6 +267,61 @@ public class HotelService {
         Hotel hotel = getHotelOrThrow(id);
         hotel.setStatus(HotelStatus.REJECTED);
         return HotelResponse.from(hotel);
+    }
+
+    /** Reversibly hides an approved hotel: it drops out of AGENCY_STAFF/staff listings and its own admin is locked out. */
+    @Transactional
+    public HotelResponse deactivate(Long id) {
+        Hotel hotel = getHotelOrThrow(id);
+        if (hotel.getStatus() != HotelStatus.ACTIVE) {
+            throw new IllegalArgumentException("Sadece aktif oteller pasife alınabilir");
+        }
+        hotel.setStatus(HotelStatus.INACTIVE);
+        return HotelResponse.from(hotel);
+    }
+
+    @Transactional
+    public HotelResponse reactivate(Long id) {
+        Hotel hotel = getHotelOrThrow(id);
+        if (hotel.getStatus() != HotelStatus.INACTIVE) {
+            throw new IllegalArgumentException("Sadece pasif oteller aktifleştirilebilir");
+        }
+        hotel.setStatus(HotelStatus.ACTIVE);
+        return HotelResponse.from(hotel);
+    }
+
+    /**
+     * Permanently deletes a hotel and everything it owns (room types/images, services,
+     * support messages, setup-reminder logs, its hotel-admin account). Blocked when the
+     * hotel has any reservations, since those carry real customer/booking history that
+     * a hard delete must not destroy — deactivate it instead.
+     */
+    @Transactional
+    public void delete(Long id) {
+        Hotel hotel = getHotelOrThrow(id);
+        if (reservationRepository.existsByHotelId(id)) {
+            throw new IllegalArgumentException(
+                    "Rezervasyonu olan bir otel silinemez. Önce oteli pasife alın.");
+        }
+
+        supportMessageRepository.deleteAll(supportMessageRepository.findByHotelIdOrderByCreatedAtAsc(id));
+        hotelSetupReminderLogRepository.deleteAll(hotelSetupReminderLogRepository.findByHotelId(id));
+
+        for (RoomType roomType : roomTypeRepository.findByHotelId(id)) {
+            roomImageRepository.deleteAll(roomImageRepository.findByRoomTypeId(roomType.getId()));
+        }
+        roomTypeRepository.deleteAll(roomTypeRepository.findByHotelId(id));
+
+        amenityRepository.deleteAll(amenityRepository.findByHotelId(id));
+
+        for (HotelUser link : hotelUserRepository.findByHotelId(id)) {
+            User owner = link.getUser();
+            passwordResetTokenRepository.deleteAll(passwordResetTokenRepository.findByUserId(owner.getId()));
+            hotelUserRepository.delete(link);
+            userRepository.delete(owner);
+        }
+
+        hotelRepository.delete(hotel);
     }
 
     /**

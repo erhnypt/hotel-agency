@@ -35,3 +35,17 @@ export async function rejectHotel(id: number): Promise<HotelResponse> {
   const response = await apiClient.post<HotelResponse>(`/hotels/${id}/reject`)
   return response.data
 }
+
+export async function deactivateHotel(id: number): Promise<HotelResponse> {
+  const response = await apiClient.post<HotelResponse>(`/hotels/${id}/deactivate`)
+  return response.data
+}
+
+export async function reactivateHotel(id: number): Promise<HotelResponse> {
+  const response = await apiClient.post<HotelResponse>(`/hotels/${id}/reactivate`)
+  return response.data
+}
+
+export async function deleteHotel(id: number): Promise<void> {
+  await apiClient.delete(`/hotels/${id}`)
+}

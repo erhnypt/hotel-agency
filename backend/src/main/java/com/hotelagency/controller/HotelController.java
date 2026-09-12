@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -86,5 +87,24 @@ public class HotelController {
     @PreAuthorize("hasRole('AGENCY_ADMIN')")
     public ResponseEntity<HotelResponse> reject(@PathVariable Long id) {
         return ResponseEntity.ok(hotelService.reject(id));
+    }
+
+    @PostMapping("/{id}/deactivate")
+    @PreAuthorize("hasRole('AGENCY_ADMIN')")
+    public ResponseEntity<HotelResponse> deactivate(@PathVariable Long id) {
+        return ResponseEntity.ok(hotelService.deactivate(id));
+    }
+
+    @PostMapping("/{id}/reactivate")
+    @PreAuthorize("hasRole('AGENCY_ADMIN')")
+    public ResponseEntity<HotelResponse> reactivate(@PathVariable Long id) {
+        return ResponseEntity.ok(hotelService.reactivate(id));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('AGENCY_ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        hotelService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

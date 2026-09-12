@@ -1,7 +1,14 @@
 import axios from 'axios'
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { approveHotel, listHotels, rejectHotel } from '../../api/hotels'
+import {
+  approveHotel,
+  deactivateHotel,
+  deleteHotel,
+  listHotels,
+  reactivateHotel,
+  rejectHotel,
+} from '../../api/hotels'
 import type { ApiErrorResponse } from '../../auth/types'
 import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
@@ -37,6 +44,13 @@ export function HotelsPage() {
     } finally {
       setBusyId(null)
     }
+  }
+
+  const handleDelete = (id: number, name: string) => {
+    if (!window.confirm(`${name} otelini kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) {
+      return
+    }
+    handleDecision(id, deleteHotel)
   }
 
   return (
@@ -92,6 +106,36 @@ export function HotelsPage() {
                           Reddet
                         </button>
                       </>
+                    )}
+                    {isAdmin && hotel.status === 'ACTIVE' && (
+                      <button
+                        type="button"
+                        className="btn btn--small btn--danger"
+                        disabled={busyId === hotel.id}
+                        onClick={() => handleDecision(hotel.id, deactivateHotel)}
+                      >
+                        Pasife Al
+                      </button>
+                    )}
+                    {isAdmin && hotel.status === 'INACTIVE' && (
+                      <button
+                        type="button"
+                        className="btn btn--small"
+                        disabled={busyId === hotel.id}
+                        onClick={() => handleDecision(hotel.id, reactivateHotel)}
+                      >
+                        Aktifleştir
+                      </button>
+                    )}
+                    {isAdmin && (
+                      <button
+                        type="button"
+                        className="btn btn--small btn--danger"
+                        disabled={busyId === hotel.id}
+                        onClick={() => handleDelete(hotel.id, hotel.name)}
+                      >
+                        Sil
+                      </button>
                     )}
                     <Link to={`${supportBasePath}/${hotel.id}/support`} className="btn btn--small">
                       Destek

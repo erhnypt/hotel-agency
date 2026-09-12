@@ -3,6 +3,7 @@ package com.hotelagency.controller;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -128,6 +129,47 @@ class HotelControllerTest {
     @WithMockCustomUser(role = RoleName.AGENCY_STAFF)
     void findMineAsAgencyStaffReturns403() throws Exception {
         mockMvc.perform(get("/api/hotels/me"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "AGENCY_ADMIN")
+    void deactivateAsAgencyAdminReturns200() throws Exception {
+        when(hotelService.deactivate(eq(1L))).thenReturn(sampleHotelResponse(HotelStatus.INACTIVE));
+
+        mockMvc.perform(post("/api/hotels/1/deactivate"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("INACTIVE"));
+    }
+
+    @Test
+    @WithMockUser(roles = "AGENCY_STAFF")
+    void deactivateAsAgencyStaffReturns403() throws Exception {
+        mockMvc.perform(post("/api/hotels/1/deactivate"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "AGENCY_ADMIN")
+    void reactivateAsAgencyAdminReturns200() throws Exception {
+        when(hotelService.reactivate(eq(1L))).thenReturn(sampleHotelResponse(HotelStatus.ACTIVE));
+
+        mockMvc.perform(post("/api/hotels/1/reactivate"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("ACTIVE"));
+    }
+
+    @Test
+    @WithMockUser(roles = "AGENCY_ADMIN")
+    void deleteAsAgencyAdminReturns204() throws Exception {
+        mockMvc.perform(delete("/api/hotels/1"))
+                .andExpect(status().isNoContent());
+    }
+
+    @Test
+    @WithMockUser(roles = "AGENCY_STAFF")
+    void deleteAsAgencyStaffReturns403() throws Exception {
+        mockMvc.perform(delete("/api/hotels/1"))
                 .andExpect(status().isForbidden());
     }
 }

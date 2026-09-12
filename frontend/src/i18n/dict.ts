@@ -110,6 +110,9 @@ const tr: Dict = {
   'gate.rejectedTitle': 'Başvurunuz Reddedildi',
   'gate.rejectedBody':
     'Otel başvurunuz acente tarafından reddedilmiştir. Detaylı bilgi için acente ile iletişime geçebilirsiniz.',
+  'gate.inactiveTitle': 'Hesabınız Pasife Alındı',
+  'gate.inactiveBody':
+    'Oteliniz acente tarafından pasife alınmıştır. Detaylı bilgi için acente ile iletişime geçebilirsiniz.',
 
   'landing.loginCta': 'Kurumsal Giriş',
   'landing.heroTitle1': 'Bir sonraki tatiliniz',
@@ -364,6 +367,9 @@ const en: Dict = {
   'gate.rejectedTitle': 'Application Rejected',
   'gate.rejectedBody':
     'Your hotel application was rejected by the agency. Please contact the agency for details.',
+  'gate.inactiveTitle': 'Your Account Has Been Deactivated',
+  'gate.inactiveBody':
+    'Your hotel has been deactivated by the agency. Please contact the agency for details.',
 
   'landing.loginCta': 'Staff Login',
   'landing.heroTitle1': 'Your next holiday',
@@ -618,6 +624,9 @@ const ru: Dict = {
   'gate.rejectedTitle': 'Заявка отклонена',
   'gate.rejectedBody':
     'Ваша заявка на отель отклонена агентством. За подробностями обратитесь в агентство.',
+  'gate.inactiveTitle': 'Ваш аккаунт деактивирован',
+  'gate.inactiveBody':
+    'Ваш отель был деактивирован агентством. За подробностями обратитесь в агентство.',
 
   'landing.loginCta': 'Вход для сотрудников',
   'landing.heroTitle1': 'Ваш следующий отпуск',
@@ -872,6 +881,9 @@ const de: Dict = {
   'gate.rejectedTitle': 'Antrag abgelehnt',
   'gate.rejectedBody':
     'Ihr Hotelantrag wurde von der Agentur abgelehnt. Für Details wenden Sie sich bitte an die Agentur.',
+  'gate.inactiveTitle': 'Ihr Konto wurde deaktiviert',
+  'gate.inactiveBody':
+    'Ihr Hotel wurde von der Agentur deaktiviert. Für Details wenden Sie sich bitte an die Agentur.',
 
   'landing.loginCta': 'Mitarbeiter-Login',
   'landing.heroTitle1': 'Ihr nächster Urlaub',
@@ -1126,6 +1138,9 @@ const es: Dict = {
   'gate.rejectedTitle': 'Solicitud rechazada',
   'gate.rejectedBody':
     'La agencia ha rechazado tu solicitud de hotel. Para más información, ponte en contacto con la agencia.',
+  'gate.inactiveTitle': 'Tu cuenta ha sido desactivada',
+  'gate.inactiveBody':
+    'La agencia ha desactivado tu hotel. Para más información, ponte en contacto con la agencia.',
 
   'landing.loginCta': 'Acceso de personal',
   'landing.heroTitle1': 'Tu próximo viaje',
@@ -1380,6 +1395,9 @@ const ar: Dict = {
   'gate.rejectedTitle': 'تم رفض الطلب',
   'gate.rejectedBody':
     'رفضت الوكالة طلب فندقك. للحصول على تفاصيل، يرجى التواصل مع الوكالة.',
+  'gate.inactiveTitle': 'تم إلغاء تفعيل حسابك',
+  'gate.inactiveBody':
+    'قامت الوكالة بإلغاء تفعيل فندقك. للحصول على تفاصيل، يرجى التواصل مع الوكالة.',
 
   'landing.loginCta': 'دخول الموظفين',
   'landing.heroTitle1': 'عطلتك القادمة',
