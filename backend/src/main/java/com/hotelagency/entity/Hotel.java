@@ -56,6 +56,14 @@ public class Hotel {
     @Column(name = "setup_reminder_sent_at")
     private Instant setupReminderSentAt;
 
+    /** When the hotel side last opened the support thread (unread = an agency message after this). */
+    @Column(name = "hotel_support_read_at")
+    private Instant hotelSupportReadAt;
+
+    /** When the agency side last opened this hotel's support thread (unread = a hotel message after this). */
+    @Column(name = "agency_support_read_at")
+    private Instant agencySupportReadAt;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

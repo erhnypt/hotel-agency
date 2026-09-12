@@ -213,14 +213,16 @@ public class EmailService {
     }
 
     @Async
-    public void sendSupportMessageNotification(String toEmail, String hotelName, String senderName) {
+    public void sendSupportMessageNotification(String toEmail, String hotelName, String senderName, String messageBody) {
         String body = wrapCorporateTemplate(
                 "Yeni Destek Mesajı",
                 """
                 <p>Merhaba,</p>
                 <p><strong>%s</strong> ile ilgili destek sohbetinde <strong>%s</strong> tarafından yeni bir mesaj
                 gönderildi.</p>
-                """.formatted(escape(hotelName), escape(senderName)),
+                <div style="margin:16px 0;padding:12px 16px;border-left:3px solid %s;background:#f9fafb;
+                     color:#1f2937;font-size:14px;line-height:1.6;">%s</div>
+                """.formatted(escape(hotelName), escape(senderName), BRAND_SIGNAL, escape(messageBody).replace("\n", "<br/>")),
                 new CallToAction("Mesajı Görüntüle", frontendUrl + "/login"));
         send(toEmail, "Yeni Destek Mesajı - " + hotelName, body, "support message");
     }

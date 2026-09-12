@@ -7,6 +7,7 @@ import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { StatusBadge } from '../../components/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
+import { useSupportUnread } from '../../hooks/useSupportUnread'
 import '../../components/crud.css'
 
 export function HotelsPage() {
@@ -18,6 +19,7 @@ export function HotelsPage() {
   const [error, setError] = useState<string | null>(null)
 
   const hotels = useAsync(listHotels, [refreshKey])
+  const { unreadHotelIds } = useSupportUnread()
   const supportBasePath = isAdmin ? '/admin/hotels' : '/staff/hotels'
 
   const handleDecision = async (id: number, decide: (id: number) => Promise<unknown>) => {
@@ -93,6 +95,7 @@ export function HotelsPage() {
                     )}
                     <Link to={`${supportBasePath}/${hotel.id}/support`} className="btn btn--small">
                       Destek
+                      {unreadHotelIds.includes(hotel.id) && <span className="badge-dot" aria-label="Yeni mesaj" />}
                     </Link>
                   </div>
                 </td>

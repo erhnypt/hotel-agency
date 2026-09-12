@@ -179,11 +179,14 @@ public class HotelService {
     }
 
     public List<HotelResponse> findAll(User requester) {
-        List<Hotel> hotels = requester.getRole().getName() == RoleName.AGENCY_STAFF
+        return listVisibleHotels(requester).stream().map(HotelResponse::from).toList();
+    }
+
+    /** The hotel entities a caller's role may see (AGENCY_STAFF is limited to ACTIVE hotels). */
+    public List<Hotel> listVisibleHotels(User requester) {
+        return requester.getRole().getName() == RoleName.AGENCY_STAFF
                 ? hotelRepository.findByStatus(HotelStatus.ACTIVE)
                 : hotelRepository.findAll();
-
-        return hotels.stream().map(HotelResponse::from).toList();
     }
 
     public HotelResponse findById(Long id, User requester) {

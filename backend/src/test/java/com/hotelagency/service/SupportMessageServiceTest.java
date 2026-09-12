@@ -16,6 +16,7 @@ import com.hotelagency.entity.SupportMessage;
 import com.hotelagency.entity.User;
 import com.hotelagency.repository.SupportMessageRepository;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -77,6 +78,64 @@ class SupportMessageServiceTest {
     }
 
     @Test
+    void listByHotelMarksReadForTheCallersSide() {
+        when(hotelService.getViewableHotel(1L, hotelAdmin)).thenReturn(hotel);
+        when(supportMessageRepository.findByHotelIdOrderByCreatedAtAsc(1L)).thenReturn(List.of());
+
+        supportMessageService.listByHotel(1L, hotelAdmin);
+
+        assertThat(hotel.getHotelSupportReadAt()).isNotNull();
+        assertThat(hotel.getAgencySupportReadAt()).isNull();
+    }
+
+    @Test
+    void listByHotelFromAgencyMarksAgencySideRead() {
+        when(hotelService.getViewableHotel(1L, agencyAdmin)).thenReturn(hotel);
+        when(supportMessageRepository.findByHotelIdOrderByCreatedAtAsc(1L)).thenReturn(List.of());
+
+        supportMessageService.listByHotel(1L, agencyAdmin);
+
+        assertThat(hotel.getAgencySupportReadAt()).isNotNull();
+        assertThat(hotel.getHotelSupportReadAt()).isNull();
+    }
+
+    @Test
+    void hasUnreadForMyHotelIsTrueWhenLatestMessageIsFromAgencyAndUnread() {
+        SupportMessage fromAgency = new SupportMessage(hotel, agencyAdmin, "Merhaba");
+        when(hotelService.requireOwnHotelId(hotelAdmin)).thenReturn(1L);
+        when(hotelService.getViewableHotel(1L, hotelAdmin)).thenReturn(hotel);
+        when(supportMessageRepository.findTopByHotelIdOrderByCreatedAtDesc(1L)).thenReturn(Optional.of(fromAgency));
+
+        assertThat(supportMessageService.hasUnreadForMyHotel(hotelAdmin)).isTrue();
+    }
+
+    @Test
+    void hasUnreadForMyHotelIsFalseWhenLatestMessageIsFromTheHotelItself() {
+        SupportMessage fromHotel = new SupportMessage(hotel, hotelAdmin, "Merhaba");
+        when(hotelService.requireOwnHotelId(hotelAdmin)).thenReturn(1L);
+        when(hotelService.getViewableHotel(1L, hotelAdmin)).thenReturn(hotel);
+        when(supportMessageRepository.findTopByHotelIdOrderByCreatedAtDesc(1L)).thenReturn(Optional.of(fromHotel));
+
+        assertThat(supportMessageService.hasUnreadForMyHotel(hotelAdmin)).isFalse();
+    }
+
+    @Test
+    void listHotelIdsWithUnreadForAgencyIncludesOnlyHotelsWithAFreshHotelMessage() {
+        Hotel otherHotel = new Hotel();
+        otherHotel.setId(2L);
+        SupportMessage fromHotel = new SupportMessage(hotel, hotelAdmin, "Merhaba");
+        SupportMessage fromAgencyOnOther = new SupportMessage(otherHotel, agencyAdmin, "Merhaba");
+
+        when(hotelService.listVisibleHotels(agencyAdmin)).thenReturn(List.of(hotel, otherHotel));
+        when(supportMessageRepository.findTopByHotelIdOrderByCreatedAtDesc(1L)).thenReturn(Optional.of(fromHotel));
+        when(supportMessageRepository.findTopByHotelIdOrderByCreatedAtDesc(2L)).thenReturn(Optional.of(fromAgencyOnOther));
+
+        List<Long> result = supportMessageService.listHotelIdsWithUnreadForAgency(agencyAdmin);
+
+        assertThat(result).containsExactly(1L);
+    }
+
+    @Test
     void sendFromHotelAdminNotifiesAgencyAdmins() {
         when(hotelService.getViewableHotel(1L, hotelAdmin)).thenReturn(hotel);
         when(hotelService.resolveAgencyAdminEmails()).thenReturn(Set.of("admin@hotel.test"));
@@ -91,7 +150,7 @@ class SupportMessageServiceTest {
         verify(supportMessageRepository).save(captor.capture());
         assertThat(captor.getValue().getSender()).isEqualTo(hotelAdmin);
 
-        verify(emailService).sendSupportMessageNotification("admin@hotel.test", "Grand Hotel", "Hotel Owner");
+        verify(emailService).sendSupportMessageNotification("admin@hotel.test", "Grand Hotel", "Hotel Owner", "Yardım lazım");
         verify(hotelService, never()).resolveHotelOwnerEmails(any());
     }
 
@@ -103,7 +162,7 @@ class SupportMessageServiceTest {
         supportMessageService.send(1L, new SupportMessageCreateRequest("Merhaba, size nasıl yardımcı olabiliriz?"), agencyAdmin);
 
         verify(emailService).sendSupportMessageNotification(
-                eq("owner@hotel.test"), eq("Grand Hotel"), eq("Agency Admin"));
+                eq("owner@hotel.test"), eq("Grand Hotel"), eq("Agency Admin"), eq("Merhaba, size nasıl yardımcı olabiliriz?"));
         verify(hotelService, never()).resolveAgencyAdminEmails();
     }
 }

@@ -23,6 +23,7 @@ import com.hotelagency.security.JwtService;
 import com.hotelagency.security.RestAuthenticationEntryPoint;
 import com.hotelagency.security.WithMockCustomUser;
 import com.hotelagency.service.HotelService;
+import com.hotelagency.service.SupportMessageService;
 import java.time.Instant;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,9 @@ class HotelControllerTest {
 
     @MockitoBean
     private HotelService hotelService;
+
+    @MockitoBean
+    private SupportMessageService supportMessageService;
 
     @MockitoBean
     private JwtService jwtService;
