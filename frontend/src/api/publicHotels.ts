@@ -1,8 +1,14 @@
 import { apiClient } from './client'
 import type { PublicHotelResponse, RoomTypeResponse } from './types'
 
-/** The backend can be cold (Render free-tier spin-down) — bound the wait so a slow wake never hangs the UI forever. */
-const PUBLIC_REQUEST_TIMEOUT_MS = 15_000
+/**
+ * The backend can be cold (Render free-tier spin-down), which can take up to
+ * ~60s to wake. Neither caller blocks the initial page render on this (see
+ * `loadRealHotels` in data/catalog.ts and the room-step spinner in
+ * LandingPage.tsx), so it's safe to wait out a full cold start rather than
+ * give up early and silently drop real hotels for that session.
+ */
+const PUBLIC_REQUEST_TIMEOUT_MS = 60_000
 
 /** Public — real, active, setup-complete hotels for the landing-page search. No auth. */
 export async function listPublicHotels(): Promise<PublicHotelResponse[]> {
