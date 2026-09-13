@@ -53,7 +53,8 @@ export interface HotelCatalog {
   hotels: CatalogHotel[]
 }
 
-let cache: Promise<HotelCatalog> | null = null
+let catalogCache: Promise<HotelCatalog> | null = null
+let realHotelsCache: Promise<PublicHotelResponse[]> | null = null
 
 function toCatalogHotel(hotel: PublicHotelResponse): CatalogHotel {
   return {
@@ -70,7 +71,7 @@ function toCatalogHotel(hotel: PublicHotelResponse): CatalogHotel {
   }
 }
 
-function mergeRealHotels(catalog: HotelCatalog, realHotels: PublicHotelResponse[]): HotelCatalog {
+export function mergeRealHotels(catalog: HotelCatalog, realHotels: PublicHotelResponse[]): HotelCatalog {
   if (realHotels.length === 0) return catalog
 
   const merged = realHotels.map(toCatalogHotel)
@@ -92,15 +93,30 @@ function mergeRealHotels(catalog: HotelCatalog, realHotels: PublicHotelResponse[
   }
 }
 
+/**
+ * Fetches the static seed catalog only — same-origin, fast, no backend
+ * dependency. Real hotels are fetched and merged separately (see
+ * `loadRealHotels`) so a slow-to-wake backend never delays or blocks the
+ * seed catalog from showing.
+ */
 export function loadCatalog(): Promise<HotelCatalog> {
-  if (!cache) {
-    cache = Promise.all([
-      fetch(`${import.meta.env.BASE_URL}hotels.catalog.json`).then((r) => {
-        if (!r.ok) throw new Error(`Katalog yüklenemedi (${r.status})`)
-        return r.json() as Promise<HotelCatalog>
-      }),
-      listPublicHotels().catch(() => [] as PublicHotelResponse[]),
-    ]).then(([catalog, realHotels]) => mergeRealHotels(catalog, realHotels))
+  if (!catalogCache) {
+    catalogCache = fetch(`${import.meta.env.BASE_URL}hotels.catalog.json`).then((r) => {
+      if (!r.ok) throw new Error(`Katalog yüklenemedi (${r.status})`)
+      return r.json() as Promise<HotelCatalog>
+    })
   }
-  return cache
+  return catalogCache
+}
+
+/**
+ * Fetches real registered hotels to merge on top of the seed catalog.
+ * Resolves to `[]` on any failure or timeout (e.g. a cold backend instance)
+ * instead of hanging or rejecting, so callers can treat it as best-effort.
+ */
+export function loadRealHotels(): Promise<PublicHotelResponse[]> {
+  if (!realHotelsCache) {
+    realHotelsCache = listPublicHotels().catch(() => [] as PublicHotelResponse[])
+  }
+  return realHotelsCache
 }

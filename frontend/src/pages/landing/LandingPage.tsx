@@ -9,7 +9,8 @@ import { useAuth } from '../../auth/useAuth'
 import { SearchSelect } from '../../components/SearchSelect'
 import { useT } from '../../i18n/useT'
 import { PublicFooter, PublicHeader } from '../public/PublicChrome'
-import { loadCatalog, type CatalogHotel, type HotelCatalog } from '../../data/catalog'
+import { loadCatalog, loadRealHotels, mergeRealHotels, type CatalogHotel, type HotelCatalog } from '../../data/catalog'
+import type { PublicHotelResponse } from '../../api/types'
 import './LandingPage.css'
 
 const REAL_HOTEL_PREFIX = 'hotel-'
@@ -91,8 +92,9 @@ export function LandingPage() {
   const { isAuthenticated, user } = useAuth()
   const { t, lang } = useT()
 
-  const [catalog, setCatalog] = useState<HotelCatalog | null>(null)
+  const [seedCatalog, setSeedCatalog] = useState<HotelCatalog | null>(null)
   const [catalogError, setCatalogError] = useState<string | null>(null)
+  const [realHotels, setRealHotels] = useState<PublicHotelResponse[]>([])
 
   const [hotel, setHotel] = useState<CatalogHotel | null>(null)
   const [cityFilter, setCityFilter] = useState<string | null>(null)
@@ -119,9 +121,20 @@ export function LandingPage() {
 
   useEffect(() => {
     loadCatalog()
-      .then(setCatalog)
+      .then(setSeedCatalog)
       .catch(() => setCatalogError(t('landing.catalogError')))
   }, [t])
+
+  useEffect(() => {
+    // Fetched independently of the seed catalog so a slow/cold backend never
+    // delays or blocks the (backend-independent) demo catalog from showing.
+    loadRealHotels().then(setRealHotels)
+  }, [])
+
+  const catalog = useMemo(() => {
+    if (!seedCatalog) return null
+    return realHotels.length > 0 ? mergeRealHotels(seedCatalog, realHotels) : seedCatalog
+  }, [seedCatalog, realHotels])
 
   const items = useMemo(() => {
     if (!catalog) return []
