@@ -333,7 +333,7 @@ public class HotelService {
         Hotel hotel = getHotelOrThrow(id);
         if (reservationRepository.existsByHotelId(id)) {
             throw new IllegalArgumentException(
-                    "Rezervasyonu olan bir otel silinemez. Önce oteli pasife alın.");
+                    "Rezervasyon geçmişi olan bir otel kalıcı olarak silinemez. Bunun yerine oteli pasife alabilirsiniz.");
         }
 
         supportMessageRepository.deleteAll(supportMessageRepository.findByHotelIdOrderByCreatedAtAsc(id));
