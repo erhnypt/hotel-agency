@@ -33,7 +33,7 @@
   border-radius: 3px;
   background: var(--signal-gradient);
   transform: rotate(45deg);
-  box-shadow: 0 2px 8px -2px rgba(109, 118, 245, 0.6);
+  box-shadow: 0 2px 8px -2px rgba(193, 80, 46, 0.6);
 }
 
 .btn {
@@ -235,7 +235,7 @@
   border-radius: 0 var(--radius) var(--radius) 0;
   padding: 14px 16px 2px;
   margin: 8px 0 18px;
-  background: rgba(109, 118, 245, 0.04);
+  background: rgba(156, 61, 34, 0.05);
 }
 
 .form-fieldset legend {

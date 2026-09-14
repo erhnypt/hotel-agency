@@ -1,36 +1,38 @@
 /*
   Public landing.
-  Its own bright, holiday-energy world; deliberately unlike the dark operator
-  panels. Shared tokens (--bg, --signal, --radius, --shadow, …) are re-scoped
-  to a light palette on `.lp` so nested primitives (SearchSelect, BrandMark)
-  follow along. The app shell never renders inside `.lp`, so it is untouched.
+  Its own sun-warmed, editorial-paper world — a travel journal, not a SaaS
+  page — but now tuned to the same "Rota" palette family as the operator
+  panels so the whole site reads as one considered brand. Shared tokens
+  (--bg, --signal, --radius, --shadow, …) are re-scoped to this light palette
+  on `.lp` so nested primitives (SearchSelect, BrandMark) follow along. The
+  app shell never renders inside `.lp`, so it is untouched.
 */
 .lp {
-  --bg: #fff7ee;
-  --bg-panel: #ffffff;
-  --bg-panel-2: #fff1e0;
-  --border: #f1e3d0;
-  --border-strong: #e4d2b9;
-  --text: #44546b;
-  --text-dim: #5f6b7e;
-  --text-h: #142438;
-  --signal: #ff5a4d;
-  --signal-hover: #eb4133;
-  --signal-bg: #fff0ed;
-  --signal-border: #ffcfc8;
-  --signal-ink: #ffffff;
-  --radius-sm: 8px;
-  --radius: 12px;
-  --radius-lg: 24px;
-  --shadow: 0 22px 50px -18px rgba(20, 36, 56, 0.28), 0 8px 18px -10px rgba(20, 36, 56, 0.16);
+  --bg: #f7f1e6;
+  --bg-panel: #fffaf0;
+  --bg-panel-2: #efe6d3;
+  --border: #ddd0b4;
+  --border-strong: #c7b68c;
+  --text: #5c5142;
+  --text-dim: #8a7f68;
+  --text-h: #2b241c;
+  --signal: #c1502e;
+  --signal-hover: #9c3d22;
+  --signal-bg: rgba(193, 80, 46, 0.08);
+  --signal-border: rgba(193, 80, 46, 0.28);
+  --signal-ink: #fff8ee;
+  --radius-sm: 7px;
+  --radius: 11px;
+  --radius-lg: 18px;
+  --shadow: 0 22px 50px -18px rgba(43, 36, 28, 0.24), 0 8px 18px -10px rgba(43, 36, 28, 0.14);
 
-  --l-coral: #ff5a4d;
-  --l-teal: #10b3b8;
-  --l-teal-deep: #0a8b8f;
-  --l-sun: #ffb020;
-  --l-navy: #142438;
-  --l-teal-tint: #e3f6f6;
-  --l-sun-tint: #fff3db;
+  --l-coral: #c1502e;
+  --l-teal: #2f6f68;
+  --l-teal-deep: #234f4a;
+  --l-sun: #b8863b;
+  --l-navy: #2b241c;
+  --l-teal-tint: #e6ece7;
+  --l-sun-tint: #f5ecd6;
 
   min-height: 100svh;
   background: var(--bg);
@@ -62,7 +64,7 @@
   justify-content: space-between;
   gap: 16px;
   padding: 14px clamp(18px, 5vw, 64px);
-  background: #fff7ee;
+  background: var(--bg);
   border-bottom: 1px solid var(--border);
 }
 
@@ -138,8 +140,8 @@
   inset: 0;
   z-index: 1;
   background:
-    linear-gradient(103deg, rgba(255, 90, 77, 0.92) 0%, rgba(255, 90, 77, 0.55) 34%, rgba(20, 36, 56, 0.28) 66%, rgba(20, 36, 56, 0.62) 100%),
-    linear-gradient(to top, rgba(20, 36, 56, 0.5), transparent 46%);
+    linear-gradient(103deg, rgba(193, 80, 46, 0.92) 0%, rgba(193, 80, 46, 0.55) 34%, rgba(43, 36, 28, 0.32) 66%, rgba(43, 36, 28, 0.66) 100%),
+    linear-gradient(to top, rgba(43, 36, 28, 0.55), transparent 46%);
 }
 
 .lp-hero__blob {
@@ -163,7 +165,7 @@
   aspect-ratio: 1;
   bottom: 22%;
   left: 3%;
-  background: radial-gradient(circle at 40% 40%, #6fdee1, var(--l-teal-deep) 58%, rgba(10, 139, 143, 0) 78%);
+  background: radial-gradient(circle at 40% 40%, #8fc4bb, var(--l-teal-deep) 58%, rgba(35, 79, 74, 0) 78%);
   animation-delay: 0.15s;
 }
 
@@ -183,13 +185,13 @@
   font-size: clamp(2.3rem, 6vw, 4.1rem);
   line-height: 1.04;
   text-wrap: balance;
-  text-shadow: 0 2px 30px rgba(20, 36, 56, 0.55), 0 1px 3px rgba(20, 36, 56, 0.4);
+  text-shadow: 0 2px 30px rgba(43, 36, 28, 0.55), 0 1px 3px rgba(43, 36, 28, 0.4);
 }
 
 .lp .lp-hero__title em {
-  font-style: normal;
-  color: #ffd166;
-  text-shadow: 0 2px 26px rgba(20, 36, 56, 0.45);
+  font-style: italic;
+  color: #f2c879;
+  text-shadow: 0 2px 26px rgba(43, 36, 28, 0.45);
 }
 
 .lp-hero__lede {
@@ -198,7 +200,7 @@
   color: rgba(255, 255, 255, 0.94);
   font-size: clamp(1rem, 1.7vw, 1.15rem);
   line-height: 1.6;
-  text-shadow: 0 1px 14px rgba(20, 36, 56, 0.4);
+  text-shadow: 0 1px 14px rgba(43, 36, 28, 0.4);
 }
 
 /* ---------- search card ---------- */
@@ -294,7 +296,7 @@
   padding: 12px 14px;
   border-radius: var(--radius);
   background: var(--l-teal-tint);
-  color: #0a6a6d;
+  color: #1f4a45;
   font-size: 13px;
 }
 
@@ -304,7 +306,7 @@
 }
 
 .lp-estimate__note {
-  color: #0a6a6d;
+  color: #1f4a45;
   opacity: 0.82;
   font-size: 12px;
 }
@@ -314,7 +316,7 @@
   border-radius: var(--radius);
   background: var(--signal-bg);
   border: 1px solid var(--signal-border);
-  color: #c53727;
+  color: #9c3d22;
   font-size: 13px;
 }
 
@@ -664,7 +666,7 @@
 
 .lp-trust__item:nth-child(1) .lp-trust__icon { color: var(--l-coral); }
 .lp-trust__item:nth-child(2) .lp-trust__icon { color: var(--l-teal-deep); }
-.lp-trust__item:nth-child(3) .lp-trust__icon { color: #d98c00; }
+.lp-trust__item:nth-child(3) .lp-trust__icon { color: #8a6425; }
 
 .lp-trust__item div {
   display: flex;
@@ -690,8 +692,8 @@
   text-align: center;
   color: #fff;
   background:
-    radial-gradient(120% 140% at 12% 0%, rgba(255, 176, 32, 0.5), transparent 55%),
-    linear-gradient(120deg, var(--l-coral), #ff7a44 55%, #ff934e);
+    radial-gradient(120% 140% at 12% 0%, rgba(184, 134, 59, 0.45), transparent 55%),
+    linear-gradient(120deg, var(--l-coral), #a8451f 55%, #7d3216);
 }
 
 .lp-band h2 {

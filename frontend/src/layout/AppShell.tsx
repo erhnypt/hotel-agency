@@ -72,7 +72,7 @@ export function AppShell({ panelTitleKey, menu }: { panelTitleKey: string; menu:
             </button>
           </div>
         </header>
-        <main className="app-shell__content">
+        <main className="app-shell__content" key={location.pathname}>
           <Outlet />
         </main>
       </div>
