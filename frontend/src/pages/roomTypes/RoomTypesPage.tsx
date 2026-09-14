@@ -1,7 +1,9 @@
+import axios from 'axios'
 import { useState } from 'react'
 import { getMyHotel, listRoomTypes } from '../../api/hotels'
 import { addRoomImage, createRoomType, deleteRoomType, updateRoomType } from '../../api/roomTypes'
 import type { RoomTypeRequest, RoomTypeResponse } from '../../api/types'
+import type { ApiErrorResponse } from '../../auth/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
 import { RoomImagesModal } from './RoomImagesModal'
@@ -50,7 +52,11 @@ export function RoomTypesPage() {
       refresh()
     } catch (err) {
       console.error('Failed to delete room type:', err)
-      setDeleteError('Oda tipi silinemedi. Lütfen tekrar deneyin.')
+      if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
+        setDeleteError(err.response.data.message)
+      } else {
+        setDeleteError('Oda tipi silinemedi. Lütfen tekrar deneyin.')
+      }
     }
   }
 

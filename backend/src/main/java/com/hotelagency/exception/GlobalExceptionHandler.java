@@ -2,6 +2,7 @@ package com.hotelagency.exception;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
@@ -13,6 +14,22 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**
+     * A delete/update that violates a foreign key (e.g. deleting a room type that
+     * still has reservations) previously propagated as an unhandled exception.
+     * With no matching handler, that fell through to the servlet container's
+     * default /error dispatch, which re-runs the whole Spring Security filter
+     * chain on a fresh request — one that loses the JWT authentication and comes
+     * back as a misleading 401, logging the user out instead of showing the real
+     * error.
+     */
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<ErrorResponse> handleDataIntegrityViolation(DataIntegrityViolationException ex) {
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(new ErrorResponse(HttpStatus.CONFLICT.value(), "Conflict",
+                        "Bu kayıt başka verilerle ilişkili olduğu için silinemedi veya güncellenemedi."));
+    }
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
