@@ -32,6 +32,7 @@ import { ReservationsPage } from './pages/reservations/ReservationsPage'
 import { RoomTypesPage } from './pages/roomTypes/RoomTypesPage'
 import { ServicesPage } from './pages/services/ServicesPage'
 import { HotelSetupReminderLogsPage } from './pages/hotelSetupReminders/HotelSetupReminderLogsPage'
+import { CardViewLogsPage } from './pages/cardViewLogs/CardViewLogsPage'
 import { HotelSupportPage } from './pages/support/HotelSupportPage'
 import { AgencyHotelSupportPage } from './pages/support/AgencyHotelSupportPage'
 
@@ -74,6 +75,7 @@ function App() {
             <Route path="customers" element={<CustomersPage />} />
             <Route path="staff" element={<StaffPage />} />
             <Route path="setup-reminders" element={<HotelSetupReminderLogsPage />} />
+            <Route path="card-view-logs" element={<CardViewLogsPage />} />
             <Route path="settings" element={<SettingsPage />} />
           </Route>
 

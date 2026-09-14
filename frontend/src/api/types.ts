@@ -18,6 +18,28 @@ export interface HotelSetupReminderLogResponse {
   sentAt: string
 }
 
+/** Full, unmasked card details — only returned by the explicit "show card" reveal endpoint. */
+export interface CardDetailsResponse {
+  customerFirstName: string
+  customerLastName: string
+  cardHolder: string | null
+  cardBrand: string | null
+  cardNumber: string | null
+  cardExpiry: string | null
+  cardNote: string | null
+}
+
+export interface CardViewLogResponse {
+  id: number
+  reservationId: number
+  reservationNumber: string
+  hotelId: number
+  hotelName: string
+  customerName: string
+  viewedByName: string
+  viewedAt: string
+}
+
 export interface IncompleteHotelSetupResponse {
   hotelId: number
   hotelName: string
@@ -147,7 +169,7 @@ export interface AvailableRoomResponse {
 
 export type ReservationStatus = 'PENDING' | 'CONFIRMED' | 'REJECTED' | 'CANCELLED'
 
-/** Card on file (school project). Full number is stored; CVV never is. */
+/** Card on file (school project). Card fields are masked when sent to a hotel; see CardDetailsResponse. */
 export interface CardOnFile {
   cardHolder: string | null
   cardBrand: string | null

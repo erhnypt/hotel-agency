@@ -1,6 +1,7 @@
 package com.hotelagency.service;
 
 import com.hotelagency.dto.reservation.AvailableRoomResponse;
+import com.hotelagency.dto.reservation.CardDetailsResponse;
 import com.hotelagency.dto.reservation.ReservationCreateRequest;
 import com.hotelagency.dto.reservation.ReservationResponse;
 import com.hotelagency.entity.Customer;
@@ -48,6 +49,7 @@ public class ReservationService {
     private final HotelService hotelService;
     private final InvoiceService invoiceService;
     private final EmailService emailService;
+    private final CardViewLogService cardViewLogService;
 
     @Transactional
     public ReservationResponse create(ReservationCreateRequest request, User requester) {
@@ -138,20 +140,32 @@ public class ReservationService {
 
     @Transactional(readOnly = true)
     public List<ReservationResponse> findAll(User requester) {
-        List<Reservation> reservations = switch (requester.getRole().getName()) {
+        RoleName role = requester.getRole().getName();
+        List<Reservation> reservations = switch (role) {
             case AGENCY_ADMIN -> reservationRepository.findAll();
             case AGENCY_STAFF -> reservationRepository.findByCreatedById(requester.getId());
             case HOTEL_ADMIN -> reservationRepository.findByHotelId(hotelService.requireOwnHotelId(requester));
         };
 
-        return reservations.stream().map(ReservationResponse::from).toList();
+        boolean maskCard = role == RoleName.HOTEL_ADMIN;
+        return reservations.stream().map(r -> ReservationResponse.from(r, maskCard)).toList();
     }
 
     @Transactional(readOnly = true)
     public ReservationResponse findById(Long id, User requester) {
         Reservation reservation = getReservationOrThrow(id);
         assertCanView(reservation, requester);
-        return ReservationResponse.from(reservation);
+        boolean maskCard = requester.getRole().getName() == RoleName.HOTEL_ADMIN;
+        return ReservationResponse.from(reservation, maskCard);
+    }
+
+    /** Reveals a reservation's full card details to its hotel and logs the view for the agency to see. */
+    @Transactional
+    public CardDetailsResponse revealCard(Long id, User requester) {
+        Reservation reservation = getReservationOrThrow(id);
+        assertHotelOwnership(reservation, requester);
+        cardViewLogService.record(reservation, requester);
+        return CardDetailsResponse.from(reservation.getCustomer());
     }
 
     @Transactional
@@ -225,6 +239,7 @@ public class ReservationService {
         }
 
         historyRepository.deleteByReservationId(id);
+        cardViewLogService.deleteByReservationId(id);
         reservationRepository.delete(reservation);
     }
 

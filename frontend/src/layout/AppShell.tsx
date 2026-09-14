@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/useAuth'
+import { useCardViewUnread } from '../hooks/useCardViewUnread'
 import { useSupportUnread } from '../hooks/useSupportUnread'
 import { LanguageSwitcher } from '../i18n/LanguageSwitcher'
 import { useT } from '../i18n/useT'
@@ -11,6 +12,7 @@ export function AppShell({ panelTitleKey, menu }: { panelTitleKey: string; menu:
   const { user, logout } = useAuth()
   const { t } = useT()
   const { hotelUnread, unreadHotelIds } = useSupportUnread()
+  const cardViewUnread = useCardViewUnread()
   const location = useLocation()
   const [navOpen, setNavOpen] = useState(false)
 
@@ -42,7 +44,8 @@ export function AppShell({ panelTitleKey, menu }: { panelTitleKey: string; menu:
           {menu.map((item) => {
             const showBadge =
               (item.path.endsWith('/support') && hotelUnread) ||
-              (item.path.endsWith('/hotels') && unreadHotelIds.length > 0)
+              (item.path.endsWith('/hotels') && unreadHotelIds.length > 0) ||
+              (item.path.endsWith('/card-view-logs') && cardViewUnread)
             return (
               <NavLink
                 key={item.path}

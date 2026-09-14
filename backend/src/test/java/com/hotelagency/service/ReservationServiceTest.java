@@ -55,6 +55,8 @@ class ReservationServiceTest {
     private InvoiceService invoiceService;
     @Mock
     private EmailService emailService;
+    @Mock
+    private CardViewLogService cardViewLogService;
 
     private ReservationService reservationService;
 
@@ -68,7 +70,8 @@ class ReservationServiceTest {
     void setUp() {
         reservationService = new ReservationService(
                 reservationRepository, historyRepository, roomTypeRepository,
-                customerRepository, customerService, hotelService, invoiceService, emailService);
+                customerRepository, customerService, hotelService, invoiceService, emailService,
+                cardViewLogService);
 
         hotel = new Hotel();
         hotel.setId(1L);

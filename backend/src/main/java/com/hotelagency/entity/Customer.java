@@ -40,7 +40,7 @@ public class Customer {
     @Column(name = "notes")
     private String notes;
 
-    /** Card on file (school project). Full number is stored; CVV is never stored. */
+    /** Card on file (school project). Full number and CVV (cardNote) are stored as plain text. */
     @Column(name = "card_holder")
     private String cardHolder;
 

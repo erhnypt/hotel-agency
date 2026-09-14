@@ -28,6 +28,11 @@ public record ReservationResponse(
         Instant updatedAt) {
 
     public static ReservationResponse from(Reservation reservation) {
+        return from(reservation, false);
+    }
+
+    /** When {@code maskCard} is true, the customer's card number/expiry/CVV are masked — used for hotels. */
+    public static ReservationResponse from(Reservation reservation, boolean maskCard) {
         return new ReservationResponse(
                 reservation.getId(),
                 reservation.getReservationNumber(),
@@ -35,7 +40,7 @@ public record ReservationResponse(
                 reservation.getHotel().getName(),
                 reservation.getRoomType().getId(),
                 reservation.getRoomType().getName(),
-                CustomerResponse.from(reservation.getCustomer()),
+                maskCard ? CustomerResponse.masked(reservation.getCustomer()) : CustomerResponse.from(reservation.getCustomer()),
                 reservation.getCheckIn(),
                 reservation.getCheckOut(),
                 reservation.getGuests(),

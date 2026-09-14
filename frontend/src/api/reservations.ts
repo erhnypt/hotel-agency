@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import type { AvailableRoomResponse, ReservationCreateRequest, ReservationResponse } from './types'
+import type { AvailableRoomResponse, CardDetailsResponse, ReservationCreateRequest, ReservationResponse } from './types'
 
 export async function listReservations(): Promise<ReservationResponse[]> {
   const response = await apiClient.get<ReservationResponse[]>('/reservations')
@@ -33,6 +33,11 @@ export async function markReservationPaid(id: number): Promise<ReservationRespon
 
 export async function unmarkReservationPaid(id: number): Promise<ReservationResponse> {
   const response = await apiClient.post<ReservationResponse>(`/reservations/${id}/unmark-paid`)
+  return response.data
+}
+
+export async function revealReservationCard(id: number): Promise<CardDetailsResponse> {
+  const response = await apiClient.get<CardDetailsResponse>(`/reservations/${id}/card`)
   return response.data
 }
 

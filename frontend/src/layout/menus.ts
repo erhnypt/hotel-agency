@@ -13,6 +13,7 @@ export const ADMIN_MENU: MenuItem[] = [
   { labelKey: 'nav.customers', path: '/admin/customers' },
   { labelKey: 'nav.staff', path: '/admin/staff' },
   { labelKey: 'nav.setupReminders', path: '/admin/setup-reminders' },
+  { labelKey: 'nav.cardViewLogs', path: '/admin/card-view-logs' },
   { labelKey: 'nav.settings', path: '/admin/settings' },
 ]
 

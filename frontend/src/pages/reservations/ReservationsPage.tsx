@@ -13,6 +13,7 @@ import {
 import type { ReservationResponse, ReservationStatus } from '../../api/types'
 import type { ApiErrorResponse } from '../../auth/types'
 import { useAuth } from '../../auth/useAuth'
+import { CardDetailsModal } from '../../components/CardDetailsModal'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { StatusBadge } from '../../components/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
@@ -35,6 +36,7 @@ export function ReservationsPage() {
   const [error, setError] = useState<string | null>(null)
   const [statusFilter, setStatusFilter] = useState<ReservationStatus | 'ALL'>('ALL')
   const [hotelFilter, setHotelFilter] = useState<number | 'ALL'>('ALL')
+  const [cardModalReservationId, setCardModalReservationId] = useState<number | null>(null)
 
   const reservations = useAsync(listReservations, [refreshKey])
 
@@ -139,17 +141,40 @@ export function ReservationsPage() {
                 {r.customer.firstName} {r.customer.lastName}
               </td>
               <td>
-                {cardLabel(r.customer.cardBrand, r.customer.cardNumber) ?? '—'}
-                {r.customer.cardExpiry && (
+                {user?.role === 'HOTEL_ADMIN' ? (
                   <>
-                    <br />
-                    <span className="data-table__muted">SKT {r.customer.cardExpiry}</span>
+                    {r.customer.cardNumber ? (
+                      <>
+                        {r.customer.cardBrand ? `${r.customer.cardBrand} ` : ''}
+                        {r.customer.cardNumber}
+                        <br />
+                        <button
+                          type="button"
+                          className="btn btn--small"
+                          onClick={() => setCardModalReservationId(r.id)}
+                        >
+                          Kart Bilgilerini Göster
+                        </button>
+                      </>
+                    ) : (
+                      '—'
+                    )}
                   </>
-                )}
-                {r.customer.cardNote && (
+                ) : (
                   <>
-                    <br />
-                    <span className="data-table__muted">CVV: {r.customer.cardNote}</span>
+                    {cardLabel(r.customer.cardBrand, r.customer.cardNumber) ?? '—'}
+                    {r.customer.cardExpiry && (
+                      <>
+                        <br />
+                        <span className="data-table__muted">SKT {r.customer.cardExpiry}</span>
+                      </>
+                    )}
+                    {r.customer.cardNote && (
+                      <>
+                        <br />
+                        <span className="data-table__muted">CVV: {r.customer.cardNote}</span>
+                      </>
+                    )}
                   </>
                 )}
               </td>
@@ -327,6 +352,13 @@ export function ReservationsPage() {
         ) : (
           renderTable(filtered)
         ))}
+
+      {cardModalReservationId !== null && (
+        <CardDetailsModal
+          reservationId={cardModalReservationId}
+          onClose={() => setCardModalReservationId(null)}
+        />
+      )}
     </div>
   )
 }

@@ -1,5 +1,6 @@
 package com.hotelagency.controller;
 
+import com.hotelagency.dto.reservation.CardDetailsResponse;
 import com.hotelagency.dto.reservation.ReservationCreateRequest;
 import com.hotelagency.dto.reservation.ReservationResponse;
 import com.hotelagency.security.CustomUserDetails;
@@ -86,6 +87,13 @@ public class ReservationController {
     public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
         reservationService.delete(id, principal.getUser());
         return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/{id}/card")
+    @PreAuthorize("hasRole('HOTEL_ADMIN')")
+    public ResponseEntity<CardDetailsResponse> revealCard(
+            @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
+        return ResponseEntity.ok(reservationService.revealCard(id, principal.getUser()));
     }
 
     @GetMapping("/{id}/invoice")
