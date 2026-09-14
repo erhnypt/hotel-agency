@@ -13,6 +13,7 @@ export function RoomTypesPage() {
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingRoomType, setEditingRoomType] = useState<RoomTypeResponse | null>(null)
   const [imagesRoomType, setImagesRoomType] = useState<RoomTypeResponse | null>(null)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const hotel = useAsync(getMyHotel, [])
   const roomTypes = useAsync(() => (hotel.data ? listRoomTypes(hotel.data.id) : Promise.resolve([])), [
@@ -43,8 +44,14 @@ export function RoomTypesPage() {
 
   const handleDelete = async (roomType: RoomTypeResponse) => {
     if (!window.confirm(`"${roomType.name}" oda tipini silmek istediğinize emin misiniz?`)) return
-    await deleteRoomType(roomType.id)
-    refresh()
+    setDeleteError(null)
+    try {
+      await deleteRoomType(roomType.id)
+      refresh()
+    } catch (err) {
+      console.error('Failed to delete room type:', err)
+      setDeleteError('Oda tipi silinemedi. Lütfen tekrar deneyin.')
+    }
   }
 
   return (
@@ -58,6 +65,7 @@ export function RoomTypesPage() {
 
       {roomTypes.loading && <LoadingState />}
       {roomTypes.error && <ErrorState message={roomTypes.error} />}
+      {deleteError && <ErrorState message={deleteError} />}
 
       {roomTypes.data && (
         <div className="data-table-wrapper"><table className="data-table">

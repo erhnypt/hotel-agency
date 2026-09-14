@@ -262,9 +262,6 @@ public class HotelService {
     public Hotel getOwnedHotel(Long id, User requester) {
         Hotel hotel = getHotelOrThrow(id);
         assertOwnsHotel(hotel, requester);
-        if (hotel.getStatus() != HotelStatus.ACTIVE) {
-            throw new AccessDeniedException("Hotel is not yet approved by the agency");
-        }
         return hotel;
     }
 
