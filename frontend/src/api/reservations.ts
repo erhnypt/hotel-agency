@@ -36,6 +36,10 @@ export async function unmarkReservationPaid(id: number): Promise<ReservationResp
   return response.data
 }
 
+export async function deleteReservation(id: number): Promise<void> {
+  await apiClient.delete(`/reservations/${id}`)
+}
+
 export async function downloadReservationInvoice(id: number, filename: string): Promise<void> {
   const response = await apiClient.get(`/reservations/${id}/invoice`, { responseType: 'blob' })
   const url = URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }))

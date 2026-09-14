@@ -211,6 +211,23 @@ public class ReservationService {
         return ReservationResponse.from(reservation);
     }
 
+    /**
+     * Permanently removes a reservation. Restricted to already-closed-out
+     * reservations (cancelled or rejected) so an active/paid booking can't be
+     * hard-deleted by mistake — those must be cancelled first.
+     */
+    @Transactional
+    public void delete(Long id, User requester) {
+        Reservation reservation = getReservationOrThrow(id);
+        assertHotelOwnership(reservation, requester);
+        if (reservation.getStatus() != ReservationStatus.CANCELLED && reservation.getStatus() != ReservationStatus.REJECTED) {
+            throw new InvalidReservationException("Only cancelled or rejected reservations can be deleted");
+        }
+
+        historyRepository.deleteByReservationId(id);
+        reservationRepository.delete(reservation);
+    }
+
     @Transactional
     public ReservationResponse markPaid(Long id, User requester) {
         Reservation reservation = getReservationOrThrow(id);

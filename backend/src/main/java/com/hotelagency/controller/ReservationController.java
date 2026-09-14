@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -78,6 +79,13 @@ public class ReservationController {
     public ResponseEntity<ReservationResponse> unmarkPaid(
             @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(reservationService.unmarkPaid(id, principal.getUser()));
+    }
+
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('HOTEL_ADMIN')")
+    public ResponseEntity<Void> delete(@PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
+        reservationService.delete(id, principal.getUser());
+        return ResponseEntity.noContent().build();
     }
 
     @GetMapping("/{id}/invoice")

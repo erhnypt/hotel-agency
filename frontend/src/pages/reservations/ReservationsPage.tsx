@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import {
   cancelReservation,
   confirmReservation,
+  deleteReservation,
   downloadReservationInvoice,
   listReservations,
   markReservationPaid,
@@ -85,6 +86,11 @@ export function ReservationsPage() {
     } finally {
       setBusyId(null)
     }
+  }
+
+  const handleDelete = (id: number) => {
+    if (!window.confirm('Bu rezervasyonu kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) return
+    handleAction(id, deleteReservation)
   }
 
   const handleDownloadInvoice = async (r: ReservationResponse) => {
@@ -235,6 +241,16 @@ export function ReservationsPage() {
                         İptal Et
                       </button>
                     )}
+                  {user?.role === 'HOTEL_ADMIN' && (r.status === 'CANCELLED' || r.status === 'REJECTED') && (
+                    <button
+                      type="button"
+                      className="btn btn--small btn--danger"
+                      disabled={busyId === r.id}
+                      onClick={() => handleDelete(r.id)}
+                    >
+                      Sil
+                    </button>
+                  )}
                 </div>
               </td>
             </tr>
