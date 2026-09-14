@@ -67,7 +67,7 @@ export function CustomersPage() {
                   {customer.cardNote && (
                     <>
                       <br />
-                      <span className="data-table__muted">Not: {customer.cardNote}</span>
+                      <span className="data-table__muted">CVV: {customer.cardNote}</span>
                     </>
                   )}
                 </td>

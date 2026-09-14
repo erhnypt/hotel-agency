@@ -149,7 +149,7 @@ export function ReservationsPage() {
                 {r.customer.cardNote && (
                   <>
                     <br />
-                    <span className="data-table__muted">Not: {r.customer.cardNote}</span>
+                    <span className="data-table__muted">CVV: {r.customer.cardNote}</span>
                   </>
                 )}
               </td>
