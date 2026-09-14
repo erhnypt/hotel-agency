@@ -1,4 +1,6 @@
+import { useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
+import { apiClient } from './api/client'
 import { AuthProvider } from './auth/AuthContext'
 import { StaffPage } from './pages/staff/StaffPage'
 import { SettingsPage } from './pages/settings/SettingsPage'
@@ -33,7 +35,18 @@ import { HotelSetupReminderLogsPage } from './pages/hotelSetupReminders/HotelSet
 import { HotelSupportPage } from './pages/support/HotelSupportPage'
 import { AgencyHotelSupportPage } from './pages/support/AgencyHotelSupportPage'
 
+let backendWarmedUp = false
+
 function App() {
+  useEffect(() => {
+    // The Render free-tier backend can be cold-started, taking up to ~60s to
+    // wake. Ping it as early as possible on any page load — most of the time
+    // this finishes silently before the user submits a form that needs it.
+    if (backendWarmedUp) return
+    backendWarmedUp = true
+    apiClient.get('/public/hotels', { timeout: 60_000 }).catch(() => {})
+  }, [])
+
   return (
     <AuthProvider>
       <Routes>

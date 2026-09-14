@@ -16,6 +16,7 @@ export function LoginPage() {
   const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+  const [slow, setSlow] = useState(false)
 
   if (isAuthenticated && user) {
     return <Navigate to={roleHomePath(user.role)} replace />
@@ -25,13 +26,20 @@ export function LoginPage() {
     event.preventDefault()
     setError(null)
     setSubmitting(true)
+    setSlow(false)
+    // The backend can be cold-started (Render free-tier spin-down) and take a
+    // while to respond — reassure the user after a few seconds so a slow
+    // login doesn't read as a frozen/broken page.
+    const slowTimer = setTimeout(() => setSlow(true), 4000)
     try {
       const loggedInUser = await login(email, password)
       navigate(roleHomePath(loggedInUser.role), { replace: true })
     } catch (err) {
       setError(err instanceof Error ? err.message : t('login.error'))
     } finally {
+      clearTimeout(slowTimer)
       setSubmitting(false)
+      setSlow(false)
     }
   }
 
@@ -81,6 +89,8 @@ export function LoginPage() {
         <button type="submit" className="login-card__submit" disabled={submitting}>
           {submitting ? t('login.submitting') : t('login.submit')}
         </button>
+
+        {submitting && slow && <p className="login-card__hint">{t('login.submittingSlow')}</p>}
 
         <p className="login-card__footer">
           {t('login.footer')} <Link to="/register">{t('login.register')}</Link>

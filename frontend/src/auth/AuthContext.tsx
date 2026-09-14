@@ -21,10 +21,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string): Promise<UserSummary> => {
     try {
-      const response = await apiClient.post<AuthResponse>('/auth/login', {
-        email,
-        password,
-      } satisfies LoginRequest)
+      const response = await apiClient.post<AuthResponse>(
+        '/auth/login',
+        { email, password } satisfies LoginRequest,
+        // The backend can be cold-started (Render free-tier spin-down) and
+        // take up to ~60s to wake — give it a generous but bounded window
+        // rather than hanging forever if something is actually broken.
+        { timeout: 90_000 },
+      )
       const stored: StoredAuth = {
         accessToken: response.data.accessToken,
         refreshToken: response.data.refreshToken,
