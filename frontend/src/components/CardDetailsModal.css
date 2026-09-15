@@ -1,9 +1,8 @@
 .card-details__face {
-  border-radius: var(--radius-lg);
+  border-radius: var(--radius);
   padding: 22px;
-  background: var(--signal-gradient);
-  box-shadow: var(--shadow-signal);
-  color: #fff;
+  background: var(--signal);
+  color: var(--signal-ink);
   display: flex;
   flex-direction: column;
   gap: 22px;

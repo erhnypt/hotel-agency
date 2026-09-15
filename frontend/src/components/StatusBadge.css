@@ -2,6 +2,10 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
+  padding: 4px 9px 4px 7px;
+  border-radius: var(--radius-sm);
+  background: var(--board-bg);
+  perspective: 240px;
 }
 
 .status-line__glyph {
@@ -21,7 +25,9 @@
 .status-line__mark--draw {
   stroke-dasharray: 10;
   stroke-dashoffset: 10;
-  animation: status-line-draw 320ms 80ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation:
+    status-line-draw 320ms 260ms cubic-bezier(0.16, 1, 0.3, 1) forwards,
+    flap-flip 560ms var(--ease-flap);
 }
 
 @keyframes status-line-draw {
@@ -39,23 +45,23 @@
 
 .status-line__label {
   font-family: var(--mono);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: inherit;
   white-space: nowrap;
 }
 
 .status-line--live {
-  color: var(--status-ok);
+  color: #5fcf9a;
 }
 
 .status-line--hold {
-  color: var(--status-warn);
+  color: #e0ac54;
 }
 
 .status-line--break,
 .status-line--pulled {
-  color: var(--danger);
+  color: #e0716a;
 }

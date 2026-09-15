@@ -1,18 +1,6 @@
 .hotel-dashboard__hotel-name {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   margin: 0 0 20px;
-  font-size: 16px;
+  font-size: 26px;
   font-weight: 500;
   color: var(--text-h);
-}
-
-.hotel-dashboard__hotel-name::before {
-  content: '';
-  display: inline-block;
-  width: 4px;
-  height: 16px;
-  background: var(--signal-gradient);
-  border-radius: 2px;
 }

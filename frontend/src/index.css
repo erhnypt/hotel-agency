@@ -1,109 +1,104 @@
 /*
-  impeccable:direction rota-a4d1f077
-  THESIS: Rota (Editorial Paper) — a warm, storied operator surface that reads
-  like a travel journal rather than a SaaS dashboard. Sun-warmed ivory paper
-  base, cream panels, and a grounded multi-hue accent system: terracotta as
-  the primary signal, with pine / gold / berry / olive / denim as categorical
-  accents across stat tiles, nav, and badges. Character comes from a serif
-  display face on headings, dashed "route line" motifs, postal/ticket details,
-  and purposeful, unhurried motion (hover lift, gradient active pills, content
-  rise-in) — never flashy, always easy on the eye.
-  Turkish geometric accents (octagon corners, star dividers) are retained.
-  NO NEON: every accent is mid-chroma, deepened just enough to hold contrast on
-  paper. No electric hues, no glow shadows — depth is warm ink, not cool.
-  OWN-WORLD: --bg warm ivory; --signal-gradient terracotta->deep crimson; --c-*
-  palette drives colourful, scannable data. Petrona (serif) for headings, Work
-  Sans for body copy; IBM Plex Mono stays for data/status/ticket labels.
-  STORY: staff open a sunlit, considered dashboard — stat numbers colour-coded,
-  tables breathable, primary actions unmistakable — and every panel
-  (Admin/Staff/Hotel) plus the corporate sign-in share one rooted aesthetic.
-  FIRST VIEWPORT: warm gradient sidebar + header, content panel of
-  colour-accented stat tiles that lift on hover, then dense breathable tables.
-  seed key a4d1f077.
+  impeccable:direction board-eda55214
+  THESIS: the reservation desk is a departure board — hotel operations read
+  like the split-flap arrivals/departures boards of the industry's own
+  airports and stations, refusing the warm-editorial-journal default this
+  category always ships (the prior "Rota" theme included).
+  OWN-WORLD: warm stone/ivory page ground carries the working surface; a
+  charcoal BOARD material (matte near-black, hairline rules, tabular mono
+  glyphs) is reserved for the nav rail, table headers and status indicators —
+  the parts of the app that read like a live board. ONE signal accent: a
+  deep vintage-airline teal. Brass/bronze appears only as a desaturated
+  hardware nuance (rivets, hairline warmth), never as a second hue. No
+  gradients as a dominant device, no glassmorphism, no purple/blue.
+  STORY: agency staff open the app to a live board, not a KPI grid — today's
+  arrivals, departures and bookings read as board rows. A reservation row
+  reads like a board row: fixed-width mono columns, a status flap that
+  visibly flips on change, hairline rules between rows instead of floating
+  cards.
+  FIRST VIEWPORT: charcoal board nav rail (strong flap-highlight active
+  state) beside an ivory content pane opening on "Today's Board".
+  FORM: split-flap departure board, grounded direction 6 of 7 (audience-
+  ranked: room rack, GDS terminal, ops manifest, guest folio, ticket stock,
+  split-flap board, editorial-journal rut), seed key eda55214.
+  FINISH: unreviewed and undocumented is unfinished; this build ends with
+  the finish review, the verdict, and DESIGN.md.
 */
 
-@import '@fontsource/petrona/400.css';
-@import '@fontsource/petrona/500.css';
-@import '@fontsource/petrona/600.css';
-@import '@fontsource/petrona/500-italic.css';
-@import '@fontsource/work-sans/400.css';
-@import '@fontsource/work-sans/500.css';
-@import '@fontsource/work-sans/600.css';
-@import '@fontsource/ibm-plex-mono/400.css';
-@import '@fontsource/ibm-plex-mono/500.css';
-@import '@fontsource/ibm-plex-mono/600.css';
+@import '@fontsource/plus-jakarta-sans/400.css';
+@import '@fontsource/plus-jakarta-sans/500.css';
+@import '@fontsource/plus-jakarta-sans/600.css';
+@import '@fontsource/plus-jakarta-sans/700.css';
+@import '@fontsource/fraunces/400.css';
+@import '@fontsource/fraunces/500.css';
+@import '@fontsource/fraunces/600.css';
+@import '@fontsource/fraunces/500-italic.css';
+@import '@fontsource/space-mono/400.css';
+@import '@fontsource/space-mono/700.css';
 
 :root {
-  /* sun-warmed ivory paper */
-  --bg: #f7f1e6;
-  --bg-panel: #fffaf0;
-  --bg-panel-2: #efe6d3;
-  --bg-elevated: #ecdfc0;
-  --border: #ddd0b4;
-  --border-strong: #c7b68c;
+  /* warm stone / ivory ground */
+  --bg: #f2efe9;
+  --bg-panel: #fbfaf7;
+  --bg-panel-2: #eae6dd;
+  --bg-elevated: #e1dccf;
+  --border: #dad4c7;
+  --border-strong: #988d76;
 
-  /* ink */
-  --text: #5c5142;
-  --text-dim: #8a7f68;
-  --text-h: #2b241c;
+  /* charcoal ink */
+  --text: #57534a;
+  --text-dim: #726c5c;
+  --text-h: #23211d;
 
-  /* primary signal — terracotta, with a deep crimson gradient partner */
-  --signal: #c1502e;
-  --signal-hover: #9c3d22;
-  --signal-ink: #fff8ee;
-  --signal-bg: rgba(193, 80, 46, 0.1);
-  --signal-border: rgba(193, 80, 46, 0.32);
-  --signal-gradient: linear-gradient(135deg, #c1502e 0%, #9c3d22 100%);
+  /* board material — matte near-black, reserved for nav/table-head/status chrome */
+  --board-bg: #1d2220;
+  --board-bg-2: #262b28;
+  --board-line: #3a4340;
+  --board-ink: #f3efe6;
+  --board-ink-dim: #9aa39e;
+  --board-brass: #a9895a;
 
-  /* categorical accents (grounded, deepened for contrast on paper) */
-  --c-indigo: #6b4d8a;
-  --c-violet: #9c3d22;
-  --c-teal: #2f6f68;
-  --c-coral: #c1502e;
-  --c-amber: #b8863b;
-  --c-emerald: #5c7a45;
-  --c-sky: #3f6a8a;
-  --c-rose: #a3243f;
+  /* the one signal accent — deep vintage-airline teal */
+  --signal: #1f6f6a;
+  --signal-hover: #17544f;
+  --signal-ink: #f3fbf9;
+  --signal-bg: rgba(31, 111, 106, 0.1);
+  --signal-border: rgba(31, 111, 106, 0.34);
+  --signal-solid: #1f6f6a;
 
-  /* secondary accent (kept name for compatibility) */
-  --accent-warm: var(--c-coral);
-  --accent-warm-bg: rgba(193, 80, 46, 0.1);
+  /* status: distinguished by icon + label, never color alone (see StatusBadge) */
+  --status-ok: #3d7a52;
+  --status-ok-bg: rgba(61, 122, 82, 0.12);
+  --status-ok-border: rgba(61, 122, 82, 0.34);
 
-  /* status: confirmed / active */
-  --status-ok: #3f7d4a;
-  --status-ok-bg: rgba(63, 125, 74, 0.12);
-  --status-ok-border: rgba(63, 125, 74, 0.36);
+  --status-warn: #8a5b1e;
+  --status-warn-bg: rgba(138, 91, 30, 0.13);
+  --status-warn-border: rgba(138, 91, 30, 0.36);
 
-  /* status: pending / hold */
-  --status-warn: #b8863b;
-  --status-warn-bg: rgba(184, 134, 59, 0.14);
-  --status-warn-border: rgba(184, 134, 59, 0.38);
-
-  /* break (danger / rejected / cancelled) */
-  --danger: #a3242f;
-  --danger-bg: rgba(163, 36, 47, 0.1);
-  --danger-border: rgba(163, 36, 47, 0.34);
+  --danger: #a13a34;
+  --danger-bg: rgba(161, 58, 52, 0.1);
+  --danger-border: rgba(161, 58, 52, 0.32);
 
   --success: var(--status-ok);
 
-  /* depth — warm ink, never cool, never glowing */
   --shadow:
-    0 14px 30px -16px rgba(43, 36, 28, 0.22), 0 4px 12px -6px rgba(43, 36, 28, 0.14);
-  --shadow-signal: 0 16px 32px -16px rgba(193, 80, 46, 0.4);
-  --shadow-sm: 0 2px 10px -4px rgba(43, 36, 28, 0.16);
+    0 14px 28px -18px rgba(29, 34, 32, 0.28), 0 4px 12px -6px rgba(29, 34, 32, 0.14);
+  --shadow-board: 0 20px 40px -20px rgba(10, 12, 11, 0.5);
+  --shadow-sm: 0 2px 10px -4px rgba(29, 34, 32, 0.16);
 
-  --sans: 'Work Sans', system-ui, 'Segoe UI', sans-serif;
-  --heading: 'Petrona', Georgia, 'Times New Roman', serif;
-  --mono: 'IBM Plex Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  --sans: 'Plus Jakarta Sans', system-ui, 'Segoe UI', sans-serif;
+  --heading: 'Fraunces', Georgia, 'Times New Roman', serif;
+  --mono: 'Space Mono', ui-monospace, 'SFMono-Regular', Consolas, monospace;
 
-  --radius-sm: 4px;
-  --radius: 8px;
-  --radius-lg: 14px;
+  --radius-sm: 3px;
+  --radius: 6px;
+  --radius-lg: 10px;
 
   --ease: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-flap: cubic-bezier(0.5, 0, 0.2, 1);
 
   font: 15px/1.5 var(--sans);
-  letter-spacing: 0.005em;
+  letter-spacing: 0;
   color-scheme: light;
   color: var(--text);
   background: var(--bg);
@@ -121,11 +116,6 @@ body {
   margin: 0;
   overflow-x: hidden;
   background: var(--bg);
-  background-image:
-    radial-gradient(760px 520px at 12% -8%, rgba(193, 80, 46, 0.08), transparent 70%),
-    radial-gradient(680px 480px at 100% 0%, rgba(184, 134, 59, 0.08), transparent 68%),
-    radial-gradient(720px 560px at 78% 108%, rgba(47, 111, 104, 0.07), transparent 72%);
-  background-attachment: fixed;
 }
 
 #root {
@@ -145,7 +135,7 @@ p {
 }
 
 ::selection {
-  background: rgba(193, 80, 46, 0.24);
+  background: rgba(31, 111, 106, 0.24);
   color: var(--text-h);
 }
 
@@ -158,7 +148,7 @@ p {
 @keyframes rise-in {
   from {
     opacity: 0;
-    transform: translateY(12px);
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
@@ -166,12 +156,19 @@ p {
   }
 }
 
-@keyframes shimmer-x {
-  from {
-    background-position: -140% 0;
+/* the signature moment: a board cell flipping to its new value */
+@keyframes flap-flip {
+  0% {
+    transform: rotateX(0deg);
   }
-  to {
-    background-position: 240% 0;
+  45% {
+    transform: rotateX(-90deg);
+  }
+  55% {
+    transform: rotateX(-90deg);
+  }
+  100% {
+    transform: rotateX(0deg);
   }
 }
 
@@ -182,62 +179,6 @@ p {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
-  }
-}
-
-/* Geometric accents */
-.octagon-corner {
-  position: relative;
-  &::before,
-  &::after {
-    content: '';
-    position: absolute;
-    width: 12px;
-    height: 12px;
-    border: 1px solid var(--signal);
-    opacity: 0.3;
-  }
-  &::before {
-    top: 0;
-    left: 0;
-    border-right: none;
-    border-bottom: none;
-  }
-  &::after {
-    top: 0;
-    right: 0;
-    border-left: none;
-    border-bottom: none;
-  }
-}
-
-/* Octagon background pattern (low opacity) */
-.octagon-pattern {
-  background-image:
-    linear-gradient(45deg, transparent 48%, var(--signal) 48%, var(--signal) 52%, transparent 52%),
-    linear-gradient(-45deg, transparent 48%, var(--signal) 48%, var(--signal) 52%, transparent 52%);
-  background-size: 20px 20px;
-  background-position: 0 0, 10px 10px;
-  opacity: 0.08;
-}
-
-/* Star divider */
-.divider-star {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  margin: 2rem 0;
-  color: var(--text-dim);
-  &::before,
-  &::after {
-    content: '';
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, transparent, var(--border-strong), transparent);
-  }
-  &::after {
-    background: linear-gradient(to left, transparent, var(--border-strong), transparent);
   }
 }
 
