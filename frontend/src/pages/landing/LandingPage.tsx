@@ -35,7 +35,11 @@ const hotelType = (n: number | null) => (n ? `${n}★` : 'Hotel')
 const UNSPLASH = (id: string, w: number) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=72`
 
-const HERO_IMG = UNSPLASH('1507525428034-b723cf961d3e', 1600)
+/** Two featured stops shown as postal stamps on the hero's route illustration. */
+const HERO_ROUTE_STOPS = [
+  { key: 'a', city: 'İstanbul' },
+  { key: 'b', city: 'Roma' },
+]
 
 const DEST_PHOTOS: Record<string, string> = {
   'İstanbul': '1541432901042-2d8bd64b4a9b',
@@ -287,22 +291,43 @@ export function LandingPage() {
       <PublicHeader />
 
       <section className="lp-hero">
-        <img className="lp-hero__img" src={HERO_IMG} alt="" aria-hidden="true" loading="eager" />
-        <div className="lp-hero__scrim" />
-        <span className="lp-hero__blob lp-hero__blob--sun" aria-hidden="true" />
-        <span className="lp-hero__blob lp-hero__blob--teal" aria-hidden="true" />
+        <div className="lp-hero__grid">
+          <div className="lp-hero__inner">
+            <span className="lp-eyebrow">{t('landing.heroEyebrow')}</span>
+            <h1 className="lp-hero__title">
+              {t('landing.heroTitle1')}
+              <br />
+              <em>{t('landing.heroTitle2')}</em>
+            </h1>
+            <p className="lp-hero__lede">
+              {catalog
+                ? t('landing.heroLede', { count: catalog.count.toLocaleString(lang) })
+                : t('landing.heroLedeNoCount')}
+            </p>
+          </div>
 
-        <div className="lp-hero__inner">
-          <h1 className="lp-hero__title">
-            {t('landing.heroTitle1')}
-            <br />
-            <em>{t('landing.heroTitle2')}</em>
-          </h1>
-          <p className="lp-hero__lede">
-            {catalog
-              ? t('landing.heroLede', { count: catalog.count.toLocaleString(lang) })
-              : t('landing.heroLedeNoCount')}
-          </p>
+          <div className="lp-hero__scene" aria-hidden="true">
+            <span className="lp-hero__blob lp-hero__blob--sun" />
+            <span className="lp-hero__blob lp-hero__blob--teal" />
+            <svg className="lp-hero__route" viewBox="0 0 440 420" preserveAspectRatio="xMidYMid meet">
+              <circle cx="90" cy="300" r="4" fill="var(--l-coral)" />
+              <circle cx="360" cy="150" r="4" fill="var(--l-teal-deep)" />
+              <path
+                className="lp-hero__route-line"
+                d="M90 300 C 150 220, 170 180, 230 130 C 280 170, 310 190, 360 150"
+                fill="none"
+                stroke="var(--l-navy)"
+                strokeWidth="1.6"
+                strokeDasharray="6 8"
+              />
+            </svg>
+            {HERO_ROUTE_STOPS.map((stop) => (
+              <span key={stop.key} className={`lp-hero__stamp lp-hero__stamp--${stop.key}`}>
+                <span className="lp-hero__stamp-city">{stop.city}</span>
+                <span className="lp-hero__stamp-brand">TRAVEL SITES</span>
+              </span>
+            ))}
+          </div>
         </div>
 
         <div className="lp-search" ref={searchRef}>
@@ -518,19 +543,20 @@ export function LandingPage() {
               const img = cityImg(d.name)
               return (
                 <button key={d.name} type="button" className="lp-card" onClick={() => pickCity(d.name)}>
-                  {img && (
-                    <img
-                      className="lp-card__img"
-                      src={img}
-                      alt=""
-                      aria-hidden="true"
-                      loading="lazy"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none'
-                      }}
-                    />
-                  )}
-                  <span className="lp-card__shade" />
+                  <span className="lp-card__photo">
+                    {img && (
+                      <img
+                        className="lp-card__img"
+                        src={img}
+                        alt=""
+                        aria-hidden="true"
+                        loading="lazy"
+                        onError={(e) => {
+                          e.currentTarget.style.display = 'none'
+                        }}
+                      />
+                    )}
+                  </span>
                   <span className="lp-card__body">
                     <span className="lp-card__city">{d.name}</span>
                     <span className="lp-card__meta">

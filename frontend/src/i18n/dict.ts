@@ -118,6 +118,7 @@ const tr: Dict = {
     'Oteliniz acente tarafından pasife alınmıştır. Detaylı bilgi için acente ile iletişime geçebilirsiniz.',
 
   'landing.loginCta': 'Kurumsal Giriş',
+  'landing.heroEyebrow': 'Seyahat Acenteniz',
   'landing.heroTitle1': 'Bir sonraki tatiliniz',
   'landing.heroTitle2': 'bir talep uzağınızda',
   'landing.heroLede':
@@ -383,6 +384,7 @@ const en: Dict = {
     'Your hotel has been deactivated by the agency. Please contact the agency for details.',
 
   'landing.loginCta': 'Staff Login',
+  'landing.heroEyebrow': 'Your Travel Agency',
   'landing.heroTitle1': 'Your next holiday',
   'landing.heroTitle2': 'is one request away',
   'landing.heroLede':
@@ -648,6 +650,7 @@ const ru: Dict = {
     'Ваш отель был деактивирован агентством. За подробностями обратитесь в агентство.',
 
   'landing.loginCta': 'Вход для сотрудников',
+  'landing.heroEyebrow': 'Ваше турагентство',
   'landing.heroTitle1': 'Ваш следующий отпуск',
   'landing.heroTitle2': 'всего в одной заявке',
   'landing.heroLede':
@@ -913,6 +916,7 @@ const de: Dict = {
     'Ihr Hotel wurde von der Agentur deaktiviert. Für Details wenden Sie sich bitte an die Agentur.',
 
   'landing.loginCta': 'Mitarbeiter-Login',
+  'landing.heroEyebrow': 'Ihr Reisebüro',
   'landing.heroTitle1': 'Ihr nächster Urlaub',
   'landing.heroTitle2': 'ist nur eine Anfrage entfernt',
   'landing.heroLede':
@@ -1178,6 +1182,7 @@ const es: Dict = {
     'La agencia ha desactivado tu hotel. Para más información, ponte en contacto con la agencia.',
 
   'landing.loginCta': 'Acceso de personal',
+  'landing.heroEyebrow': 'Su Agencia de Viajes',
   'landing.heroTitle1': 'Tu próximo viaje',
   'landing.heroTitle2': 'está a una solicitud de distancia',
   'landing.heroLede':
@@ -1443,6 +1448,7 @@ const ar: Dict = {
     'قامت الوكالة بإلغاء تفعيل فندقك. للحصول على تفاصيل، يرجى التواصل مع الوكالة.',
 
   'landing.loginCta': 'دخول الموظفين',
+  'landing.heroEyebrow': 'وكالة سفرك',
   'landing.heroTitle1': 'عطلتك القادمة',
   'landing.heroTitle2': 'على بُعد طلب واحد',
   'landing.heroLede':
