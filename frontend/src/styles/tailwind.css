@@ -1,0 +1,64 @@
+/*
+  Tailwind for shadcn-style components only. Preflight (Tailwind's base
+  reset) is intentionally skipped — this app's pages are hand-styled plain
+  CSS and a global reset would fight them. Utilities load in their own
+  cascade layer, which CSS gives lower priority than the app's unlayered
+  stylesheets, so a name collision (e.g. a future `.border`) can never win
+  over the app's own styles.
+*/
+@import 'tailwindcss/theme.css' layer(theme);
+@import 'tailwindcss/utilities.css' layer(utilities);
+
+/*
+  shadcn's semantic color tokens, mapped onto the landing page's own "Rota"
+  palette (defined on `.lp` in LandingPage.css) so shadcn primitives render
+  on-brand instead of the library's generic indigo defaults. Falls back to
+  a neutral palette outside `.lp` so these primitives stay usable elsewhere.
+*/
+@theme {
+  --color-background: var(--bg-panel, #ffffff);
+  --color-foreground: var(--text-h, #18181b);
+  --color-card: var(--bg-panel, #ffffff);
+  --color-card-foreground: var(--text, #27272a);
+  --color-border: var(--border, #e4e4e7);
+  --color-input: var(--border, #e4e4e7);
+  --color-ring: var(--signal, #18181b);
+
+  --color-primary: var(--signal, #18181b);
+  --color-primary-foreground: var(--signal-ink, #fafafa);
+  --color-secondary: var(--l-teal-tint, #f4f4f5);
+  --color-secondary-foreground: var(--text-h, #18181b);
+  --color-accent: var(--l-teal-tint, #f4f4f5);
+  --color-accent-foreground: var(--text-h, #18181b);
+  --color-muted: var(--bg-panel-2, #f4f4f5);
+  --color-muted-foreground: var(--text-dim, #71717a);
+  --color-destructive: #b3261e;
+  --color-destructive-foreground: #fff5f4;
+}
+
+/*
+  Custom properties inherit their *resolved* value, not their `var(...)`
+  text — so the mapping above, only ever set at :root, would freeze to
+  :root's own --signal (the app shell's teal) for every descendant, even
+  inside `.lp` where --signal is redeclared coral. Re-declaring the same
+  tokens here, scoped to `.lp`, makes them resolve `.lp`'s own palette
+  instead.
+*/
+.lp {
+  --color-background: var(--bg-panel);
+  --color-foreground: var(--text-h);
+  --color-card: var(--bg-panel);
+  --color-card-foreground: var(--text);
+  --color-border: var(--border);
+  --color-input: var(--border);
+  --color-ring: var(--signal);
+
+  --color-primary: var(--signal);
+  --color-primary-foreground: var(--signal-ink);
+  --color-secondary: var(--l-teal-tint);
+  --color-secondary-foreground: var(--text-h);
+  --color-accent: var(--l-teal-tint);
+  --color-accent-foreground: var(--text-h);
+  --color-muted: var(--bg-panel-2);
+  --color-muted-foreground: var(--text-dim);
+}

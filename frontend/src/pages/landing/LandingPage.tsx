@@ -7,6 +7,7 @@ import type { ApiErrorResponse } from '../../auth/types'
 import { roleHomePath } from '../../auth/roleHome'
 import { useAuth } from '../../auth/useAuth'
 import { SearchSelect } from '../../components/SearchSelect'
+import { PlaceCard } from '../../components/ui/card-22'
 import { useT } from '../../i18n/useT'
 import { PublicFooter, PublicHeader } from '../public/PublicChrome'
 import { loadCatalog, loadRealHotels, mergeRealHotels, type CatalogHotel, type HotelCatalog } from '../../data/catalog'
@@ -156,6 +157,15 @@ export function LandingPage() {
     })
   }, [catalog])
 
+  /** A photogenic slice of the catalog for the PlaceCard showcase — only
+   *  hotels in a city we have a photo for, highest star rating first. */
+  const featured = useMemo(() => {
+    return [...items]
+      .filter((h) => cityImg(h.city))
+      .sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0))
+      .slice(0, 6)
+  }, [items])
+
   if (isAuthenticated && user) {
     return <Navigate to={roleHomePath(user.role)} replace />
   }
@@ -176,6 +186,12 @@ export function LandingPage() {
   const pickCity = (city: string) => {
     setCityFilter(city)
     setHotel(null)
+    focusSearch()
+  }
+
+  const pickHotel = (h: CatalogHotel) => {
+    setCityFilter(null)
+    setHotel(h)
     focusSearch()
   }
 
@@ -565,6 +581,35 @@ export function LandingPage() {
                     </span>
                   </span>
                 </button>
+              )
+            })}
+          </div>
+        </section>
+      )}
+
+      {featured.length > 0 && (
+        <section className="lp-dest">
+          <h2 className="lp-dest__title">{t('landing.featuredTitle')}</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {featured.map((h) => {
+              const img = cityImg(h.city)
+              return (
+                <PlaceCard
+                  key={h.id}
+                  className="max-w-none"
+                  images={img ? [img] : []}
+                  tags={[h.city, h.country]}
+                  rating={h.stars ?? undefined}
+                  title={h.name}
+                  dateRange={`${h.city}, ${h.country}`}
+                  hostType={h.stars ? `${h.stars}★` : t('landing.hotelFallbackLabel')}
+                  isTopRated={(h.stars ?? 0) >= 5}
+                  description={t('landing.featuredNote')}
+                  priceLabel={fromPrice(h.priceFrom, h.currency ?? catalog?.currency ?? 'EUR')}
+                  ctaLabel={t('landing.viewHotel')}
+                  topRatedLabel={t('landing.topRated')}
+                  onBook={() => pickHotel(h)}
+                />
               )
             })}
           </div>
