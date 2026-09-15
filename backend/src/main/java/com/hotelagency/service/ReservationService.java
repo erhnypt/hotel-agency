@@ -277,7 +277,7 @@ public class ReservationService {
         }
 
         byte[] pdf = invoiceService.generate(reservation);
-        return new InvoiceFile(pdf, "fatura-" + reservation.getReservationNumber() + ".pdf");
+        return new InvoiceFile(pdf, "invoice-" + reservation.getReservationNumber() + ".pdf");
     }
 
     public record InvoiceFile(byte[] bytes, String filename) {

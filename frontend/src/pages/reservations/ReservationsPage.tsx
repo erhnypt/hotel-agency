@@ -100,7 +100,7 @@ export function ReservationsPage() {
     setError(null)
     setBusyId(r.id)
     try {
-      await downloadReservationInvoice(r.id, `fatura-${r.reservationNumber}.pdf`)
+      await downloadReservationInvoice(r.id, `invoice-${r.reservationNumber}.pdf`)
     } catch (err) {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
