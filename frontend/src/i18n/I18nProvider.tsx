@@ -4,6 +4,18 @@ import { I18nContext } from './I18nContext'
 
 const STORAGE_KEY = 'app.lang'
 
+/** Whether the visitor has an explicit (saved) language preference — as
+ *  opposed to one guessed from the browser's locale. Used to default the
+ *  authenticated operator app to English without touching a preference the
+ *  visitor already set. */
+export function hasSavedLangPreference(): boolean {
+  try {
+    return localStorage.getItem(STORAGE_KEY) != null
+  } catch {
+    return false
+  }
+}
+
 function detectInitial(): Lang {
   try {
     const saved = localStorage.getItem(STORAGE_KEY)
