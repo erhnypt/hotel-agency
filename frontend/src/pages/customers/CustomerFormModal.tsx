@@ -4,6 +4,7 @@ import type { ApiErrorResponse } from '../../auth/types'
 import { Modal } from '../../components/Modal'
 import type { CustomerRequest, CustomerResponse } from '../../api/types'
 import { detectBrand, digitsOnly, formatCardNumber } from '../../lib/card'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
 export function CustomerFormModal({
@@ -15,6 +16,7 @@ export function CustomerFormModal({
   onClose: () => void
   onSave: (request: CustomerRequest) => Promise<void>
 }) {
+  const { t } = useT()
   const [firstName, setFirstName] = useState(customer?.firstName ?? '')
   const [lastName, setLastName] = useState(customer?.lastName ?? '')
   const [phone, setPhone] = useState(customer?.phone ?? '')
@@ -45,11 +47,11 @@ export function CustomerFormModal({
 
     const expiry = cardExpiry.trim() || null
     if (expiry && !/^(0[1-9]|1[0-2])\/\d{2}$/.test(expiry)) {
-      setError('Son kullanma tarihi AA/YY biçiminde olmalı.')
+      setError(t('customerForm.errorExpiryFormat'))
       return
     }
     if (digits && (digits.length < 12 || digits.length > 19)) {
-      setError('Kart numarası 12-19 hane olmalı.')
+      setError(t('customerForm.errorCardLength'))
       return
     }
 
@@ -73,7 +75,7 @@ export function CustomerFormModal({
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('Kaydedilemedi. Lütfen tekrar deneyin.')
+        setError(t('customerForm.errorSaveFailed'))
       }
     } finally {
       setSubmitting(false)
@@ -81,52 +83,52 @@ export function CustomerFormModal({
   }
 
   return (
-    <Modal title={customer ? 'Müşteriyi Düzenle' : 'Yeni Müşteri'} onClose={onClose}>
+    <Modal title={customer ? t('customerForm.titleEdit') : t('customerForm.titleNew')} onClose={onClose}>
       <form onSubmit={handleSubmit}>
         <label className="form-field">
-          <span>Ad</span>
+          <span>{t('customerForm.firstName')}</span>
           <input value={firstName} onChange={(e) => setFirstName(e.target.value)} required autoFocus />
         </label>
         <label className="form-field">
-          <span>Soyad</span>
+          <span>{t('customerForm.lastName')}</span>
           <input value={lastName} onChange={(e) => setLastName(e.target.value)} required />
         </label>
         <label className="form-field">
-          <span>Telefon</span>
+          <span>{t('common.phone')}</span>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
         </label>
         <label className="form-field">
-          <span>E-posta</span>
+          <span>{t('common.email')}</span>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
         </label>
         <label className="form-field">
-          <span>Pasaport No</span>
+          <span>{t('customerForm.passportNumber')}</span>
           <input value={passportNumber} onChange={(e) => setPassportNumber(e.target.value)} />
         </label>
         <label className="form-field">
-          <span>Uyruk</span>
+          <span>{t('customerForm.nationality')}</span>
           <input value={nationality} onChange={(e) => setNationality(e.target.value)} />
         </label>
         <label className="form-field">
-          <span>Notlar</span>
+          <span>{t('customerForm.notes')}</span>
           <textarea value={notes} onChange={(e) => setNotes(e.target.value)} rows={3} />
         </label>
 
         <fieldset className="form-fieldset">
-          <legend>Ödeme Kartı (opsiyonel)</legend>
+          <legend>{t('customerForm.paymentCardLegend')}</legend>
           <p className="form-hint">
-            Otele rezervasyonla birlikte iletilir.
+            {t('customerForm.paymentCardHint')}
           </p>
           <label className="form-field">
-            <span>Kart Sahibi</span>
+            <span>{t('customerForm.cardHolder')}</span>
             <input
               value={cardHolder}
               onChange={(e) => setCardHolder(e.target.value)}
-              placeholder="Kart üzerindeki isim"
+              placeholder={t('customerForm.cardHolderPlaceholder')}
             />
           </label>
           <label className="form-field">
-            <span>Kart Numarası {brand && <em className="form-field__hint">{brand}</em>}</span>
+            <span>{t('customerForm.cardNumber')} {brand && <em className="form-field__hint">{brand}</em>}</span>
             <input
               inputMode="numeric"
               autoComplete="off"
@@ -136,7 +138,7 @@ export function CustomerFormModal({
             />
           </label>
           <label className="form-field">
-            <span>Son Kullanma (AA/YY)</span>
+            <span>{t('customerForm.cardExpiry')}</span>
             <input
               inputMode="numeric"
               value={cardExpiry}
@@ -146,7 +148,7 @@ export function CustomerFormModal({
             />
           </label>
           <label className="form-field">
-            <span>CVV</span>
+            <span>{t('customerForm.cvv')}</span>
             <input
               type="text"
               value={cardNote}
@@ -161,10 +163,10 @@ export function CustomerFormModal({
 
         <div className="form-actions">
           <button type="button" className="btn" onClick={onClose}>
-            Vazgeç
+            {t('common.cancel')}
           </button>
           <button type="submit" className="btn btn--primary" disabled={submitting}>
-            {submitting ? 'Kaydediliyor...' : 'Kaydet'}
+            {submitting ? t('common.saving') : t('common.save')}
           </button>
         </div>
       </form>

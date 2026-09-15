@@ -15,9 +15,11 @@ import { ErrorState, LoadingState } from '../../components/PageState'
 import { StatusBadge } from '../../components/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
 import { useSupportUnread } from '../../hooks/useSupportUnread'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
 export function HotelsPage() {
+  const { t } = useT()
   const { user } = useAuth()
   const isAdmin = user?.role === 'AGENCY_ADMIN'
 
@@ -39,7 +41,7 @@ export function HotelsPage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('İşlem başarısız oldu.')
+        setError(t('hotels.actionFailed'))
       }
     } finally {
       setBusyId(null)
@@ -47,7 +49,7 @@ export function HotelsPage() {
   }
 
   const handleDelete = (id: number, name: string) => {
-    if (!window.confirm(`${name} otelini kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`)) {
+    if (!window.confirm(t('hotels.deleteConfirm', { name }))) {
       return
     }
     handleDecision(id, deleteHotel)
@@ -56,7 +58,7 @@ export function HotelsPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Oteller</h2>
+        <h2>{t('hotels.title')}</h2>
       </div>
 
       {error && <p className="form-error">{error}</p>}
@@ -67,10 +69,10 @@ export function HotelsPage() {
         <div className="data-table-wrapper"><table className="data-table">
           <thead>
             <tr>
-              <th>Otel</th>
-              <th>Şehir</th>
-              <th>İletişim</th>
-              <th>Durum</th>
+              <th>{t('common.hotel')}</th>
+              <th>{t('common.city')}</th>
+              <th>{t('hotels.columnContact')}</th>
+              <th>{t('common.status')}</th>
               <th></th>
             </tr>
           </thead>
@@ -88,7 +90,7 @@ export function HotelsPage() {
                 <td>
                   <div className="data-table__actions">
                     <Link to={`${hotelsBasePath}/${hotel.id}`} className="btn btn--small">
-                      Detay
+                      {t('hotels.detailLink')}
                     </Link>
                     {isAdmin && hotel.status === 'PENDING' && (
                       <>
@@ -98,7 +100,7 @@ export function HotelsPage() {
                           disabled={busyId === hotel.id}
                           onClick={() => handleDecision(hotel.id, approveHotel)}
                         >
-                          Onayla
+                          {t('common.confirm')}
                         </button>
                         <button
                           type="button"
@@ -106,7 +108,7 @@ export function HotelsPage() {
                           disabled={busyId === hotel.id}
                           onClick={() => handleDecision(hotel.id, rejectHotel)}
                         >
-                          Reddet
+                          {t('common.reject')}
                         </button>
                       </>
                     )}
@@ -117,7 +119,7 @@ export function HotelsPage() {
                         disabled={busyId === hotel.id}
                         onClick={() => handleDecision(hotel.id, deactivateHotel)}
                       >
-                        Pasife Al
+                        {t('hotels.deactivateButton')}
                       </button>
                     )}
                     {isAdmin && hotel.status === 'INACTIVE' && (
@@ -127,7 +129,7 @@ export function HotelsPage() {
                         disabled={busyId === hotel.id}
                         onClick={() => handleDecision(hotel.id, reactivateHotel)}
                       >
-                        Aktifleştir
+                        {t('hotels.activateButton')}
                       </button>
                     )}
                     {isAdmin && (
@@ -137,12 +139,14 @@ export function HotelsPage() {
                         disabled={busyId === hotel.id}
                         onClick={() => handleDelete(hotel.id, hotel.name)}
                       >
-                        Sil
+                        {t('common.delete')}
                       </button>
                     )}
                     <Link to={`${hotelsBasePath}/${hotel.id}/support`} className="btn btn--small">
-                      Destek
-                      {unreadHotelIds.includes(hotel.id) && <span className="badge-dot" aria-label="Yeni mesaj" />}
+                      {t('hotels.supportLink')}
+                      {unreadHotelIds.includes(hotel.id) && (
+                        <span className="badge-dot" aria-label={t('hotels.newMessageAriaLabel')} />
+                      )}
                     </Link>
                   </div>
                 </td>
@@ -151,7 +155,7 @@ export function HotelsPage() {
             {hotels.data.length === 0 && (
               <tr>
                 <td colSpan={5} className="data-table__empty">
-                  Henüz otel yok.
+                  {t('hotels.noHotels')}
                 </td>
               </tr>
             )}

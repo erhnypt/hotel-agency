@@ -5,6 +5,7 @@ import type { ApiErrorResponse } from '../auth/types'
 import { useAuth } from '../auth/useAuth'
 import { useAsync } from '../hooks/useAsync'
 import { notifySupportRead } from '../hooks/supportEvents'
+import { useT } from '../i18n/useT'
 import { ErrorState, LoadingState } from './PageState'
 import './SupportChatThread.css'
 
@@ -12,6 +13,7 @@ const POLL_INTERVAL_MS = 20_000
 
 export function SupportChatThread({ hotelId }: { hotelId: number }) {
   const { user } = useAuth()
+  const { t, lang } = useT()
   const [refreshKey, setRefreshKey] = useState(0)
   const [messages, setMessages] = useState<Awaited<ReturnType<typeof listSupportMessages>>>([])
   const [hasLoadedOnce, setHasLoadedOnce] = useState(false)
@@ -56,7 +58,7 @@ export function SupportChatThread({ hotelId }: { hotelId: number }) {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('Mesaj gönderilemedi.')
+        setError(t('support.sendError'))
       }
     } finally {
       setSending(false)
@@ -70,7 +72,7 @@ export function SupportChatThread({ hotelId }: { hotelId: number }) {
 
       {hasLoadedOnce && (
         <div className="support-chat__thread">
-          {messages.length === 0 && <p className="page-state">Henüz mesaj yok. İlk mesajı siz gönderin.</p>}
+          {messages.length === 0 && <p className="page-state">{t('support.empty')}</p>}
           {messages.map((message) => (
             <div
               key={message.id}
@@ -80,7 +82,7 @@ export function SupportChatThread({ hotelId }: { hotelId: number }) {
             >
               <div className="support-chat__meta">
                 <span className="support-chat__sender">{message.senderName}</span>
-                <span className="support-chat__time">{new Date(message.createdAt).toLocaleString('tr-TR')}</span>
+                <span className="support-chat__time">{new Date(message.createdAt).toLocaleString(lang)}</span>
               </div>
               <p className="support-chat__body">{message.body}</p>
             </div>
@@ -95,12 +97,12 @@ export function SupportChatThread({ hotelId }: { hotelId: number }) {
         <textarea
           value={body}
           onChange={(event) => setBody(event.target.value)}
-          placeholder="Mesajınızı yazın..."
+          placeholder={t('support.placeholder')}
           rows={2}
           required
         />
         <button type="submit" className="btn btn--primary" disabled={sending}>
-          Gönder
+          {t('common.send')}
         </button>
       </form>
     </div>

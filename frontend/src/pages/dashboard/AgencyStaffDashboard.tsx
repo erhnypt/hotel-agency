@@ -3,9 +3,11 @@ import { listReservations } from '../../api/reservations'
 import { BoardSection, BoardStrip, ReservationMiniTable } from '../../components/Board'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import './AgencyStaffDashboard.css'
 
 export function AgencyStaffDashboard() {
+  const { t } = useT()
   const reservations = useAsync(listReservations, [])
 
   if (reservations.loading) return <LoadingState />
@@ -25,43 +27,47 @@ export function AgencyStaffDashboard() {
   return (
     <div>
       <div className="staff-dashboard__head">
-        <h2 className="staff-dashboard__title">Bugünün Panosu</h2>
+        <h2 className="staff-dashboard__title">{t('dashboard.todaysBoard')}</h2>
         <Link to="/staff/reservations/new" className="btn btn--primary">
-          + Yeni Rezervasyon
+          {t('dashboard.newReservation')}
         </Link>
       </div>
 
       <BoardStrip
         items={[
-          { label: 'Toplam Rezervasyonum', value: list.length, to: '/staff/reservations' },
-          { label: 'Bekliyor', value: list.filter((r) => r.status === 'PENDING').length, to: '/staff/reservations' },
+          { label: t('dashboard.myTotalReservations'), value: list.length, to: '/staff/reservations' },
           {
-            label: 'Onaylandı',
+            label: t('status.pending'),
+            value: list.filter((r) => r.status === 'PENDING').length,
+            to: '/staff/reservations',
+          },
+          {
+            label: t('status.confirmed'),
             value: list.filter((r) => r.status === 'CONFIRMED').length,
             to: '/staff/reservations',
           },
           {
-            label: 'İptal Edildi',
+            label: t('status.cancelled'),
             value: list.filter((r) => r.status === 'CANCELLED').length,
             to: '/staff/reservations',
           },
         ]}
       />
 
-      <BoardSection title="Bugün Giriş" count={checkingInToday.length}>
-        <ReservationMiniTable items={checkingInToday} emptyLabel="Bugün giriş yapacak rezervasyon yok." />
+      <BoardSection title={t('dashboard.checkingInToday')} count={checkingInToday.length}>
+        <ReservationMiniTable items={checkingInToday} emptyLabel={t('dashboard.noCheckInsToday')} />
       </BoardSection>
 
-      <BoardSection title="Bugün Çıkış" count={checkingOutToday.length}>
-        <ReservationMiniTable items={checkingOutToday} emptyLabel="Bugün çıkış yapacak rezervasyon yok." />
+      <BoardSection title={t('dashboard.checkingOutToday')} count={checkingOutToday.length}>
+        <ReservationMiniTable items={checkingOutToday} emptyLabel={t('dashboard.noCheckOutsToday')} />
       </BoardSection>
 
-      <BoardSection title="Önümüzdeki 7 Gün" count={upcoming.length}>
-        <ReservationMiniTable items={upcoming} emptyLabel="Önümüzdeki 7 günde giriş yok." />
+      <BoardSection title={t('dashboard.next7Days')} count={upcoming.length}>
+        <ReservationMiniTable items={upcoming} emptyLabel={t('dashboard.noUpcomingCheckIns')} />
       </BoardSection>
 
-      <BoardSection title="Son Rezervasyonlar" count={recent.length}>
-        <ReservationMiniTable items={recent} emptyLabel="Henüz rezervasyon yok." />
+      <BoardSection title={t('dashboard.recentReservations')} count={recent.length}>
+        <ReservationMiniTable items={recent} emptyLabel={t('dashboard.noReservationsYet')} />
       </BoardSection>
     </div>
   )

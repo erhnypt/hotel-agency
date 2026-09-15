@@ -16,10 +16,12 @@ import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { StatusBadge } from '../../components/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import { HotelRoomImagesModal } from './HotelRoomImagesModal'
 import '../../components/crud.css'
 
 export function HotelDetailPage() {
+  const { t } = useT()
   const { hotelId } = useParams<{ hotelId: string }>()
   const id = Number(hotelId)
   const { user } = useAuth()
@@ -45,7 +47,7 @@ export function HotelDetailPage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('İşlem başarısız oldu.')
+        setError(t('hotels.actionFailed'))
       }
     } finally {
       setBusy(false)
@@ -54,11 +56,7 @@ export function HotelDetailPage() {
 
   const handleDelete = async () => {
     if (!hotel.data) return
-    if (
-      !window.confirm(
-        `${hotel.data.name} otelini kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz.`,
-      )
-    ) {
+    if (!window.confirm(t('hotels.deleteConfirm', { name: hotel.data.name }))) {
       return
     }
     setError(null)
@@ -70,7 +68,7 @@ export function HotelDetailPage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('İşlem başarısız oldu.')
+        setError(t('hotels.actionFailed'))
       }
       setBusy(false)
     }
@@ -87,36 +85,36 @@ export function HotelDetailPage() {
       <div className="page-header">
         <h2>{h.name}</h2>
         <Link to={basePath} className="btn btn--small">
-          ← Oteller
+          ← {t('hotels.title')}
         </Link>
       </div>
 
       {error && <p className="form-error">{error}</p>}
 
       <div className="info-grid">
-        <span className="info-grid__label">Durum</span>
+        <span className="info-grid__label">{t('common.status')}</span>
         <span className="info-grid__value">
           <StatusBadge status={h.status} />
         </span>
-        <span className="info-grid__label">E-posta</span>
+        <span className="info-grid__label">{t('common.email')}</span>
         <span className="info-grid__value">{h.email}</span>
-        <span className="info-grid__label">Telefon</span>
+        <span className="info-grid__label">{t('common.phone')}</span>
         <span className="info-grid__value">{h.phone}</span>
-        <span className="info-grid__label">Yetkili</span>
+        <span className="info-grid__label">{t('hotelDetail.contactLabel')}</span>
         <span className="info-grid__value">{h.contactPerson}</span>
-        <span className="info-grid__label">Adres</span>
+        <span className="info-grid__label">{t('hotelDetail.addressLabel')}</span>
         <span className="info-grid__value">
           {h.address}, {h.city}, {h.country}
         </span>
         {h.website && (
           <>
-            <span className="info-grid__label">Website</span>
+            <span className="info-grid__label">{t('hotelDetail.websiteLabel')}</span>
             <span className="info-grid__value">{h.website}</span>
           </>
         )}
         {h.description && (
           <>
-            <span className="info-grid__label">Açıklama</span>
+            <span className="info-grid__label">{t('common.description')}</span>
             <span className="info-grid__value">{h.description}</span>
           </>
         )}
@@ -132,7 +130,7 @@ export function HotelDetailPage() {
                 disabled={busy}
                 onClick={() => runAction(() => approveHotel(id))}
               >
-                Onayla
+                {t('common.confirm')}
               </button>
               <button
                 type="button"
@@ -140,7 +138,7 @@ export function HotelDetailPage() {
                 disabled={busy}
                 onClick={() => runAction(() => rejectHotel(id))}
               >
-                Reddet
+                {t('common.reject')}
               </button>
             </>
           )}
@@ -151,7 +149,7 @@ export function HotelDetailPage() {
               disabled={busy}
               onClick={() => runAction(() => deactivateHotel(id))}
             >
-              Pasife Al
+              {t('hotels.deactivateButton')}
             </button>
           )}
           {h.status === 'INACTIVE' && (
@@ -161,17 +159,17 @@ export function HotelDetailPage() {
               disabled={busy}
               onClick={() => runAction(() => reactivateHotel(id))}
             >
-              Aktifleştir
+              {t('hotels.activateButton')}
             </button>
           )}
           <button type="button" className="btn btn--small btn--danger" disabled={busy} onClick={handleDelete}>
-            Sil
+            {t('common.delete')}
           </button>
         </div>
       )}
 
       <div className="page-header">
-        <h2>Oda Tipleri</h2>
+        <h2>{t('hotelDetail.roomTypesTitle')}</h2>
       </div>
 
       {roomTypes.loading && <LoadingState />}
@@ -182,13 +180,13 @@ export function HotelDetailPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Ad</th>
-                <th>Kapasite</th>
-                <th>Yatak Tipi</th>
-                <th>Oda Sayısı</th>
-                <th>Gecelik Fiyat</th>
+                <th>{t('common.name')}</th>
+                <th>{t('hotelDetail.columnCapacity')}</th>
+                <th>{t('hotelDetail.columnBedType')}</th>
+                <th>{t('hotelDetail.columnRoomCount')}</th>
+                <th>{t('hotelDetail.columnNightlyPrice')}</th>
                 <th>m²</th>
-                <th>Görseller</th>
+                <th>{t('hotelDetail.columnImages')}</th>
               </tr>
             </thead>
             <tbody>
@@ -207,7 +205,7 @@ export function HotelDetailPage() {
                       disabled={roomType.images.length === 0}
                       onClick={() => setViewingImagesFor(roomType)}
                     >
-                      {roomType.images.length} görsel
+                      {t('hotelDetail.imageCount', { count: roomType.images.length })}
                     </button>
                   </td>
                 </tr>
@@ -215,7 +213,7 @@ export function HotelDetailPage() {
               {roomTypes.data.length === 0 && (
                 <tr>
                   <td colSpan={7} className="data-table__empty">
-                    Henüz oda tipi eklenmemiş.
+                    {t('hotelDetail.noRoomTypes')}
                   </td>
                 </tr>
               )}

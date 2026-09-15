@@ -4,18 +4,26 @@ import type { BookingRequestResponse, BookingRequestStatus } from '../../api/typ
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { StatusBadge } from '../../components/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
-const NEXT_ACTIONS: Record<BookingRequestStatus, { label: string; to: BookingRequestStatus }[]> = {
-  NEW: [{ label: 'İşleme al', to: 'IN_PROGRESS' }, { label: 'Kapat', to: 'CLOSED' }],
-  IN_PROGRESS: [{ label: 'Kapat', to: 'CLOSED' }, { label: 'Yeniye al', to: 'NEW' }],
-  CLOSED: [{ label: 'Yeniden aç', to: 'IN_PROGRESS' }],
-}
-
 export function BookingRequestsPage() {
+  const { t, lang } = useT()
   const [refreshKey, setRefreshKey] = useState(0)
   const [busyId, setBusyId] = useState<number | null>(null)
   const requests = useAsync(listBookingRequests, [refreshKey])
+
+  const NEXT_ACTIONS: Record<BookingRequestStatus, { label: string; to: BookingRequestStatus }[]> = {
+    NEW: [
+      { label: t('bookingRequests.actionStart'), to: 'IN_PROGRESS' },
+      { label: t('bookingRequests.actionClose'), to: 'CLOSED' },
+    ],
+    IN_PROGRESS: [
+      { label: t('bookingRequests.actionClose'), to: 'CLOSED' },
+      { label: t('bookingRequests.actionReopenNew'), to: 'NEW' },
+    ],
+    CLOSED: [{ label: t('bookingRequests.actionReopen'), to: 'IN_PROGRESS' }],
+  }
 
   const refresh = () => setRefreshKey((k) => k + 1)
 
@@ -32,10 +40,10 @@ export function BookingRequestsPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Talepler</h2>
+        <h2>{t('bookingRequests.title')}</h2>
       </div>
       <p className="page-state">
-        Ana sayfadaki otel aramasından gelen rezervasyon talepleri. İnceleyip müşteriyle iletişime geçin.
+        {t('bookingRequests.subtitle')}
       </p>
 
       {requests.loading && <LoadingState />}
@@ -46,21 +54,21 @@ export function BookingRequestsPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Tarih</th>
-                <th>Otel</th>
-                <th>Şehir / Ülke</th>
-                <th>Konaklama</th>
-                <th>Misafir</th>
-                <th>İletişim</th>
-                <th>Not</th>
-                <th>Durum</th>
+                <th>{t('bookingRequests.columnDate')}</th>
+                <th>{t('common.hotel')}</th>
+                <th>{t('bookingRequests.columnCityCountry')}</th>
+                <th>{t('bookingRequests.columnStay')}</th>
+                <th>{t('common.guest')}</th>
+                <th>{t('bookingRequests.columnContact')}</th>
+                <th>{t('bookingRequests.columnNote')}</th>
+                <th>{t('common.status')}</th>
                 <th></th>
               </tr>
             </thead>
             <tbody>
               {requests.data.map((r) => (
                 <tr key={r.id}>
-                  <td>{new Date(r.createdAt).toLocaleDateString('tr-TR')}</td>
+                  <td>{new Date(r.createdAt).toLocaleDateString(lang)}</td>
                   <td>
                     {r.propertyName}
                     <br />
@@ -116,7 +124,7 @@ export function BookingRequestsPage() {
               {requests.data.length === 0 && (
                 <tr>
                   <td colSpan={9} className="data-table__empty">
-                    Henüz talep yok.
+                    {t('bookingRequests.emptyState')}
                   </td>
                 </tr>
               )}

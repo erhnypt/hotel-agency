@@ -9,12 +9,14 @@ import { roleHomePath } from '../../auth/roleHome'
 import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import type { AvailableRoomResponse } from '../../api/types'
 import { detectBrand, digitsOnly } from '../../lib/card'
 import '../../components/crud.css'
 import './NewReservationPage.css'
 
 export function NewReservationPage() {
+  const { t } = useT()
   const navigate = useNavigate()
   const { user } = useAuth()
   const hotels = useAsync(listHotels, [])
@@ -62,7 +64,7 @@ export function NewReservationPage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setSearchError(err.response.data.message)
       } else {
-        setSearchError('Müsait odalar aranamadı.')
+        setSearchError(t('newReservation.searchError'))
       }
     } finally {
       setSearching(false)
@@ -124,7 +126,7 @@ export function NewReservationPage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setSubmitError(err.response.data.message)
       } else {
-        setSubmitError('Rezervasyon oluşturulamadı.')
+        setSubmitError(t('newReservation.createError'))
       }
     } finally {
       setSubmitting(false)
@@ -134,18 +136,18 @@ export function NewReservationPage() {
   if (reservationNumber) {
     return (
       <div className="reservation-success">
-        <h2>Rezervasyon Oluşturuldu</h2>
+        <h2>{t('newReservation.successTitle')}</h2>
         <p className="reservation-success__number">{reservationNumber}</p>
         <div className="form-actions form-actions--start">
           <button type="button" className="btn btn--primary" onClick={resetForNewReservation}>
-            Yeni Rezervasyon Oluştur
+            {t('newReservation.newReservationButton')}
           </button>
           <button
             type="button"
             className="btn"
             onClick={() => navigate(`${roleHomePath(user!.role)}/reservations`)}
           >
-            Rezervasyonlara Git
+            {t('newReservation.goToReservationsButton')}
           </button>
         </div>
       </div>
@@ -158,15 +160,15 @@ export function NewReservationPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Yeni Rezervasyon</h2>
+        <h2>{t('newReservation.title')}</h2>
       </div>
 
       <form onSubmit={handleSearch} className="inline-form">
         <label className="select-field">
-          <span>Otel</span>
+          <span>{t('common.hotel')}</span>
           <select value={hotelId} onChange={(e) => setHotelId(e.target.value)} required>
             <option value="" disabled>
-              Seçiniz
+              {t('newReservation.selectPlaceholder')}
             </option>
             {hotels.data?.map((hotel) => (
               <option key={hotel.id} value={hotel.id}>
@@ -176,19 +178,19 @@ export function NewReservationPage() {
           </select>
         </label>
         <label className="form-field">
-          <span>Check-in</span>
+          <span>{t('common.checkIn')}</span>
           <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} required />
         </label>
         <label className="form-field">
-          <span>Check-out</span>
+          <span>{t('common.checkOut')}</span>
           <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} required />
         </label>
         <label className="form-field">
-          <span>Misafir Sayısı</span>
+          <span>{t('newReservation.guestsLabel')}</span>
           <input type="number" min={1} value={guests} onChange={(e) => setGuests(e.target.value)} required />
         </label>
         <button type="submit" className="btn btn--primary" disabled={searching || !hotelId}>
-          {searching ? 'Aranıyor...' : 'Müsait Odaları Göster'}
+          {searching ? t('newReservation.searchingLabel') : t('newReservation.searchButton')}
         </button>
       </form>
 
@@ -197,7 +199,7 @@ export function NewReservationPage() {
       {availableRooms && (
         <div className="room-options">
           {availableRooms.length === 0 && (
-            <p className="page-state">Bu tarihlerde ve misafir sayısında müsait oda bulunamadı.</p>
+            <p className="page-state">{t('newReservation.noRoomsFound')}</p>
           )}
           {availableRooms.map((room) => (
             <button
@@ -210,7 +212,7 @@ export function NewReservationPage() {
             >
               <div className="room-option__name">{room.name}</div>
               <div className="room-option__meta">
-                {room.capacity} kişi · {room.bedType}
+                {t('newReservation.roomCapacityLabel', { capacity: room.capacity })} · {room.bedType}
               </div>
               <div className="room-option__price">
                 {room.totalPrice} {room.currency}
@@ -223,7 +225,7 @@ export function NewReservationPage() {
       {selectedRoomTypeId && (
         <form onSubmit={handleSubmit} className="reservation-customer-form">
           <div className="page-header">
-            <h2>Müşteri</h2>
+            <h2>{t('newReservation.customerSectionTitle')}</h2>
           </div>
 
           <div className="customer-mode-toggle">
@@ -232,23 +234,23 @@ export function NewReservationPage() {
               className={'btn btn--small' + (customerMode === 'existing' ? ' btn--primary' : '')}
               onClick={() => setCustomerMode('existing')}
             >
-              Mevcut Müşteri
+              {t('newReservation.existingCustomerButton')}
             </button>
             <button
               type="button"
               className={'btn btn--small' + (customerMode === 'new' ? ' btn--primary' : '')}
               onClick={() => setCustomerMode('new')}
             >
-              Yeni Müşteri
+              {t('newReservation.newCustomerButton')}
             </button>
           </div>
 
           {customerMode === 'existing' ? (
             <label className="select-field">
-              <span>Müşteri</span>
+              <span>{t('newReservation.customerSectionTitle')}</span>
               <select value={customerId} onChange={(e) => setCustomerId(e.target.value)} required>
                 <option value="" disabled>
-                  Seçiniz
+                  {t('newReservation.selectPlaceholder')}
                 </option>
                 {customers.data?.map((customer) => (
                   <option key={customer.id} value={customer.id}>
@@ -260,33 +262,33 @@ export function NewReservationPage() {
           ) : (
             <div className="new-customer-fields">
               <label className="form-field">
-                <span>Ad</span>
+                <span>{t('common.name')}</span>
                 <input value={newFirstName} onChange={(e) => setNewFirstName(e.target.value)} required />
               </label>
               <label className="form-field">
-                <span>Soyad</span>
+                <span>{t('newReservation.lastNameLabel')}</span>
                 <input value={newLastName} onChange={(e) => setNewLastName(e.target.value)} required />
               </label>
               <label className="form-field">
-                <span>Telefon</span>
+                <span>{t('common.phone')}</span>
                 <input value={newPhone} onChange={(e) => setNewPhone(e.target.value)} required />
               </label>
               <label className="form-field">
-                <span>E-posta</span>
+                <span>{t('common.email')}</span>
                 <input type="email" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
               </label>
 
               <fieldset className="form-fieldset new-customer-fields__card">
-  <legend>Ödeme Kartı (opsiyonel)</legend>
+  <legend>{t('newReservation.paymentCardLegend')}</legend>
   <p className="form-hint">
-    Otele iletilmek üzere kart bilgileri saklanır.
+    {t('newReservation.cardHint')}
   </p>
   <label className="form-field">
-    <span>Kart Sahibi</span>
+    <span>{t('newReservation.cardHolderLabel')}</span>
     <input value={newCardHolder} onChange={(e) => setNewCardHolder(e.target.value)} />
   </label>
   <label className="form-field">
-    <span>Kart Numarası</span>
+    <span>{t('newReservation.cardNumberLabel')}</span>
     <input
       inputMode="numeric"
       autoComplete="off"
@@ -297,7 +299,7 @@ export function NewReservationPage() {
     />
   </label>
   <label className="form-field">
-    <span>Son Kullanma (AA/YY)</span>
+    <span>{t('newReservation.cardExpiryLabel')}</span>
     <input
       inputMode="numeric"
       maxLength={5}
@@ -327,7 +329,7 @@ export function NewReservationPage() {
 
           <div className="form-actions form-actions--start">
             <button type="submit" className="btn btn--primary" disabled={submitting || !selectedCustomerValid}>
-              {submitting ? 'Oluşturuluyor...' : 'Rezervasyonu Oluştur'}
+              {submitting ? t('newReservation.submittingLabel') : t('newReservation.submitButton')}
             </button>
           </div>
         </form>

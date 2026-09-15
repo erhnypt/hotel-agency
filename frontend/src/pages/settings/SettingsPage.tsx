@@ -2,9 +2,11 @@ import { useState } from 'react'
 import { getProfile, updateProfile } from '../../api/profile'
 import { useAsync } from '../../hooks/useAsync'
 import { LoadingState, ErrorState } from '../../components/PageState'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
 export function SettingsPage() {
+  const { t } = useT()
   const profile = useAsync(getProfile, [])
 
   const [fullName, setFullName] = useState('')
@@ -26,7 +28,7 @@ export function SettingsPage() {
     setErrorMsg(null)
 
     if (newPassword && newPassword !== confirmPassword) {
-      setErrorMsg('Yeni şifreler eşleşmiyor.')
+      setErrorMsg(t('settings.passwordMismatch'))
       return
     }
 
@@ -37,13 +39,13 @@ export function SettingsPage() {
         currentPassword: currentPassword || undefined,
         newPassword: newPassword || undefined,
       })
-      setSuccessMsg('Bilgiler başarıyla güncellendi.')
+      setSuccessMsg(t('settings.updateSuccess'))
       setCurrentPassword('')
       setNewPassword('')
       setConfirmPassword('')
     } catch (err: unknown) {
       const axiosError = err as { response?: { data?: { message?: string } }; message?: string }
-      setErrorMsg(axiosError?.response?.data?.message ?? axiosError?.message ?? 'Bir hata oluştu.')
+      setErrorMsg(axiosError?.response?.data?.message ?? axiosError?.message ?? t('settings.genericError'))
     } finally {
       setSaving(false)
     }
@@ -55,19 +57,19 @@ export function SettingsPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Ayarlar</h2>
+        <h2>{t('settings.title')}</h2>
       </div>
 
       <form style={{ maxWidth: 480 }} onSubmit={handleSubmit}>
-        <h3 style={{ marginBottom: '1rem', fontWeight: 600 }}>Profil Bilgileri</h3>
+        <h3 style={{ marginBottom: '1rem', fontWeight: 600 }}>{t('settings.sectionProfile')}</h3>
 
         <label className="form-field">
-          <span>E-posta</span>
+          <span>{t('common.email')}</span>
           <input type="email" value={profile.data?.email ?? ''} disabled />
         </label>
 
         <label className="form-field">
-          <span>Ad Soyad *</span>
+          <span>{t('settings.fullNameLabel')}</span>
           <input
             type="text"
             value={fullName}
@@ -76,13 +78,13 @@ export function SettingsPage() {
           />
         </label>
 
-        <h3 style={{ margin: '1.5rem 0 1rem', fontWeight: 600 }}>Şifre Değiştir</h3>
+        <h3 style={{ margin: '1.5rem 0 1rem', fontWeight: 600 }}>{t('settings.sectionPassword')}</h3>
         <p style={{ fontSize: '0.85rem', color: 'var(--text)', marginBottom: '0.75rem' }}>
-          Şifrenizi değiştirmek istemiyorsanız bu alanları boş bırakın.
+          {t('settings.passwordHint')}
         </p>
 
         <label className="form-field">
-          <span>Mevcut Şifre</span>
+          <span>{t('settings.currentPasswordLabel')}</span>
           <input
             type="password"
             value={currentPassword}
@@ -91,7 +93,7 @@ export function SettingsPage() {
         </label>
 
         <label className="form-field">
-          <span>Yeni Şifre (en az 8 karakter)</span>
+          <span>{t('settings.newPasswordLabel')}</span>
           <input
             type="password"
             value={newPassword}
@@ -101,7 +103,7 @@ export function SettingsPage() {
         </label>
 
         <label className="form-field">
-          <span>Yeni Şifre (tekrar)</span>
+          <span>{t('settings.confirmPasswordLabel')}</span>
           <input
             type="password"
             value={confirmPassword}
@@ -118,7 +120,7 @@ export function SettingsPage() {
 
         <div className="form-actions">
           <button type="submit" className="btn btn--primary" disabled={saving}>
-            {saving ? 'Kaydediliyor...' : 'Kaydet'}
+            {saving ? t('common.saving') : t('common.save')}
           </button>
         </div>
       </form>

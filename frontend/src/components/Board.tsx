@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
 import { Link } from 'react-router-dom'
 import type { ReservationResponse } from '../api/types'
+import { useT } from '../i18n/useT'
 import { StatusBadge } from './StatusBadge'
 import './crud.css'
 import './Board.css'
@@ -68,6 +69,8 @@ export function ReservationMiniTable({
   showHotel?: boolean
   emptyLabel: string
 }) {
+  const { t } = useT()
+
   if (items.length === 0) return <BoardEmpty>{emptyLabel}</BoardEmpty>
 
   return (
@@ -75,13 +78,13 @@ export function ReservationMiniTable({
       <table className="data-table">
         <thead>
           <tr>
-            <th>No</th>
-            {showHotel && <th>Otel</th>}
-            <th>Oda Tipi</th>
-            <th>Misafir</th>
-            <th>Giriş</th>
-            <th>Çıkış</th>
-            <th>Durum</th>
+            <th>{t('board.colNo')}</th>
+            {showHotel && <th>{t('common.hotel')}</th>}
+            <th>{t('common.roomType')}</th>
+            <th>{t('common.guest')}</th>
+            <th>{t('common.checkIn')}</th>
+            <th>{t('common.checkOut')}</th>
+            <th>{t('common.status')}</th>
           </tr>
         </thead>
         <tbody>

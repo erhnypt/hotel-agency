@@ -4,6 +4,7 @@ import type { StaffRequest, StaffResponse } from '../../api/types'
 import { Modal } from '../../components/Modal'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
 function StaffFormModal({
@@ -13,6 +14,7 @@ function StaffFormModal({
   onSubmit: (req: StaffRequest) => Promise<void>
   onClose: () => void
 }) {
+  const { t } = useT()
   const [form, setForm] = useState<StaffRequest>({ fullName: '', email: '', password: '' })
   const [error, setError] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -28,25 +30,25 @@ function StaffFormModal({
       await onSubmit(form)
     } catch (err: unknown) {
       const axiosError = err as { response?: { data?: { message?: string } }; message?: string }
-      setError(axiosError?.response?.data?.message ?? axiosError?.message ?? 'Bir hata oluştu.')
+      setError(axiosError?.response?.data?.message ?? axiosError?.message ?? t('staff.genericError'))
     } finally {
       setSaving(false)
     }
   }
 
   return (
-    <Modal title="Yeni Çalışan" onClose={onClose}>
+    <Modal title={t('staff.newStaffModalTitle')} onClose={onClose}>
       <form onSubmit={handleSubmit}>
         <label className="form-field">
-          <span>Ad Soyad *</span>
+          <span>{t('staff.fullNameLabel')}</span>
           <input name="fullName" value={form.fullName} onChange={handleChange} required />
         </label>
         <label className="form-field">
-          <span>E-posta *</span>
+          <span>{t('staff.emailLabel')}</span>
           <input type="email" name="email" value={form.email} onChange={handleChange} required />
         </label>
         <label className="form-field">
-          <span>Şifre (en az 8 karakter) *</span>
+          <span>{t('staff.passwordLabel')}</span>
           <input
             type="password"
             name="password"
@@ -59,10 +61,10 @@ function StaffFormModal({
         {error && <p className="form-error">{error}</p>}
         <div className="form-actions">
           <button type="button" className="btn" onClick={onClose}>
-            İptal
+            {t('common.cancel')}
           </button>
           <button type="submit" className="btn btn--primary" disabled={saving}>
-            {saving ? 'Kaydediliyor...' : 'Oluştur'}
+            {saving ? t('common.saving') : t('common.create')}
           </button>
         </div>
       </form>
@@ -71,6 +73,7 @@ function StaffFormModal({
 }
 
 export function StaffPage() {
+  const { t, lang } = useT()
   const [refreshKey, setRefreshKey] = useState(0)
   const [showCreate, setShowCreate] = useState(false)
   const [deleting, setDeleting] = useState<number | null>(null)
@@ -85,7 +88,7 @@ export function StaffPage() {
   }
 
   const handleDelete = async (member: StaffResponse) => {
-    if (!window.confirm(`"${member.fullName}" çalışanını silmek istiyor musunuz?`)) return
+    if (!window.confirm(t('staff.deleteConfirm', { name: member.fullName }))) return
     setDeleting(member.id)
     try {
       await deleteStaff(member.id)
@@ -98,9 +101,9 @@ export function StaffPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Çalışanlar</h2>
+        <h2>{t('staff.title')}</h2>
         <button type="button" className="btn btn--primary" onClick={() => setShowCreate(true)}>
-          + Yeni Çalışan
+          {t('staff.addButton')}
         </button>
       </div>
 
@@ -112,9 +115,9 @@ export function StaffPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Ad Soyad</th>
-                <th>E-posta</th>
-                <th>Kayıt Tarihi</th>
+                <th>{t('staff.columnFullName')}</th>
+                <th>{t('common.email')}</th>
+                <th>{t('staff.columnJoined')}</th>
                 <th></th>
               </tr>
             </thead>
@@ -123,7 +126,7 @@ export function StaffPage() {
                 <tr key={member.id}>
                   <td>{member.fullName}</td>
                   <td>{member.email}</td>
-                  <td>{new Date(member.createdAt).toLocaleDateString('tr-TR')}</td>
+                  <td>{new Date(member.createdAt).toLocaleDateString(lang)}</td>
                   <td>
                     <div className="data-table__actions">
                       <button
@@ -132,7 +135,7 @@ export function StaffPage() {
                         onClick={() => handleDelete(member)}
                         disabled={deleting === member.id}
                       >
-                        {deleting === member.id ? '...' : 'Sil'}
+                        {deleting === member.id ? '...' : t('common.delete')}
                       </button>
                     </div>
                   </td>
@@ -141,7 +144,7 @@ export function StaffPage() {
               {staff.data.length === 0 && (
                 <tr>
                   <td colSpan={4} className="data-table__empty">
-                    Henüz çalışan yok.
+                    {t('staff.emptyMessage')}
                   </td>
                 </tr>
               )}

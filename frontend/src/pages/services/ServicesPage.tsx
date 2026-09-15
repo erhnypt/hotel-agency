@@ -4,10 +4,12 @@ import { createService, deleteService, listServices, updateService } from '../..
 import type { ServiceRequest, ServiceResponse } from '../../api/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import { ServiceFormModal } from './ServiceFormModal'
 import '../../components/crud.css'
 
 export function ServicesPage() {
+  const { t } = useT()
   const [refreshKey, setRefreshKey] = useState(0)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingService, setEditingService] = useState<ServiceResponse | null>(null)
@@ -37,7 +39,7 @@ export function ServicesPage() {
   }
 
   const handleDelete = async (id: number, name: string) => {
-    if (!window.confirm(`"${name}" hizmetini silmek istediğinize emin misiniz?`)) return
+    if (!window.confirm(t('services.confirmDelete', { name }))) return
     await deleteService(id)
     refresh()
   }
@@ -45,9 +47,9 @@ export function ServicesPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Hizmetler</h2>
+        <h2>{t('services.title')}</h2>
         <button type="button" className="btn btn--primary" onClick={() => setShowCreateModal(true)}>
-          + Yeni Hizmet
+          + {t('services.addButton')}
         </button>
       </div>
 
@@ -58,9 +60,9 @@ export function ServicesPage() {
         <div className="data-table-wrapper"><table className="data-table">
           <thead>
             <tr>
-              <th>Ad</th>
-              <th>Açıklama</th>
-              <th>Fiyat</th>
+              <th>{t('common.name')}</th>
+              <th>{t('common.description')}</th>
+              <th>{t('common.price')}</th>
               <th></th>
             </tr>
           </thead>
@@ -75,14 +77,14 @@ export function ServicesPage() {
                 <td>
                   <div className="data-table__actions">
                     <button type="button" className="btn btn--small" onClick={() => setEditingService(service)}>
-                      Düzenle
+                      {t('common.edit')}
                     </button>
                     <button
                       type="button"
                       className="btn btn--small btn--danger"
                       onClick={() => handleDelete(service.id, service.name)}
                     >
-                      Sil
+                      {t('common.delete')}
                     </button>
                   </div>
                 </td>
@@ -91,7 +93,7 @@ export function ServicesPage() {
             {services.data.length === 0 && (
               <tr>
                 <td colSpan={4} className="data-table__empty">
-                  Henüz hizmet yok.
+                  {t('services.empty')}
                 </td>
               </tr>
             )}

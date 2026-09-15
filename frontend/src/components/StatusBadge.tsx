@@ -1,17 +1,18 @@
+import { useT } from '../i18n/useT'
 import './StatusBadge.css'
 
 type Tone = 'live' | 'hold' | 'break' | 'pulled'
 
-const CONFIG: Record<string, { label: string; tone: Tone }> = {
-  ACTIVE: { label: 'Aktif', tone: 'live' },
-  CONFIRMED: { label: 'Onaylandı', tone: 'live' },
-  PENDING: { label: 'Bekliyor', tone: 'hold' },
-  REJECTED: { label: 'Reddedildi', tone: 'break' },
-  INACTIVE: { label: 'Pasif', tone: 'hold' },
-  CANCELLED: { label: 'İptal Edildi', tone: 'pulled' },
-  NEW: { label: 'Yeni', tone: 'hold' },
-  IN_PROGRESS: { label: 'İşlemde', tone: 'live' },
-  CLOSED: { label: 'Kapandı', tone: 'pulled' },
+const CONFIG: Record<string, { key: string; tone: Tone }> = {
+  ACTIVE: { key: 'status.active', tone: 'live' },
+  CONFIRMED: { key: 'status.confirmed', tone: 'live' },
+  PENDING: { key: 'status.pending', tone: 'hold' },
+  REJECTED: { key: 'status.rejected', tone: 'break' },
+  INACTIVE: { key: 'status.inactive', tone: 'hold' },
+  CANCELLED: { key: 'status.cancelled', tone: 'pulled' },
+  NEW: { key: 'status.new', tone: 'hold' },
+  IN_PROGRESS: { key: 'status.inProgress', tone: 'live' },
+  CLOSED: { key: 'status.closed', tone: 'pulled' },
 }
 
 function StatusIcon({ tone }: { tone: Tone }) {
@@ -56,11 +57,14 @@ function StatusIcon({ tone }: { tone: Tone }) {
 }
 
 export function StatusBadge({ status }: { status: string }) {
-  const config = CONFIG[status] ?? { label: status, tone: 'hold' as Tone }
+  const { t } = useT()
+  const config = CONFIG[status]
+  const label = config ? t(config.key) : status
+  const tone = config?.tone ?? ('hold' as Tone)
   return (
-    <span className={`status-line status-line--${config.tone}`}>
-      <StatusIcon tone={config.tone} />
-      <span className="status-line__label">{config.label}</span>
+    <span className={`status-line status-line--${tone}`}>
+      <StatusIcon tone={tone} />
+      <span className="status-line__label">{label}</span>
     </span>
   )
 }

@@ -1,4 +1,5 @@
 import { useEffect, useId, useMemo, useRef, useState } from 'react'
+import { useT } from '../i18n/useT'
 import './SearchSelect.css'
 
 export interface SearchSelectProps<T> {
@@ -23,10 +24,11 @@ export function SearchSelect<T>({
   getLabel,
   getMeta,
   getSearchText,
-  placeholder = 'Ara...',
+  placeholder,
   maxResults = 60,
   id,
 }: SearchSelectProps<T>) {
+  const { t } = useT()
   const reactId = useId()
   const listId = `${id ?? reactId}-list`
   const [open, setOpen] = useState(false)
@@ -103,7 +105,7 @@ export function SearchSelect<T>({
           aria-autocomplete="list"
           autoComplete="off"
           className="search-select__input"
-          placeholder={placeholder}
+          placeholder={placeholder ?? t('searchSelect.placeholder')}
           value={displayValue}
           onFocusCapture={() => setOpen(true)}
           onChange={(e) => {
@@ -116,7 +118,7 @@ export function SearchSelect<T>({
           <button
             type="button"
             className="search-select__clear"
-            aria-label="Seçimi temizle"
+            aria-label={t('searchSelect.clear')}
             onClick={() => onChange(null)}
           >
             ×
@@ -126,7 +128,7 @@ export function SearchSelect<T>({
 
       {open && (
         <ul className="search-select__list" id={listId} role="listbox">
-          {results.length === 0 && <li className="search-select__empty">Sonuç yok</li>}
+          {results.length === 0 && <li className="search-select__empty">{t('common.noResults')}</li>}
           {results.map((item, i) => (
             <li
               key={getKey(item)}

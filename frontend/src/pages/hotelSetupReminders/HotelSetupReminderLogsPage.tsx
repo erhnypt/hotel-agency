@@ -8,9 +8,11 @@ import {
 import type { ApiErrorResponse } from '../../auth/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
 export function HotelSetupReminderLogsPage() {
+  const { t, lang } = useT()
   const [refreshKey, setRefreshKey] = useState(0)
   const [busyId, setBusyId] = useState<number | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -30,7 +32,7 @@ export function HotelSetupReminderLogsPage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('Hatırlatma gönderilemedi.')
+        setError(t('setupReminders.sendError'))
       }
     } finally {
       setBusyId(null)
@@ -40,12 +42,12 @@ export function HotelSetupReminderLogsPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Kurulum Hatırlatmaları</h2>
+        <h2>{t('setupReminders.title')}</h2>
       </div>
 
       {error && <p className="form-error">{error}</p>}
 
-      <h3>Kurulumu Tamamlanmamış Oteller</h3>
+      <h3>{t('setupReminders.incompleteHotelsTitle')}</h3>
       {incompleteHotels.loading && <LoadingState />}
       {incompleteHotels.error && <ErrorState message={incompleteHotels.error} />}
       {incompleteHotels.data && (
@@ -53,10 +55,10 @@ export function HotelSetupReminderLogsPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Otel</th>
-                <th>E-posta</th>
-                <th>Onay Tarihi</th>
-                <th>Son Hatırlatma</th>
+                <th>{t('common.hotel')}</th>
+                <th>{t('common.email')}</th>
+                <th>{t('setupReminders.approvalDate')}</th>
+                <th>{t('setupReminders.lastReminder')}</th>
                 <th></th>
               </tr>
             </thead>
@@ -65,10 +67,10 @@ export function HotelSetupReminderLogsPage() {
                 <tr key={hotel.hotelId}>
                   <td>{hotel.hotelName}</td>
                   <td>{hotel.hotelEmail}</td>
-                  <td>{hotel.approvedAt ? new Date(hotel.approvedAt).toLocaleString('tr-TR') : '—'}</td>
+                  <td>{hotel.approvedAt ? new Date(hotel.approvedAt).toLocaleString(lang) : '—'}</td>
                   <td>
                     {hotel.lastReminderSentAt
-                      ? new Date(hotel.lastReminderSentAt).toLocaleString('tr-TR')
+                      ? new Date(hotel.lastReminderSentAt).toLocaleString(lang)
                       : '—'}
                   </td>
                   <td>
@@ -78,7 +80,7 @@ export function HotelSetupReminderLogsPage() {
                       disabled={busyId === hotel.hotelId}
                       onClick={() => handleSend(hotel.hotelId)}
                     >
-                      Hatırlatma Gönder
+                      {t('setupReminders.sendButton')}
                     </button>
                   </td>
                 </tr>
@@ -86,7 +88,7 @@ export function HotelSetupReminderLogsPage() {
               {incompleteHotels.data.length === 0 && (
                 <tr>
                   <td colSpan={5} className="data-table__empty">
-                    Kurulumu tamamlanmamış otel yok.
+                    {t('setupReminders.noIncompleteHotels')}
                   </td>
                 </tr>
               )}
@@ -95,7 +97,7 @@ export function HotelSetupReminderLogsPage() {
         </div>
       )}
 
-      <h3>Gönderim Logları</h3>
+      <h3>{t('setupReminders.logsTitle')}</h3>
       {logs.loading && <LoadingState />}
       {logs.error && <ErrorState message={logs.error} />}
       {logs.data && (
@@ -103,9 +105,9 @@ export function HotelSetupReminderLogsPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Otel</th>
-                <th>Alıcılar</th>
-                <th>Gönderim Zamanı</th>
+                <th>{t('common.hotel')}</th>
+                <th>{t('setupReminders.recipients')}</th>
+                <th>{t('setupReminders.sentAt')}</th>
               </tr>
             </thead>
             <tbody>
@@ -113,13 +115,13 @@ export function HotelSetupReminderLogsPage() {
                 <tr key={log.id}>
                   <td>{log.hotelName}</td>
                   <td>{log.recipients}</td>
-                  <td>{new Date(log.sentAt).toLocaleString('tr-TR')}</td>
+                  <td>{new Date(log.sentAt).toLocaleString(lang)}</td>
                 </tr>
               ))}
               {logs.data.length === 0 && (
                 <tr>
                   <td colSpan={3} className="data-table__empty">
-                    Henüz hatırlatma gönderilmedi.
+                    {t('setupReminders.noLogs')}
                   </td>
                 </tr>
               )}

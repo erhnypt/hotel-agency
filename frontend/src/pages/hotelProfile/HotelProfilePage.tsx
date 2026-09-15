@@ -4,9 +4,11 @@ import { getMyHotel, updateHotel } from '../../api/hotels'
 import type { ApiErrorResponse } from '../../auth/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
 export function HotelProfilePage() {
+  const { t } = useT()
   const hotel = useAsync(getMyHotel, [])
 
   const [name, setName] = useState('')
@@ -62,7 +64,7 @@ export function HotelProfilePage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('Kaydedilemedi. Lütfen tekrar deneyin.')
+        setError(t('hotelProfile.saveError'))
       }
     } finally {
       setSubmitting(false)
@@ -72,53 +74,53 @@ export function HotelProfilePage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Otel Profili</h2>
+        <h2>{t('hotelProfile.title')}</h2>
       </div>
 
       <form onSubmit={handleSubmit} className="form--narrow">
         <label className="form-field">
-          <span>Otel Adı</span>
+          <span>{t('hotelProfile.fieldName')}</span>
           <input value={name} onChange={(e) => setName(e.target.value)} required />
         </label>
         <label className="form-field">
-          <span>Açıklama</span>
+          <span>{t('common.description')}</span>
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
         </label>
         <label className="form-field">
-          <span>Adres</span>
+          <span>{t('hotelProfile.fieldAddress')}</span>
           <input value={address} onChange={(e) => setAddress(e.target.value)} required />
         </label>
         <label className="form-field">
-          <span>Şehir</span>
+          <span>{t('common.city')}</span>
           <input value={city} onChange={(e) => setCity(e.target.value)} required />
         </label>
         <label className="form-field">
-          <span>Ülke</span>
+          <span>{t('common.country')}</span>
           <input value={country} onChange={(e) => setCountry(e.target.value)} required />
         </label>
         <label className="form-field">
-          <span>Telefon</span>
+          <span>{t('common.phone')}</span>
           <input value={phone} onChange={(e) => setPhone(e.target.value)} required />
         </label>
         <label className="form-field">
-          <span>E-posta</span>
+          <span>{t('common.email')}</span>
           <input type="email" value={email} onChange={(e) => setEmail(e.target.value)} required />
         </label>
         <label className="form-field">
-          <span>Web Sitesi</span>
+          <span>{t('hotelProfile.fieldWebsite')}</span>
           <input value={website} onChange={(e) => setWebsite(e.target.value)} />
         </label>
         <label className="form-field">
-          <span>Yetkili Kişi</span>
+          <span>{t('hotelProfile.fieldContactPerson')}</span>
           <input value={contactPerson} onChange={(e) => setContactPerson(e.target.value)} required />
         </label>
 
         {error && <p className="form-error">{error}</p>}
-        {success && <p className="form-success">Kaydedildi.</p>}
+        {success && <p className="form-success">{t('hotelProfile.saveSuccess')}</p>}
 
         <div className="form-actions form-actions--start">
           <button type="submit" className="btn btn--primary" disabled={submitting}>
-            {submitting ? 'Kaydediliyor...' : 'Kaydet'}
+            {submitting ? t('common.saving') : t('common.save')}
           </button>
         </div>
       </form>

@@ -5,9 +5,11 @@ import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
 import { cardLabel } from '../../lib/card'
 import { CustomerFormModal } from './CustomerFormModal'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
 export function CustomersPage() {
+  const { t } = useT()
   const [refreshKey, setRefreshKey] = useState(0)
   const [editingCustomer, setEditingCustomer] = useState<CustomerResponse | null>(null)
   const [showCreateModal, setShowCreateModal] = useState(false)
@@ -32,9 +34,9 @@ export function CustomersPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Müşteriler</h2>
+        <h2>{t('customers.title')}</h2>
         <button type="button" className="btn btn--primary" onClick={() => setShowCreateModal(true)}>
-          + Yeni Müşteri
+          + {t('customers.newCustomer')}
         </button>
       </div>
 
@@ -45,11 +47,11 @@ export function CustomersPage() {
         <div className="data-table-wrapper"><table className="data-table">
           <thead>
             <tr>
-              <th>Ad Soyad</th>
-              <th>Telefon</th>
-              <th>E-posta</th>
-              <th>Uyruk</th>
-              <th>Kart</th>
+              <th>{t('customers.columnFullName')}</th>
+              <th>{t('common.phone')}</th>
+              <th>{t('common.email')}</th>
+              <th>{t('customers.columnNationality')}</th>
+              <th>{t('customers.columnCard')}</th>
               <th></th>
             </tr>
           </thead>
@@ -67,14 +69,14 @@ export function CustomersPage() {
                   {customer.cardNote && (
                     <>
                       <br />
-                      <span className="data-table__muted">CVV: {customer.cardNote}</span>
+                      <span className="data-table__muted">{t('customers.cvvLabel', { value: customer.cardNote })}</span>
                     </>
                   )}
                 </td>
                 <td>
                   <div className="data-table__actions">
                     <button type="button" className="btn btn--small" onClick={() => setEditingCustomer(customer)}>
-                      Düzenle
+                      {t('common.edit')}
                     </button>
                   </div>
                 </td>
@@ -83,7 +85,7 @@ export function CustomersPage() {
             {customers.data.length === 0 && (
               <tr>
                 <td colSpan={6} className="data-table__empty">
-                  Henüz müşteri yok.
+                  {t('customers.emptyState')}
                 </td>
               </tr>
             )}

@@ -3,9 +3,11 @@ import { listCardViewLogs, markCardViewLogsRead } from '../../api/cardViewLogs'
 import { notifyCardViewRead } from '../../hooks/cardViewEvents'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
 export function CardViewLogsPage() {
+  const { t, lang } = useT()
   const logs = useAsync(listCardViewLogs, [])
 
   useEffect(() => {
@@ -19,10 +21,10 @@ export function CardViewLogsPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Kart Görüntüleme Bildirimleri</h2>
+        <h2>{t('cardViewLogs.title')}</h2>
       </div>
       <p className="data-table__muted">
-        Bir otel bir rezervasyonun kart bilgilerini görüntülediğinde burada listelenir.
+        {t('cardViewLogs.subtitle')}
       </p>
 
       {logs.loading && <LoadingState />}
@@ -32,11 +34,11 @@ export function CardViewLogsPage() {
           <table className="data-table">
             <thead>
               <tr>
-                <th>Rezervasyon</th>
-                <th>Otel</th>
-                <th>Müşteri</th>
-                <th>Görüntüleyen</th>
-                <th>Zaman</th>
+                <th>{t('cardViewLogs.columnReservation')}</th>
+                <th>{t('common.hotel')}</th>
+                <th>{t('cardViewLogs.columnCustomer')}</th>
+                <th>{t('cardViewLogs.columnViewedBy')}</th>
+                <th>{t('cardViewLogs.columnTime')}</th>
               </tr>
             </thead>
             <tbody>
@@ -46,13 +48,13 @@ export function CardViewLogsPage() {
                   <td>{log.hotelName}</td>
                   <td>{log.customerName}</td>
                   <td>{log.viewedByName}</td>
-                  <td>{new Date(log.viewedAt).toLocaleString('tr-TR')}</td>
+                  <td>{new Date(log.viewedAt).toLocaleString(lang)}</td>
                 </tr>
               ))}
               {logs.data.length === 0 && (
                 <tr>
                   <td colSpan={5} className="data-table__empty">
-                    Henüz kart görüntüleme kaydı yok.
+                    {t('cardViewLogs.emptyState')}
                   </td>
                 </tr>
               )}

@@ -17,19 +17,20 @@ import { CardDetailsModal } from '../../components/CardDetailsModal'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { StatusBadge } from '../../components/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import { cardLabel } from '../../lib/card'
 import '../../components/crud.css'
 import './ReservationsPage.css'
 
-const STATUS_LABELS: Record<ReservationStatus | 'ALL', string> = {
-  ALL: 'Tümü',
-  PENDING: 'Bekliyor',
-  CONFIRMED: 'Onaylandı',
-  CANCELLED: 'İptal Edildi',
-  REJECTED: 'Reddedildi',
-}
-
 export function ReservationsPage() {
+  const { t, lang } = useT()
+  const STATUS_LABELS: Record<ReservationStatus | 'ALL', string> = {
+    ALL: t('common.all'),
+    PENDING: t('status.pending'),
+    CONFIRMED: t('status.confirmed'),
+    CANCELLED: t('status.cancelled'),
+    REJECTED: t('status.rejected'),
+  }
   const { user } = useAuth()
   const [refreshKey, setRefreshKey] = useState(0)
   const [busyId, setBusyId] = useState<number | null>(null)
@@ -83,7 +84,7 @@ export function ReservationsPage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('İşlem başarısız oldu.')
+        setError(t('reservations.actionFailed'))
       }
     } finally {
       setBusyId(null)
@@ -91,7 +92,7 @@ export function ReservationsPage() {
   }
 
   const handleDelete = (id: number) => {
-    if (!window.confirm('Bu rezervasyonu kalıcı olarak silmek istediğinize emin misiniz? Bu işlem geri alınamaz.')) return
+    if (!window.confirm(t('reservations.deleteConfirm'))) return
     handleAction(id, deleteReservation)
   }
 
@@ -104,7 +105,7 @@ export function ReservationsPage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('Fatura indirilemedi.')
+        setError(t('reservations.invoiceDownloadError'))
       }
     } finally {
       setBusyId(null)
@@ -112,23 +113,25 @@ export function ReservationsPage() {
   }
 
   const emptyMessage =
-    statusFilter === 'ALL' ? 'Bu otelde rezervasyon yok.' : `"${STATUS_LABELS[statusFilter]}" durumunda rezervasyon yok.`
+    statusFilter === 'ALL'
+      ? t('reservations.emptyAll')
+      : t('reservations.emptyForStatus', { status: STATUS_LABELS[statusFilter] })
 
   const renderTable = (items: ReservationResponse[]) => (
     <div className="data-table-wrapper">
       <table className="data-table">
         <thead>
           <tr>
-            <th>No</th>
-            <th>Oda Tipi</th>
-            <th>Müşteri</th>
-            <th>Kart</th>
-            <th>Check-in</th>
-            <th>Check-out</th>
-            <th>Misafir</th>
-            <th>Toplam</th>
-            <th>Durum</th>
-            <th>Ödeme</th>
+            <th>{t('board.colNo')}</th>
+            <th>{t('common.roomType')}</th>
+            <th>{t('reservations.columnCustomer')}</th>
+            <th>{t('reservations.columnCard')}</th>
+            <th>{t('common.checkIn')}</th>
+            <th>{t('common.checkOut')}</th>
+            <th>{t('common.guest')}</th>
+            <th>{t('common.total')}</th>
+            <th>{t('common.status')}</th>
+            <th>{t('reservations.columnPayment')}</th>
             <th></th>
           </tr>
         </thead>
@@ -153,7 +156,7 @@ export function ReservationsPage() {
                           className="btn btn--small"
                           onClick={() => setCardModalReservationId(r.id)}
                         >
-                          Kart Bilgilerini Göster
+                          {t('reservations.showCardDetailsButton')}
                         </button>
                       </>
                     ) : (
@@ -166,13 +169,17 @@ export function ReservationsPage() {
                     {r.customer.cardExpiry && (
                       <>
                         <br />
-                        <span className="data-table__muted">SKT {r.customer.cardExpiry}</span>
+                        <span className="data-table__muted">
+                          {t('reservations.cardExpiryValue', { value: r.customer.cardExpiry })}
+                        </span>
                       </>
                     )}
                     {r.customer.cardNote && (
                       <>
                         <br />
-                        <span className="data-table__muted">CVV: {r.customer.cardNote}</span>
+                        <span className="data-table__muted">
+                          {t('reservations.cardCvvValue', { value: r.customer.cardNote })}
+                        </span>
                       </>
                     )}
                   </>
@@ -190,11 +197,11 @@ export function ReservationsPage() {
               <td>
                 {r.paid ? (
                   <span className="data-table__paid">
-                    Ödendi
+                    {t('reservations.paid')}
                     {r.paidAt && (
                       <>
                         <br />
-                        <span className="data-table__muted">{new Date(r.paidAt).toLocaleDateString('tr-TR')}</span>
+                        <span className="data-table__muted">{new Date(r.paidAt).toLocaleDateString(lang)}</span>
                       </>
                     )}
                   </span>
@@ -211,7 +218,7 @@ export function ReservationsPage() {
                       disabled={busyId === r.id}
                       onClick={() => handleAction(r.id, markReservationPaid)}
                     >
-                      Ödeme Alındı
+                      {t('reservations.markPaidButton')}
                     </button>
                   )}
                   {user?.role === 'HOTEL_ADMIN' && r.paid && (
@@ -221,7 +228,7 @@ export function ReservationsPage() {
                       disabled={busyId === r.id}
                       onClick={() => handleAction(r.id, unmarkReservationPaid)}
                     >
-                      Ödemeyi Geri Al
+                      {t('reservations.unmarkPaidButton')}
                     </button>
                   )}
                   {r.paid && (
@@ -231,7 +238,7 @@ export function ReservationsPage() {
                       disabled={busyId === r.id}
                       onClick={() => handleDownloadInvoice(r)}
                     >
-                      Faturayı İndir
+                      {t('reservations.downloadInvoiceButton')}
                     </button>
                   )}
                   {user?.role === 'HOTEL_ADMIN' && r.status === 'PENDING' && (
@@ -242,7 +249,7 @@ export function ReservationsPage() {
                         disabled={busyId === r.id}
                         onClick={() => handleAction(r.id, confirmReservation)}
                       >
-                        Onayla
+                        {t('common.confirm')}
                       </button>
                       <button
                         type="button"
@@ -250,7 +257,7 @@ export function ReservationsPage() {
                         disabled={busyId === r.id}
                         onClick={() => handleAction(r.id, rejectReservation)}
                       >
-                        Reddet
+                        {t('common.reject')}
                       </button>
                     </>
                   )}
@@ -263,7 +270,7 @@ export function ReservationsPage() {
                         disabled={busyId === r.id}
                         onClick={() => handleAction(r.id, cancelReservation)}
                       >
-                        İptal Et
+                        {t('reservations.cancelButton')}
                       </button>
                     )}
                   {user?.role === 'HOTEL_ADMIN' && (r.status === 'CANCELLED' || r.status === 'REJECTED') && (
@@ -273,7 +280,7 @@ export function ReservationsPage() {
                       disabled={busyId === r.id}
                       onClick={() => handleDelete(r.id)}
                     >
-                      Sil
+                      {t('common.delete')}
                     </button>
                   )}
                 </div>
@@ -295,7 +302,7 @@ export function ReservationsPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Rezervasyonlar</h2>
+        <h2>{t('reservations.title')}</h2>
         <div className="status-filter-bar">
           {(Object.keys(STATUS_LABELS) as Array<ReservationStatus | 'ALL'>).map((s) => (
             <button
@@ -315,12 +322,12 @@ export function ReservationsPage() {
 
       {hotelOptions.length > 1 && (
         <label className="select-field select-field--hotel">
-          <span>Otel</span>
+          <span>{t('common.hotel')}</span>
           <select
             value={hotelFilter}
             onChange={(e) => setHotelFilter(e.target.value === 'ALL' ? 'ALL' : Number(e.target.value))}
           >
-            <option value="ALL">Tüm Oteller ({statusFiltered.length})</option>
+            <option value="ALL">{t('reservations.allHotelsOption', { count: statusFiltered.length })}</option>
             {hotelOptions.map((h) => (
               <option key={h.id} value={h.id}>
                 {h.name} ({statusFiltered.filter((r) => r.hotelId === h.id).length})

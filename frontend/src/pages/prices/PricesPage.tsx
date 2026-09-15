@@ -5,9 +5,11 @@ import { getPrice, setPrice } from '../../api/prices'
 import type { ApiErrorResponse } from '../../auth/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
 export function PricesPage() {
+  const { t } = useT()
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<number | null>(null)
   const [price, setPriceValue] = useState('')
   const [currency, setCurrency] = useState('EUR')
@@ -35,7 +37,7 @@ export function PricesPage() {
         setCurrency(p.currency || 'EUR')
       })
       .catch(() => {
-        if (active) setError('Fiyat yüklenemedi.')
+        if (active) setError(t('prices.fetchError'))
       })
     return () => {
       active = false
@@ -59,7 +61,7 @@ export function PricesPage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('Kaydedilemedi. Lütfen tekrar deneyin.')
+        setError(t('prices.saveError'))
       }
     } finally {
       setSubmitting(false)
@@ -69,20 +71,17 @@ export function PricesPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Fiyatlar</h2>
+        <h2>{t('prices.title')}</h2>
       </div>
 
       {(roomTypes.data?.length ?? 0) === 0 ? (
-        <p className="page-state">Fiyat girmek için önce bir oda tipi oluşturmalısınız.</p>
+        <p className="page-state">{t('prices.emptyRoomTypes')}</p>
       ) : (
         <>
-          <p className="page-state">
-            Her oda tipi için tek bir gecelik fiyat girin. Rezervasyon tutarı bu fiyatın gece
-            sayısıyla çarpımıdır.
-          </p>
+          <p className="page-state">{t('prices.description')}</p>
 
           <label className="select-field">
-            <span>Oda Tipi</span>
+            <span>{t('common.roomType')}</span>
             <select
               value={roomTypeId ?? ''}
               onChange={(e) => {
@@ -100,7 +99,7 @@ export function PricesPage() {
 
           <form onSubmit={handleSubmit} className="inline-form">
             <label className="form-field">
-              <span>Gecelik Fiyat</span>
+              <span>{t('prices.nightlyPriceLabel')}</span>
               <input
                 type="number"
                 min={0}
@@ -114,7 +113,7 @@ export function PricesPage() {
               />
             </label>
             <label className="form-field">
-              <span>Para Birimi</span>
+              <span>{t('common.currency')}</span>
               <select
                 className="form-field__select--tiny"
                 value={currency}
@@ -129,12 +128,12 @@ export function PricesPage() {
               </select>
             </label>
             <button type="submit" className="btn btn--primary" disabled={submitting}>
-              {submitting ? 'Kaydediliyor...' : 'Kaydet'}
+              {submitting ? t('common.saving') : t('common.save')}
             </button>
           </form>
 
           {error && <p className="form-error">{error}</p>}
-          {saved && <p className="form-success">Fiyat kaydedildi.</p>}
+          {saved && <p className="form-success">{t('prices.saved')}</p>}
         </>
       )}
     </div>

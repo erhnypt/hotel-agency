@@ -6,11 +6,13 @@ import type { RoomTypeRequest, RoomTypeResponse } from '../../api/types'
 import type { ApiErrorResponse } from '../../auth/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import { RoomImagesModal } from './RoomImagesModal'
 import { RoomTypeFormModal } from './RoomTypeFormModal'
 import '../../components/crud.css'
 
 export function RoomTypesPage() {
+  const { t } = useT()
   const [refreshKey, setRefreshKey] = useState(0)
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [editingRoomType, setEditingRoomType] = useState<RoomTypeResponse | null>(null)
@@ -45,7 +47,7 @@ export function RoomTypesPage() {
   }
 
   const handleDelete = async (roomType: RoomTypeResponse) => {
-    if (!window.confirm(`"${roomType.name}" oda tipini silmek istediğinize emin misiniz?`)) return
+    if (!window.confirm(t('roomTypes.deleteConfirm', { name: roomType.name }))) return
     setDeleteError(null)
     try {
       await deleteRoomType(roomType.id)
@@ -55,7 +57,7 @@ export function RoomTypesPage() {
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setDeleteError(err.response.data.message)
       } else {
-        setDeleteError('Oda tipi silinemedi. Lütfen tekrar deneyin.')
+        setDeleteError(t('roomTypes.deleteError'))
       }
     }
   }
@@ -63,9 +65,9 @@ export function RoomTypesPage() {
   return (
     <div>
       <div className="page-header">
-        <h2>Oda Tipleri</h2>
+        <h2>{t('roomTypes.title')}</h2>
         <button type="button" className="btn btn--primary" onClick={() => setShowCreateModal(true)}>
-          + Yeni Oda Tipi
+          + {t('roomTypes.newRoomType')}
         </button>
       </div>
 
@@ -77,13 +79,13 @@ export function RoomTypesPage() {
         <div className="data-table-wrapper"><table className="data-table">
           <thead>
             <tr>
-              <th>Ad</th>
-              <th>Kapasite</th>
-              <th>Yatak Tipi</th>
-              <th>Oda Sayısı</th>
-              <th>Gecelik Fiyat</th>
-              <th>m²</th>
-              <th>Görseller</th>
+              <th>{t('common.name')}</th>
+              <th>{t('roomTypes.columnCapacity')}</th>
+              <th>{t('roomTypes.columnBedType')}</th>
+              <th>{t('roomTypes.columnRoomCount')}</th>
+              <th>{t('roomTypes.columnNightlyPrice')}</th>
+              <th>{t('roomTypes.columnSize')}</th>
+              <th>{t('roomTypes.columnImages')}</th>
               <th></th>
             </tr>
           </thead>
@@ -100,20 +102,20 @@ export function RoomTypesPage() {
                 <td>{roomType.roomSize ?? '—'}</td>
                 <td>
                   <button type="button" className="btn btn--small" onClick={() => setImagesRoomType(roomType)}>
-                    {roomType.images.length} görsel
+                    {t('roomTypes.imagesCount', { count: roomType.images.length })}
                   </button>
                 </td>
                 <td>
                   <div className="data-table__actions">
                     <button type="button" className="btn btn--small" onClick={() => setEditingRoomType(roomType)}>
-                      Düzenle
+                      {t('common.edit')}
                     </button>
                     <button
                       type="button"
                       className="btn btn--small btn--danger"
                       onClick={() => handleDelete(roomType)}
                     >
-                      Sil
+                      {t('common.delete')}
                     </button>
                   </div>
                 </td>
@@ -122,7 +124,7 @@ export function RoomTypesPage() {
             {roomTypes.data.length === 0 && (
               <tr>
                 <td colSpan={8} className="data-table__empty">
-                  Henüz oda tipi yok.
+                  {t('roomTypes.empty')}
                 </td>
               </tr>
             )}

@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react'
 import { MAX_ROOM_IMAGES } from '../api/types'
 import { compressImageToDataUrl } from '../utils/compressImage'
+import { useT } from '../i18n/useT'
 import './ImageUploadField.css'
 
 export interface ImageUploadItem {
@@ -19,6 +20,7 @@ export function ImageUploadField({
   onAdd: (dataUrl: string) => void | Promise<void>
   onRemove: (key: string) => void | Promise<void>
 }) {
+  const { t } = useT()
   const inputRef = useRef<HTMLInputElement>(null)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -36,7 +38,7 @@ export function ImageUploadField({
         await onAdd(dataUrl)
       }
     } catch {
-      setError('Fotoğraf eklenemedi. Lütfen tekrar deneyin.')
+      setError(t('imageUpload.error'))
     } finally {
       setBusy(false)
       if (inputRef.current) inputRef.current.value = ''
@@ -53,7 +55,7 @@ export function ImageUploadField({
               type="button"
               className="image-upload-field__remove"
               onClick={() => onRemove(image.key)}
-              aria-label="Kaldır"
+              aria-label={t('imageUpload.remove')}
             >
               ×
             </button>
@@ -67,7 +69,7 @@ export function ImageUploadField({
             onClick={() => inputRef.current?.click()}
             disabled={busy}
           >
-            {busy ? '...' : '+ Fotoğraf'}
+            {busy ? '...' : t('imageUpload.add')}
           </button>
         )}
       </div>
@@ -82,7 +84,8 @@ export function ImageUploadField({
       />
 
       <p className="image-upload-field__hint">
-        {images.length}/{maxImages} fotoğraf {remainingSlots === 0 && '— limit doldu'}
+        {t('imageUpload.count', { count: images.length, max: maxImages })}{' '}
+        {remainingSlots === 0 && t('imageUpload.limitReached')}
       </p>
 
       {error && <p className="form-error">{error}</p>}

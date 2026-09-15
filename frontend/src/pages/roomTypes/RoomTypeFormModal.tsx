@@ -4,6 +4,7 @@ import type { ApiErrorResponse } from '../../auth/types'
 import { Modal } from '../../components/Modal'
 import { ImageUploadField } from '../../components/ImageUploadField'
 import type { RoomTypeRequest, RoomTypeResponse } from '../../api/types'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
 export function RoomTypeFormModal({
@@ -15,6 +16,7 @@ export function RoomTypeFormModal({
   onClose: () => void
   onSave: (request: RoomTypeRequest, imageDataUrls?: string[]) => Promise<void>
 }) {
+  const { t } = useT()
   const [name, setName] = useState(roomType?.name ?? '')
   const [description, setDescription] = useState(roomType?.description ?? '')
   const [capacity, setCapacity] = useState(String(roomType?.capacity ?? 2))
@@ -45,7 +47,7 @@ export function RoomTypeFormModal({
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('Kaydedilemedi. Lütfen tekrar deneyin.')
+        setError(t('roomTypeForm.saveError'))
       }
     } finally {
       setSubmitting(false)
@@ -53,22 +55,22 @@ export function RoomTypeFormModal({
   }
 
   return (
-    <Modal title={roomType ? 'Oda Tipini Düzenle' : 'Yeni Oda Tipi'} onClose={onClose}>
+    <Modal title={roomType ? t('roomTypeForm.editTitle') : t('roomTypeForm.createTitle')} onClose={onClose}>
       <form onSubmit={handleSubmit}>
         <label className="form-field">
-          <span>Ad</span>
+          <span>{t('common.name')}</span>
           <input value={name} onChange={(e) => setName(e.target.value)} required autoFocus />
         </label>
         <label className="form-field">
-          <span>Açıklama</span>
+          <span>{t('common.description')}</span>
           <textarea value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
         </label>
         <label className="form-field">
-          <span>Kapasite</span>
+          <span>{t('roomTypes.columnCapacity')}</span>
           <input type="number" min={1} value={capacity} onChange={(e) => setCapacity(e.target.value)} required />
         </label>
         <label className="form-field">
-          <span>Oda Sayısı</span>
+          <span>{t('roomTypes.columnRoomCount')}</span>
           <input
             type="number"
             min={1}
@@ -78,17 +80,22 @@ export function RoomTypeFormModal({
           />
         </label>
         <label className="form-field">
-          <span>Yatak Tipi</span>
-          <input value={bedType} onChange={(e) => setBedType(e.target.value)} required placeholder="ör. King Bed" />
+          <span>{t('roomTypes.columnBedType')}</span>
+          <input
+            value={bedType}
+            onChange={(e) => setBedType(e.target.value)}
+            required
+            placeholder={t('roomTypeForm.bedTypePlaceholder')}
+          />
         </label>
         <label className="form-field">
-          <span>Oda Büyüklüğü (m²)</span>
+          <span>{t('roomTypeForm.roomSizeLabel')}</span>
           <input type="number" min={0} step="0.1" value={roomSize} onChange={(e) => setRoomSize(e.target.value)} />
         </label>
 
         {!roomType && (
           <label className="form-field">
-            <span>Fotoğraflar</span>
+            <span>{t('roomTypeForm.photosLabel')}</span>
             <ImageUploadField
               images={stagedImages}
               onAdd={(dataUrl) =>
@@ -103,10 +110,10 @@ export function RoomTypeFormModal({
 
         <div className="form-actions">
           <button type="button" className="btn" onClick={onClose}>
-            Vazgeç
+            {t('common.cancel')}
           </button>
           <button type="submit" className="btn btn--primary" disabled={submitting}>
-            {submitting ? 'Kaydediliyor...' : 'Kaydet'}
+            {submitting ? t('common.saving') : t('common.save')}
           </button>
         </div>
       </form>

@@ -3,9 +3,11 @@ import { listReservations } from '../../api/reservations'
 import { BoardSection, BoardStrip, ReservationMiniTable } from '../../components/Board'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
+import { useT } from '../../i18n/useT'
 import './HotelAdminDashboard.css'
 
 export function HotelAdminDashboard() {
+  const { t } = useT()
   const hotel = useAsync(getMyHotel, [])
   const roomTypes = useAsync(
     () => (hotel.data ? listRoomTypes(hotel.data.id) : Promise.resolve([])),
@@ -36,11 +38,11 @@ export function HotelAdminDashboard() {
 
       <BoardStrip
         items={[
-          { label: 'Oda Tipi', value: roomTypeList.length, to: '/hotel/rooms' },
-          { label: 'Toplam Oda', value: totalRooms, to: '/hotel/rooms' },
-          { label: 'Onay Bekliyor', value: pending.length, to: '/hotel/reservations' },
+          { label: t('common.roomType'), value: roomTypeList.length, to: '/hotel/rooms' },
+          { label: t('dashboard.totalRooms'), value: totalRooms, to: '/hotel/rooms' },
+          { label: t('dashboard.pendingApproval'), value: pending.length, to: '/hotel/reservations' },
           {
-            label: 'Onaylandı',
+            label: t('status.confirmed'),
             value: list.filter((r) => r.status === 'CONFIRMED').length,
             to: '/hotel/reservations',
           },
@@ -48,25 +50,29 @@ export function HotelAdminDashboard() {
       />
 
       {pending.length > 0 && (
-        <BoardSection title="Onay Bekleyen Rezervasyonlar" count={pending.length}>
+        <BoardSection title={t('dashboard.reservationsAwaitingApproval')} count={pending.length}>
           <ReservationMiniTable items={pending} showHotel={false} emptyLabel="" />
         </BoardSection>
       )}
 
-      <BoardSection title="Bugün Giriş" count={checkingInToday.length}>
-        <ReservationMiniTable items={checkingInToday} showHotel={false} emptyLabel="Bugün giriş yapacak rezervasyon yok." />
-      </BoardSection>
-
-      <BoardSection title="Bugün Çıkış" count={checkingOutToday.length}>
+      <BoardSection title={t('dashboard.checkingInToday')} count={checkingInToday.length}>
         <ReservationMiniTable
-          items={checkingOutToday}
+          items={checkingInToday}
           showHotel={false}
-          emptyLabel="Bugün çıkış yapacak rezervasyon yok."
+          emptyLabel={t('dashboard.noCheckInsToday')}
         />
       </BoardSection>
 
-      <BoardSection title="Önümüzdeki 7 Gün" count={upcoming.length}>
-        <ReservationMiniTable items={upcoming} showHotel={false} emptyLabel="Önümüzdeki 7 günde giriş yok." />
+      <BoardSection title={t('dashboard.checkingOutToday')} count={checkingOutToday.length}>
+        <ReservationMiniTable
+          items={checkingOutToday}
+          showHotel={false}
+          emptyLabel={t('dashboard.noCheckOutsToday')}
+        />
+      </BoardSection>
+
+      <BoardSection title={t('dashboard.next7Days')} count={upcoming.length}>
+        <ReservationMiniTable items={upcoming} showHotel={false} emptyLabel={t('dashboard.noUpcomingCheckIns')} />
       </BoardSection>
     </div>
   )

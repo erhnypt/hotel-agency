@@ -5,6 +5,7 @@ import type { ApiErrorResponse } from '../../auth/types'
 import { Modal } from '../../components/Modal'
 import { ImageUploadField } from '../../components/ImageUploadField'
 import type { RoomTypeResponse } from '../../api/types'
+import { useT } from '../../i18n/useT'
 import '../../components/crud.css'
 
 export function RoomImagesModal({
@@ -16,6 +17,7 @@ export function RoomImagesModal({
   onClose: () => void
   onChanged: () => void
 }) {
+  const { t } = useT()
   const [error, setError] = useState<string | null>(null)
 
   const handleAdd = async (dataUrl: string) => {
@@ -27,7 +29,7 @@ export function RoomImagesModal({
       if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
         setError(err.response.data.message)
       } else {
-        setError('Görsel eklenemedi.')
+        setError(t('roomImages.addError'))
       }
       throw err
     }
@@ -39,7 +41,7 @@ export function RoomImagesModal({
   }
 
   return (
-    <Modal title={`${roomType.name} — Görseller`} onClose={onClose}>
+    <Modal title={`${roomType.name} — ${t('hotelRoomImages.title')}`} onClose={onClose}>
       <ImageUploadField
         images={roomType.images.map((image) => ({ key: String(image.id), url: image.imageUrl }))}
         onAdd={handleAdd}
