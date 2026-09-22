@@ -10,8 +10,8 @@
 
 .lp-page__head {
   margin-bottom: clamp(28px, 5vw, 44px);
-  padding-bottom: 22px;
-  border-bottom: 2px solid var(--l-sun);
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--border);
 }
 
 .lp-page__head h1 {
@@ -64,18 +64,18 @@
 }
 
 .lp-prose li::marker {
-  color: var(--l-coral);
+  color: var(--signal);
 }
 
 .lp-prose a {
-  color: var(--l-teal-deep);
+  color: var(--signal);
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 2px;
 }
 
 .lp-prose a:hover {
-  color: var(--l-coral);
+  color: var(--signal-hover);
 }
 
 .lp-prose address {
@@ -84,6 +84,14 @@
   flex-direction: column;
   gap: 2px;
   color: var(--text-h);
+}
+
+.lp-prose hr {
+  margin: 2.4em 0;
+  height: 0;
+  border: none;
+  border-top: 1px solid var(--border);
+  max-width: 64ch;
 }
 
 /* contact */
@@ -164,7 +172,7 @@
   content: '+';
   font-size: 1.2rem;
   font-weight: 400;
-  color: var(--l-coral);
+  color: var(--signal);
   transition: transform 0.18s ease;
 }
 

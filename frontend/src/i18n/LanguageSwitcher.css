@@ -39,15 +39,15 @@
 
 /* light context (landing/public header) */
 .lang-switcher--light {
-  border: 1.5px solid var(--l-teal-deep, #0a8b8f);
-  background: var(--l-teal-tint, #e3f6f6);
-  color: var(--l-teal-deep, #0a8b8f);
-  box-shadow: 0 6px 16px -10px rgba(43, 36, 28, 0.3);
+  border: 1.5px solid var(--signal, #2456e8);
+  background: var(--signal-bg, #eef2ff);
+  color: var(--signal, #2456e8);
+  box-shadow: 0 6px 16px -10px rgba(15, 28, 46, 0.2);
 }
 
 .lang-switcher--light:hover {
-  background: var(--l-teal, #10b3b8);
-  border-color: var(--l-teal, #10b3b8);
+  background: var(--signal, #2456e8);
+  border-color: var(--signal, #2456e8);
   color: #fff;
   transform: translateY(-1px);
 }

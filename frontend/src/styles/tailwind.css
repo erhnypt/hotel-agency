@@ -10,7 +10,7 @@
 @import 'tailwindcss/utilities.css' layer(utilities);
 
 /*
-  shadcn's semantic color tokens, mapped onto the landing page's own "Rota"
+  shadcn's semantic color tokens, mapped onto the landing page's own blue
   palette (defined on `.lp` in LandingPage.css) so shadcn primitives render
   on-brand instead of the library's generic indigo defaults. Falls back to
   a neutral palette outside `.lp` so these primitives stay usable elsewhere.
@@ -26,9 +26,9 @@
 
   --color-primary: var(--signal, #18181b);
   --color-primary-foreground: var(--signal-ink, #fafafa);
-  --color-secondary: var(--l-teal-tint, #f4f4f5);
+  --color-secondary: var(--bg-panel-2, #f4f4f5);
   --color-secondary-foreground: var(--text-h, #18181b);
-  --color-accent: var(--l-teal-tint, #f4f4f5);
+  --color-accent: var(--signal-bg, #f4f4f5);
   --color-accent-foreground: var(--text-h, #18181b);
   --color-muted: var(--bg-panel-2, #f4f4f5);
   --color-muted-foreground: var(--text-dim, #71717a);
@@ -40,7 +40,7 @@
   Custom properties inherit their *resolved* value, not their `var(...)`
   text — so the mapping above, only ever set at :root, would freeze to
   :root's own --signal (the app shell's teal) for every descendant, even
-  inside `.lp` where --signal is redeclared coral. Re-declaring the same
+  inside `.lp` where --signal is redeclared blue. Re-declaring the same
   tokens here, scoped to `.lp`, makes them resolve `.lp`'s own palette
   instead.
 */
@@ -55,9 +55,9 @@
 
   --color-primary: var(--signal);
   --color-primary-foreground: var(--signal-ink);
-  --color-secondary: var(--l-teal-tint);
+  --color-secondary: var(--bg-panel-2);
   --color-secondary-foreground: var(--text-h);
-  --color-accent: var(--l-teal-tint);
+  --color-accent: var(--signal-bg);
   --color-accent-foreground: var(--text-h);
   --color-muted: var(--bg-panel-2);
   --color-muted-foreground: var(--text-dim);

@@ -7,7 +7,7 @@ import type { ApiErrorResponse } from '../../auth/types'
 import { roleHomePath } from '../../auth/roleHome'
 import { useAuth } from '../../auth/useAuth'
 import { SearchSelect } from '../../components/SearchSelect'
-import { TicketCard } from '../../components/TicketCard'
+import { PlaceCard } from '../../components/ui/card-22'
 import { useT } from '../../i18n/useT'
 import { PublicFooter, PublicHeader } from '../public/PublicChrome'
 import { loadCatalog, loadRealHotels, mergeRealHotels, type CatalogHotel, type HotelCatalog } from '../../data/catalog'
@@ -36,9 +36,8 @@ const hotelType = (n: number | null) => (n ? `${n}★` : 'Hotel')
 const UNSPLASH = (id: string, w: number) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=72`
 
-/** The postcard tucked into the hero envelope. */
-const ENVELOPE_PHOTO = UNSPLASH('1502602898657-3e91760cbb34', 480)
-const ENVELOPE_CITY = 'Paris'
+/** The hero's full-bleed destination photograph. */
+const HERO_PHOTO = UNSPLASH('1502602898657-3e91760cbb34', 1100)
 
 const DEST_PHOTOS: Record<string, string> = {
   'Londra': '1513635269975-59663e0ac1ad',
@@ -119,6 +118,7 @@ export function LandingPage() {
   const [reference, setReference] = useState<number | null>(null)
 
   const searchRef = useRef<HTMLDivElement>(null)
+  const trustRef = useRef<HTMLElement>(null)
 
   useEffect(() => {
     loadCatalog()
@@ -153,14 +153,16 @@ export function LandingPage() {
     })
   }, [catalog])
 
-  /** A photogenic slice of the catalog for the PlaceCard showcase — only
-   *  hotels in a city we have a photo for, highest star rating first. */
+  /** A photogenic slice of the catalog for the featured-hotels showcase —
+   *  only hotels in a city we have a photo for, highest star rating first. */
   const featured = useMemo(() => {
     return [...items]
       .filter((h) => cityImg(h.city))
       .sort((a, b) => (b.stars ?? 0) - (a.stars ?? 0))
       .slice(0, 6)
   }, [items])
+
+  const topFeatured = featured[0] ?? null
 
   if (isAuthenticated && user) {
     return <Navigate to={roleHomePath(user.role)} replace />
@@ -177,6 +179,10 @@ export function LandingPage() {
 
   const focusSearch = () => {
     searchRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+
+  const scrollToTrust = () => {
+    trustRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
   }
 
   const pickCity = (city: string) => {
@@ -316,53 +322,57 @@ export function LandingPage() {
                 ? t('landing.heroLede', { count: catalog.count.toLocaleString(lang) })
                 : t('landing.heroLedeNoCount')}
             </p>
+
+            <div className="lp-hero__cta">
+              <button type="button" className="lp-btn" onClick={focusSearch}>
+                {t('landing.searchTitle')}
+              </button>
+              <button type="button" className="lp-btn lp-btn--ghost" onClick={scrollToTrust}>
+                {t('landing.trustHeading')}
+              </button>
+            </div>
+
+            {catalog && (
+              <dl className="lp-stats">
+                <div className="lp-stats__item">
+                  <dt>{catalog.count.toLocaleString(lang)}</dt>
+                  <dd>{t('landing.hotelFallbackLabel')}</dd>
+                </div>
+                <div className="lp-stats__item">
+                  <dt>{catalog.cities.length.toLocaleString(lang)}</dt>
+                  <dd>{t('common.city')}</dd>
+                </div>
+              </dl>
+            )}
           </div>
 
           <div className="lp-hero__scene" aria-hidden="true">
-            <div className="lp-envelope">
-              <span className="lp-envelope__flap" />
-              <span className="lp-envelope__photo">
-                <img src={ENVELOPE_PHOTO} alt="" loading="lazy" />
-              </span>
-              <span className="lp-envelope__address">
-                <span className="lp-envelope__addr-label">{t('landing.envelopeTo')}</span>
-                <span className="lp-envelope__addr-city">{ENVELOPE_CITY}</span>
-              </span>
-              <span className="lp-envelope__postmark">
-                <svg viewBox="0 0 96 96" fill="none">
-                  <circle cx="48" cy="48" r="43" stroke="var(--l-navy)" strokeWidth="1.2" strokeDasharray="2 4.5" />
-                  <circle cx="48" cy="48" r="35" stroke="var(--l-navy)" strokeWidth="1" />
-                  <path
-                    d="M31 53 43 41 51 48 66 32"
-                    stroke="var(--l-coral)"
-                    strokeWidth="2.4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <text
-                    x="48"
-                    y="26"
-                    textAnchor="middle"
-                    fontFamily="var(--mono)"
-                    fontSize="6.5"
-                    letterSpacing="2"
-                    fill="var(--text-dim)"
-                  >
-                    PAR AVION
-                  </text>
-                  <text
-                    x="48"
-                    y="68"
-                    textAnchor="middle"
-                    fontFamily="var(--mono)"
-                    fontSize="7.5"
-                    fontWeight="700"
-                    letterSpacing="1"
-                    fill="var(--l-navy)"
-                  >
-                    {ENVELOPE_CITY.toUpperCase()}
-                  </text>
+            <div className="lp-hero__photo">
+              <img src={HERO_PHOTO} alt="" loading="lazy" />
+            </div>
+
+            {topFeatured && (
+              <button type="button" className="lp-hero__card lp-hero__card--hotel" onClick={() => pickHotel(topFeatured)}>
+                {cityImg(topFeatured.city) && <img src={cityImg(topFeatured.city)!} alt="" loading="lazy" />}
+                <span className="lp-hero__card-body">
+                  <strong>{topFeatured.name}</strong>
+                  <span>{topFeatured.city}, {topFeatured.country}</span>
+                  <span className="lp-hero__card-price">
+                    {fromPrice(topFeatured.priceFrom, topFeatured.currency ?? catalog?.currency ?? 'EUR')}
+                  </span>
+                </span>
+              </button>
+            )}
+
+            <div className="lp-hero__card lp-hero__card--trust">
+              <span className="lp-hero__card-check" aria-hidden="true">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M4 12.5 9.5 18 20 6" />
                 </svg>
+              </span>
+              <span className="lp-hero__card-body">
+                <strong>{t('landing.trust2Title')}</strong>
+                <span>{t('landing.trust2Body')}</span>
               </span>
             </div>
           </div>
@@ -612,17 +622,18 @@ export function LandingPage() {
       {featured.length > 0 && (
         <section className="lp-dest">
           <h2 className="lp-dest__title">{t('landing.featuredTitle')}</h2>
-          <div className="lp-ticket-grid">
+          <div className="lp-cards-grid">
             {featured.map((h) => (
-              <TicketCard
+              <PlaceCard
                 key={h.id}
-                image={cityImg(h.city)}
-                city={h.city}
-                country={h.country}
+                images={[cityImg(h.city) ?? ''].filter(Boolean)}
+                tags={[h.city]}
+                rating={h.stars ?? undefined}
                 title={h.name}
-                stars={h.stars}
+                dateRange={h.city}
+                hostType={h.country}
                 isTopRated={(h.stars ?? 0) >= 5}
-                note={t('landing.featuredNote')}
+                description={t('landing.featuredNote')}
                 priceLabel={fromPrice(h.priceFrom, h.currency ?? catalog?.currency ?? 'EUR')}
                 ctaLabel={t('landing.viewHotel')}
                 topRatedLabel={t('landing.topRated')}
@@ -633,7 +644,7 @@ export function LandingPage() {
         </section>
       )}
 
-      <section className="lp-trust">
+      <section className="lp-trust" ref={trustRef}>
         <div className="lp-trust__lead">
           <h2>{t('landing.trustHeading')}</h2>
           <p>{t('landing.trustLede')}</p>
@@ -641,24 +652,24 @@ export function LandingPage() {
         <ul className="lp-trust__list">
           {TRUST.map((item) => (
             <li key={item.key} className="lp-trust__item">
-              <svg
-                className="lp-trust__icon"
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                {item.icon}
-              </svg>
-              <div>
-                <strong>{t(`landing.trust${item.key}Title`)}</strong>
-                <span>{t(`landing.trust${item.key}Body`)}</span>
-              </div>
+              <span className="lp-trust__icon-wrap">
+                <svg
+                  className="lp-trust__icon"
+                  width="22"
+                  height="22"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  {item.icon}
+                </svg>
+              </span>
+              <strong>{t(`landing.trust${item.key}Title`)}</strong>
+              <span>{t(`landing.trust${item.key}Body`)}</span>
             </li>
           ))}
         </ul>
