@@ -7,7 +7,7 @@ import type { ApiErrorResponse } from '../../auth/types'
 import { roleHomePath } from '../../auth/roleHome'
 import { useAuth } from '../../auth/useAuth'
 import { SearchSelect } from '../../components/SearchSelect'
-import { PlaceCard } from '../../components/ui/card-22'
+import { TicketCard } from '../../components/TicketCard'
 import { useT } from '../../i18n/useT'
 import { PublicFooter, PublicHeader } from '../public/PublicChrome'
 import { loadCatalog, loadRealHotels, mergeRealHotels, type CatalogHotel, type HotelCatalog } from '../../data/catalog'
@@ -36,18 +36,15 @@ const hotelType = (n: number | null) => (n ? `${n}★` : 'Hotel')
 const UNSPLASH = (id: string, w: number) =>
   `https://images.unsplash.com/photo-${id}?auto=format&fit=crop&w=${w}&q=72`
 
-/** Two featured stops shown as postal stamps on the hero's route illustration. */
-const HERO_ROUTE_STOPS = [
-  { key: 'a', city: 'İstanbul' },
-  { key: 'b', city: 'Roma' },
-]
+/** The postcard tucked into the hero envelope. */
+const ENVELOPE_PHOTO = UNSPLASH('1502602898657-3e91760cbb34', 480)
+const ENVELOPE_CITY = 'Paris'
 
 const DEST_PHOTOS: Record<string, string> = {
-  'İstanbul': '1541432901042-2d8bd64b4a9b',
   'Londra': '1513635269975-59663e0ac1ad',
   'Paris': '1502602898657-3e91760cbb34',
   'Roma': '1552832230-c0197dd311b5',
-  'Barselona': '1509840841025-9088ba78a826',
+  'Barselona': '1523531294919-4bcd7c65e216',
   'Amsterdam': '1534351590666-13e3e96b5017',
   'Dublin': '1549918864-48ac978761a4',
   'Madrid': '1539037116277-4db20889f2d4',
@@ -56,13 +53,12 @@ const DEST_PHOTOS: Record<string, string> = {
   'Lizbon': '1585208798174-6cedd86e019a',
   'Porto': '1555881400-74d7acaacd8b',
   'Prag': '1541849546-216549ae216d',
-  'Budapeşte': '1518604666860-9ed391f76460',
+  'Budapeşte': '1616432902940-b7a1acbc60b3',
   'Atina': '1555993539-1732b0258235',
   'Milano': '1520440229-6469a149ac59',
   'Venedik': '1514890547357-a9ee288728e0',
   'Floransa': '1541370976299-4d24ebbc9077',
   'Münih': '1595867818082-083862f3d630',
-  'Antalya': '1589308078059-be1415eab4c3',
   'Dubai': '1512453979798-5ea266f8880c',
   'New York': '1496442226666-8d4d0e62e6e9',
   'Bangkok': '1508009603885-50cf7c579365',
@@ -323,26 +319,52 @@ export function LandingPage() {
           </div>
 
           <div className="lp-hero__scene" aria-hidden="true">
-            <span className="lp-hero__blob lp-hero__blob--sun" />
-            <span className="lp-hero__blob lp-hero__blob--teal" />
-            <svg className="lp-hero__route" viewBox="0 0 440 420" preserveAspectRatio="xMidYMid meet">
-              <circle cx="90" cy="300" r="4" fill="var(--l-coral)" />
-              <circle cx="360" cy="150" r="4" fill="var(--l-teal-deep)" />
-              <path
-                className="lp-hero__route-line"
-                d="M90 300 C 150 220, 170 180, 230 130 C 280 170, 310 190, 360 150"
-                fill="none"
-                stroke="var(--l-navy)"
-                strokeWidth="1.6"
-                strokeDasharray="6 8"
-              />
-            </svg>
-            {HERO_ROUTE_STOPS.map((stop) => (
-              <span key={stop.key} className={`lp-hero__stamp lp-hero__stamp--${stop.key}`}>
-                <span className="lp-hero__stamp-city">{stop.city}</span>
-                <span className="lp-hero__stamp-brand">TRAVEL SITES</span>
+            <div className="lp-envelope">
+              <span className="lp-envelope__flap" />
+              <span className="lp-envelope__photo">
+                <img src={ENVELOPE_PHOTO} alt="" loading="lazy" />
               </span>
-            ))}
+              <span className="lp-envelope__address">
+                <span className="lp-envelope__addr-label">{t('landing.envelopeTo')}</span>
+                <span className="lp-envelope__addr-city">{ENVELOPE_CITY}</span>
+              </span>
+              <span className="lp-envelope__postmark">
+                <svg viewBox="0 0 96 96" fill="none">
+                  <circle cx="48" cy="48" r="43" stroke="var(--l-navy)" strokeWidth="1.2" strokeDasharray="2 4.5" />
+                  <circle cx="48" cy="48" r="35" stroke="var(--l-navy)" strokeWidth="1" />
+                  <path
+                    d="M31 53 43 41 51 48 66 32"
+                    stroke="var(--l-coral)"
+                    strokeWidth="2.4"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <text
+                    x="48"
+                    y="26"
+                    textAnchor="middle"
+                    fontFamily="var(--mono)"
+                    fontSize="6.5"
+                    letterSpacing="2"
+                    fill="var(--text-dim)"
+                  >
+                    PAR AVION
+                  </text>
+                  <text
+                    x="48"
+                    y="68"
+                    textAnchor="middle"
+                    fontFamily="var(--mono)"
+                    fontSize="7.5"
+                    fontWeight="700"
+                    letterSpacing="1"
+                    fill="var(--l-navy)"
+                  >
+                    {ENVELOPE_CITY.toUpperCase()}
+                  </text>
+                </svg>
+              </span>
+            </div>
           </div>
         </div>
 
@@ -590,28 +612,23 @@ export function LandingPage() {
       {featured.length > 0 && (
         <section className="lp-dest">
           <h2 className="lp-dest__title">{t('landing.featuredTitle')}</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {featured.map((h) => {
-              const img = cityImg(h.city)
-              return (
-                <PlaceCard
-                  key={h.id}
-                  className="max-w-none"
-                  images={img ? [img] : []}
-                  tags={[h.city, h.country]}
-                  rating={h.stars ?? undefined}
-                  title={h.name}
-                  dateRange={`${h.city}, ${h.country}`}
-                  hostType={h.stars ? `${h.stars}★` : t('landing.hotelFallbackLabel')}
-                  isTopRated={(h.stars ?? 0) >= 5}
-                  description={t('landing.featuredNote')}
-                  priceLabel={fromPrice(h.priceFrom, h.currency ?? catalog?.currency ?? 'EUR')}
-                  ctaLabel={t('landing.viewHotel')}
-                  topRatedLabel={t('landing.topRated')}
-                  onBook={() => pickHotel(h)}
-                />
-              )
-            })}
+          <div className="lp-ticket-grid">
+            {featured.map((h) => (
+              <TicketCard
+                key={h.id}
+                image={cityImg(h.city)}
+                city={h.city}
+                country={h.country}
+                title={h.name}
+                stars={h.stars}
+                isTopRated={(h.stars ?? 0) >= 5}
+                note={t('landing.featuredNote')}
+                priceLabel={fromPrice(h.priceFrom, h.currency ?? catalog?.currency ?? 'EUR')}
+                ctaLabel={t('landing.viewHotel')}
+                topRatedLabel={t('landing.topRated')}
+                onBook={() => pickHotel(h)}
+              />
+            ))}
           </div>
         </section>
       )}
