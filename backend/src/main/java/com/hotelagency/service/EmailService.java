@@ -43,79 +43,80 @@ public class EmailService {
     @Async
     public void sendHotelRegistrationEmail(String toEmail, String hotelName) {
         String body = wrapCorporateTemplate(
-                "Başvurunuz Alındı",
+                "Application Received",
                 """
-                <p>Merhaba,</p>
-                <p><strong>%s</strong> için otel kaydınız başarıyla alınmıştır.</p>
-                <p>Başvurunuz şu anda acente ekibimiz tarafından incelenmektedir. İnceleme tamamlandığında
-                onay durumu hakkında size ayrıca bilgilendirme e-postası gönderilecektir.</p>
-                <p>Onay sürecinin ardından, kayıt sırasında belirlediğiniz e-posta ve şifre ile otel yönetim
-                panelinize giriş yaparak oda tipleri, fiyatlar ve müsaitlik bilgilerinizi girebileceksiniz.</p>
+                <p>Hello,</p>
+                <p>Your hotel registration for <strong>%s</strong> has been received successfully.</p>
+                <p>Your application is currently being reviewed by our agency team. You will receive a
+                separate notification email once the review has been completed.</p>
+                <p>After approval, you will be able to log in to the hotel management panel using the email
+                address and password you set during registration to enter your room types, rates, and
+                availability.</p>
                 """.formatted(escape(hotelName)),
                 null);
-        send(toEmail, "Otel Kaydı - Başvurunuz İnceleniyor", body, "registration");
+        send(toEmail, "Hotel Registration - Your Application Is Under Review", body, "registration");
     }
 
     @Async
     public void sendHotelApprovalEmail(String toEmail, String hotelName) {
         String body = wrapCorporateTemplate(
-                "Başvurunuz Onaylandı",
+                "Your Application Has Been Approved",
                 """
-                <p>Merhaba,</p>
-                <p><strong>%s</strong> için yapmış olduğunuz otel kaydı acentemiz tarafından onaylanmıştır.</p>
-                <p>Artık kayıt sırasında belirlediğiniz e-posta adresi ve şifre ile otel yönetim panelinize
-                giriş yapabilir; oda tiplerinizi, fiyatlarınızı, müsaitlik takviminizi ve sunduğunuz hizmetleri
-                girebilirsiniz.</p>
+                <p>Hello,</p>
+                <p>Your hotel registration for <strong>%s</strong> has been approved by our agency.</p>
+                <p>You can now log in to the hotel management panel using the email address and password
+                you set during registration to enter your room types, rates, availability calendar, and the
+                services you offer.</p>
                 """.formatted(escape(hotelName)),
-                new CallToAction("Panele Giriş Yap", frontendUrl + "/login"));
-        send(toEmail, "Otel Kaydı - Başvurunuz Onaylandı", body, "approval");
+                new CallToAction("Log In to Panel", frontendUrl + "/login"));
+        send(toEmail, "Hotel Registration - Your Application Has Been Approved", body, "approval");
     }
 
     @Async
     public void sendPasswordResetEmail(String toEmail, String resetLink) {
         String body = wrapCorporateTemplate(
-                "Şifre Sıfırlama Talebi",
+                "Password Reset Request",
                 """
-                <p>Merhaba,</p>
-                <p>Hesabınız için bir şifre sıfırlama talebi aldık. Yeni bir şifre belirlemek için aşağıdaki
-                butona tıklayabilirsiniz. Bu bağlantı 30 dakika süreyle geçerlidir.</p>
-                <p>Bu talebi siz oluşturmadıysanız bu e-postayı dikkate almayabilirsiniz; şifreniz
-                değiştirilmeyecektir.</p>
+                <p>Hello,</p>
+                <p>We received a password reset request for your account. You can click the button below to
+                set a new password. This link is valid for 30 minutes.</p>
+                <p>If you did not make this request, you can disregard this email; your password will not
+                be changed.</p>
                 """,
-                new CallToAction("Şifreyi Sıfırla", resetLink));
-        send(toEmail, "Şifre Sıfırlama Talebi", body, "password reset");
+                new CallToAction("Reset Password", resetLink));
+        send(toEmail, "Password Reset Request", body, "password reset");
     }
 
     @Async
     public void sendAdminNewHotelNotification(
             String adminEmail, String hotelName, String contactPerson, String hotelEmail, String phone) {
         String body = wrapCorporateTemplate(
-                "Yeni Otel Başvurusu",
+                "New Hotel Application",
                 """
-                <p>Merhaba,</p>
-                <p>Sisteme yeni bir otel kaydı yapıldı ve onayınızı bekliyor.</p>
+                <p>Hello,</p>
+                <p>A new hotel has registered in the system and is awaiting your approval.</p>
                 <table style="width:100%%;border-collapse:collapse;margin:16px 0;">
-                  <tr><td style="padding:6px 0;color:#6b7280;width:140px;">Otel Adı</td><td style="padding:6px 0;font-weight:600;">%s</td></tr>
-                  <tr><td style="padding:6px 0;color:#6b7280;">İletişim Kişisi</td><td style="padding:6px 0;">%s</td></tr>
-                  <tr><td style="padding:6px 0;color:#6b7280;">E-posta</td><td style="padding:6px 0;">%s</td></tr>
-                  <tr><td style="padding:6px 0;color:#6b7280;">Telefon</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;width:140px;">Hotel Name</td><td style="padding:6px 0;font-weight:600;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Contact Person</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Email</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Phone</td><td style="padding:6px 0;">%s</td></tr>
                 </table>
-                <p>Başvuruyu incelemek ve onaylamak/reddetmek için yönetim paneline giriş yapabilirsiniz.</p>
+                <p>You can log in to the admin panel to review and approve or reject the application.</p>
                 """.formatted(escape(hotelName), escape(contactPerson), escape(hotelEmail), escape(phone)),
-                new CallToAction("Başvuruyu İncele", frontendUrl + "/admin/hotels"));
-        send(adminEmail, "Yeni Otel Başvurusu - Onayınızı Bekliyor", body, "admin notification");
+                new CallToAction("Review Application", frontendUrl + "/admin/hotels"));
+        send(adminEmail, "New Hotel Application - Awaiting Your Approval", body, "admin notification");
     }
 
     @Async
     public void sendRoomTypeCreatedEmail(String toEmail, String hotelName, String roomTypeName) {
         String body = wrapCorporateTemplate(
-                "Yeni Oda Tipi Eklendi",
+                "New Room Type Added",
                 """
-                <p>Merhaba,</p>
-                <p><strong>%s</strong> için <strong>%s</strong> adlı yeni bir oda tipi eklendi.</p>
-                """.formatted(escape(hotelName), escape(roomTypeName)),
-                new CallToAction("Panele Giriş Yap", frontendUrl + "/login"));
-        send(toEmail, "Yeni Oda Tipi Eklendi - " + hotelName, body, "room type created");
+                <p>Hello,</p>
+                <p>A new room type named <strong>%s</strong> has been added for <strong>%s</strong>.</p>
+                """.formatted(escape(roomTypeName), escape(hotelName)),
+                new CallToAction("Log In to Panel", frontendUrl + "/login"));
+        send(toEmail, "New Room Type Added - " + hotelName, body, "room type created");
     }
 
     @Async
@@ -128,16 +129,16 @@ public class EmailService {
             String checkIn,
             String checkOut) {
         String body = wrapCorporateTemplate(
-                "Yeni Rezervasyon",
+                "New Reservation",
                 """
-                <p>Merhaba,</p>
-                <p><strong>%s</strong> için yeni bir rezervasyon oluşturuldu.</p>
+                <p>Hello,</p>
+                <p>A new reservation has been created for <strong>%s</strong>.</p>
                 <table style="width:100%%;border-collapse:collapse;margin:16px 0;">
-                  <tr><td style="padding:6px 0;color:#6b7280;width:140px;">Rezervasyon No</td><td style="padding:6px 0;font-weight:600;">%s</td></tr>
-                  <tr><td style="padding:6px 0;color:#6b7280;">Oda Tipi</td><td style="padding:6px 0;">%s</td></tr>
-                  <tr><td style="padding:6px 0;color:#6b7280;">Müşteri</td><td style="padding:6px 0;">%s</td></tr>
-                  <tr><td style="padding:6px 0;color:#6b7280;">Giriş</td><td style="padding:6px 0;">%s</td></tr>
-                  <tr><td style="padding:6px 0;color:#6b7280;">Çıkış</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;width:140px;">Reservation No</td><td style="padding:6px 0;font-weight:600;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Room Type</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Guest</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Check-in</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Check-out</td><td style="padding:6px 0;">%s</td></tr>
                 </table>
                 """.formatted(
                         escape(hotelName),
@@ -146,8 +147,8 @@ public class EmailService {
                         escape(customerName),
                         escape(checkIn),
                         escape(checkOut)),
-                new CallToAction("Panele Giriş Yap", frontendUrl + "/login"));
-        send(toEmail, "Yeni Rezervasyon - " + reservationNumber, body, "new reservation");
+                new CallToAction("Log In to Panel", frontendUrl + "/login"));
+        send(toEmail, "New Reservation - " + reservationNumber, body, "new reservation");
     }
 
     @Async
@@ -160,16 +161,16 @@ public class EmailService {
             String checkIn,
             String checkOut) {
         String body = wrapCorporateTemplate(
-                "Rezervasyon Onaylandı",
+                "Reservation Confirmed",
                 """
-                <p>Merhaba,</p>
-                <p><strong>%s</strong> otel tarafından bir rezervasyon onaylandı.</p>
+                <p>Hello,</p>
+                <p>A reservation has been confirmed by <strong>%s</strong>.</p>
                 <table style="width:100%%;border-collapse:collapse;margin:16px 0;">
-                  <tr><td style="padding:6px 0;color:#6b7280;width:140px;">Rezervasyon No</td><td style="padding:6px 0;font-weight:600;">%s</td></tr>
-                  <tr><td style="padding:6px 0;color:#6b7280;">Oda Tipi</td><td style="padding:6px 0;">%s</td></tr>
-                  <tr><td style="padding:6px 0;color:#6b7280;">Müşteri</td><td style="padding:6px 0;">%s</td></tr>
-                  <tr><td style="padding:6px 0;color:#6b7280;">Giriş</td><td style="padding:6px 0;">%s</td></tr>
-                  <tr><td style="padding:6px 0;color:#6b7280;">Çıkış</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;width:140px;">Reservation No</td><td style="padding:6px 0;font-weight:600;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Room Type</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Guest</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Check-in</td><td style="padding:6px 0;">%s</td></tr>
+                  <tr><td style="padding:6px 0;color:#6b7280;">Check-out</td><td style="padding:6px 0;">%s</td></tr>
                 </table>
                 """.formatted(
                         escape(hotelName),
@@ -178,53 +179,51 @@ public class EmailService {
                         escape(customerName),
                         escape(checkIn),
                         escape(checkOut)),
-                new CallToAction("Panele Giriş Yap", frontendUrl + "/login"));
-        send(toEmail, "Rezervasyon Onaylandı - " + reservationNumber, body, "reservation confirmed");
+                new CallToAction("Log In to Panel", frontendUrl + "/login"));
+        send(toEmail, "Reservation Confirmed - " + reservationNumber, body, "reservation confirmed");
     }
 
     @Async
     public void sendHotelSetupReminderEmail(String toEmail, String hotelName) {
         String body = wrapCorporateTemplate(
-                "Otel Kurulumunuzu Tamamlayın",
+                "Complete Your Hotel Setup",
                 """
-                <p>Merhaba,</p>
-                <p><strong>%s</strong> onaylandı, ancak rezervasyon alabilmeniz için henüz oda tipi ve
-                gecelik fiyat girişi tamamlanmamış görünüyor.</p>
-                <p>Otel yönetim panelinizden en az bir oda tipi ekleyip gecelik fiyatını girerek
-                otelinizi rezervasyona açabilirsiniz. Tamamlanana kadar bu hatırlatmayı periyodik olarak
-                almaya devam edeceksiniz.</p>
+                <p>Hello,</p>
+                <p><strong>%s</strong> has been approved, but it looks like you haven't yet added a room
+                type and nightly rate, so you can't take reservations.</p>
+                <p>You can open your hotel for reservations by adding at least one room type and its
+                nightly rate from the hotel management panel. You will keep receiving this reminder
+                periodically until this is completed.</p>
                 """.formatted(escape(hotelName)),
-                new CallToAction("Panele Giriş Yap", frontendUrl + "/login"));
-        send(toEmail, "Otel Kurulumunuzu Tamamlayın - " + hotelName, body, "setup reminder");
+                new CallToAction("Log In to Panel", frontendUrl + "/login"));
+        send(toEmail, "Complete Your Hotel Setup - " + hotelName, body, "setup reminder");
     }
 
     @Async
     public void sendHotelSetupReminderAdminNotification(String adminEmail, String hotelName) {
         String body = wrapCorporateTemplate(
-                "Otel Kurulumu Hala Tamamlanmadı",
+                "Hotel Setup Still Not Completed",
                 """
-                <p>Merhaba,</p>
-                <p><strong>%s</strong> otelinin onayının üzerinden belirli bir süre geçmesine rağmen
-                henüz oda tipi ve gecelik fiyat girişini tamamlamadığı tespit edildi. Otele bir
-                hatırlatma e-postası gönderildi.</p>
+                <p>Hello,</p>
+                <p><strong>%s</strong> has still not added a room type and nightly rate although some
+                time has passed since approval. A reminder email has been sent to the hotel.</p>
                 """.formatted(escape(hotelName)),
-                new CallToAction("Otelleri Görüntüle", frontendUrl + "/admin/hotels"));
-        send(adminEmail, "Otel Kurulumu Tamamlanmadı - " + hotelName, body, "setup reminder admin notice");
+                new CallToAction("View Hotels", frontendUrl + "/admin/hotels"));
+        send(adminEmail, "Hotel Setup Not Completed - " + hotelName, body, "setup reminder admin notice");
     }
 
     @Async
     public void sendSupportMessageNotification(String toEmail, String hotelName, String senderName, String messageBody) {
         String body = wrapCorporateTemplate(
-                "Yeni Destek Mesajı",
+                "New Support Message",
                 """
-                <p>Merhaba,</p>
-                <p><strong>%s</strong> ile ilgili destek sohbetinde <strong>%s</strong> tarafından yeni bir mesaj
-                gönderildi.</p>
+                <p>Hello,</p>
+                <p>A new message was sent by <strong>%s</strong> in the support chat for <strong>%s</strong>.</p>
                 <div style="margin:16px 0;padding:12px 16px;border-left:3px solid %s;background:#f9fafb;
                      color:#1f2937;font-size:14px;line-height:1.6;">%s</div>
-                """.formatted(escape(hotelName), escape(senderName), BRAND_SIGNAL, escape(messageBody).replace("\n", "<br/>")),
-                new CallToAction("Mesajı Görüntüle", frontendUrl + "/login"));
-        send(toEmail, "Yeni Destek Mesajı - " + hotelName, body, "support message");
+                """.formatted(escape(senderName), escape(hotelName), BRAND_SIGNAL, escape(messageBody).replace("\n", "<br/>")),
+                new CallToAction("View Message", frontendUrl + "/login"));
+        send(toEmail, "New Support Message - " + hotelName, body, "support message");
     }
 
     private record CallToAction(String label, String url) {
@@ -294,7 +293,7 @@ public class EmailService {
                             <tr>
                               <td style="background:%s;padding:24px 32px;">
                                 <span style="color:%s;font-size:15px;font-weight:700;letter-spacing:2px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;">TRAVEL SITES</span>
-                                <div style="color:#8b929d;font-size:12px;margin-top:4px;">Otel Acentesi Merkezi</div>
+                                <div style="color:#8b929d;font-size:12px;margin-top:4px;">Hotel Partner Portal</div>
                               </td>
                             </tr>
                             <tr>
@@ -306,7 +305,7 @@ public class EmailService {
                             </tr>
                             <tr>
                               <td style="padding:20px 32px;background:#f9fafb;border-top:1px solid #eef0f3;color:#9ca3af;font-size:12px;">
-                                Bu e-posta Travel Sites sistemi tarafından otomatik olarak gönderilmiştir.
+                                This email was sent automatically by the Travel Sites system.
                               </td>
                             </tr>
                           </table>
