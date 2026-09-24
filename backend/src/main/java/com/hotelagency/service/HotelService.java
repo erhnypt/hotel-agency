@@ -36,6 +36,7 @@ import com.hotelagency.security.JwtService;
 import java.time.Instant;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,6 +72,14 @@ public class HotelService {
      */
     @Value("${app.notify.admin-email:}")
     private List<String> adminNotifyEmails;
+
+    /**
+     * Addresses that must never receive notification emails (comma-separated), even if they
+     * exist as AGENCY_ADMIN users or appear in {@code app.notify.admin-email}. Intended for
+     * seeded test accounts such as {@code admin@hotel.test} whose inboxes do not exist.
+     */
+    @Value("${app.notify.exclude-emails:}")
+    private List<String> excludedEmails;
 
     @Transactional
     public HotelRegisterResponse register(HotelRegisterRequest request) {
@@ -120,8 +129,17 @@ public class HotelService {
                 email, hotel.getName(), hotel.getContactPerson(), hotel.getEmail(), hotel.getPhone()));
     }
 
-    /** Every AGENCY_ADMIN user's email, plus any extra addresses configured via {@code ADMIN_NOTIFY_EMAIL}. */
+    /**
+     * Every AGENCY_ADMIN user's email plus any extra addresses configured via
+     * {@code ADMIN_NOTIFY_EMAIL}, minus addresses excluded via {@code NOTIFY_EXCLUDE_EMAILS}.
+     */
     public Set<String> resolveAgencyAdminEmails() {
+        Set<String> excluded = excludedEmails == null ? Set.of() : excludedEmails.stream()
+                .filter(email -> email != null && !email.isBlank())
+                .map(String::trim)
+                .map(email -> email.toLowerCase(Locale.ROOT))
+                .collect(Collectors.toSet());
+
         LinkedHashSet<String> recipients = new LinkedHashSet<>();
         userRepository.findByRole_Name(RoleName.AGENCY_ADMIN).forEach(admin -> recipients.add(admin.getEmail()));
         if (adminNotifyEmails != null) {
@@ -130,6 +148,7 @@ public class HotelService {
         return recipients.stream()
                 .filter(email -> email != null && !email.isBlank())
                 .map(String::trim)
+                .filter(email -> !excluded.contains(email.toLowerCase(Locale.ROOT)))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
     }
 

@@ -31,6 +31,7 @@ import com.hotelagency.repository.UserRepository;
 import com.hotelagency.security.JwtService;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -39,6 +40,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 class HotelServiceTest {
@@ -91,6 +93,36 @@ class HotelServiceTest {
         agencyAdminRole.setId(1L);
         agencyStaffRole = new Role(RoleName.AGENCY_STAFF);
         agencyStaffRole.setId(2L);
+
+        ReflectionTestUtils.setField(hotelService, "adminNotifyEmails", List.of());
+        ReflectionTestUtils.setField(hotelService, "excludedEmails", List.of());
+    }
+
+    @Test
+    void resolveAgencyAdminEmailsExcludesConfiguredAddresses() {
+        ReflectionTestUtils.setField(hotelService, "adminNotifyEmails",
+                List.of("travellsites@gmail.com", "admin@hotel.test"));
+        ReflectionTestUtils.setField(hotelService, "excludedEmails", List.of("admin@hotel.test"));
+
+        User agencyAdmin = new User();
+        agencyAdmin.setEmail("admin@hotel.test");
+        agencyAdmin.setRole(agencyAdminRole);
+        when(userRepository.findByRole_Name(RoleName.AGENCY_ADMIN)).thenReturn(List.of(agencyAdmin));
+
+        assertThat(hotelService.resolveAgencyAdminEmails())
+                .containsExactly("travellsites@gmail.com");
+    }
+
+    @Test
+    void resolveAgencyAdminEmailsExclusionIsCaseInsensitive() {
+        ReflectionTestUtils.setField(hotelService, "excludedEmails", List.of("ADMIN@Hotel.Test"));
+
+        User agencyAdmin = new User();
+        agencyAdmin.setEmail("admin@hotel.test");
+        agencyAdmin.setRole(agencyAdminRole);
+        when(userRepository.findByRole_Name(RoleName.AGENCY_ADMIN)).thenReturn(List.of(agencyAdmin));
+
+        assertThat(hotelService.resolveAgencyAdminEmails()).isEmpty();
     }
 
     private HotelRegisterRequest sampleRequest() {
