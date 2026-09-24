@@ -127,7 +127,7 @@ Backend testleri **111/111**, frontend `tsc -b`, lint ve `vite build` temiz.
 - Rezervasyon/bildirim maillerinin alıcıları iki kaynaktan toplanır:
   1. `users` tablosunda rolü `AGENCY_ADMIN` olan tüm hesapların email'leri (DB)
   2. `ADMIN_NOTIFY_EMAIL` env değişkeni (virgülle ayrılır, DB'den bağımsız ekstra alıcılar)
-- Güncel aktif bildirim adresi: `travellsites@gmail.com` (Render → Environment → `ADMIN_NOTIFY_EMAIL`).
+- Güncel aktif bildirim adresi: `travellsitess@gmail.com` (Render → Environment → `ADMIN_NOTIFY_EMAIL`).
 - `NOTIFY_EXCLUDE_EMAILS` env: bildirim alıcı listesinden çıkarılacak adresler (virgülle ayrılır) — DB'de AGENCY_ADMIN olsalar bile. Varsayılan olarak `admin@hotel.test` (DataLoader'ın sahte admin hesabı; panel girişi için duruyor) hariç tutulur, çünkü inbox'u yoktur ve mail'leri boşa bounce eder.
 - `erhan.yapt@gmail.com` test AGENCY_ADMIN hesabı V12 migration'ı ile eklenmişti; V32 migration'ı hesabı FK-güvenli şekilde siliyor (rezervasyon/support_message/card_view_log kayıtları `admin@hotel.test`'e devrediliyor).
 - Diğer mail env'leri: `RESEND_API_KEY` (Resend API key — unset ise mail'ler konsola loglanır), `MAIL_FROM` (gönderen adresi, varsayılan `onboarding@resend.dev`).
