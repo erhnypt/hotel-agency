@@ -122,4 +122,14 @@ Backend testleri **111/111**, frontend `tsc -b`, lint ve `vite build` temiz.
 - Database → Neon (PostgreSQL, `?sslmode=require` ile güvenli bağlantı)
 - CORS `CORS_ORIGINS` env var ile Vercel URL'sine göre yapılandırılıyor
 
+**Mail Bildirimleri (Resend)**:
+- Mail'ler SMTP ile değil, Resend'in HTTP API'si üzerinden gönderilir (`EmailService`) — Render giden SMTP portlarını (25/465/587) blokladığı için bu yöntem zorunlu.
+- Rezervasyon/bildirim maillerinin alıcıları iki kaynaktan toplanır:
+  1. `users` tablosunda rolü `AGENCY_ADMIN` olan tüm hesapların email'leri (DB)
+  2. `ADMIN_NOTIFY_EMAIL` env değişkeni (virgülle ayrılır, DB'den bağımsız ekstra alıcılar)
+- Güncel aktif bildirim adresi: `travellsites@gmail.com` (Render → Environment → `ADMIN_NOTIFY_EMAIL`).
+- `erhan.yapt@gmail.com` test AGENCY_ADMIN hesabı V12 migration'ı ile eklenmişti; V32 migration'ı hesabı FK-güvenli şekilde siliyor (rezervasyon/support_message/card_view_log kayıtları `admin@hotel.test`'e devrediliyor).
+- Diğer mail env'leri: `RESEND_API_KEY` (Resend API key — unset ise mail'ler konsola loglanır), `MAIL_FROM` (gönderen adresi, varsayılan `onboarding@resend.dev`).
+- Not: Bu yapılandırma yalnızca acente tarafı bildirimleri kapsar; otel sahipleri (`hotel_users` bağlantısı) yeni rezervasyon mailini tasarımdan kendi adreslerine almaya devam eder.
+
 **Phase 11 — Tüm özellikler tamamlandı.** Backend testleri geçiyor, frontend `tsc -b && vite build` temiz.
