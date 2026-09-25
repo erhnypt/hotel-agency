@@ -2,6 +2,8 @@ package com.hotelagency.service;
 
 import com.hotelagency.dto.auth.AuthResponse;
 import com.hotelagency.dto.auth.UserSummary;
+import com.hotelagency.dto.hotel.HotelNotesResponse;
+import com.hotelagency.dto.hotel.HotelNotesUpdateRequest;
 import com.hotelagency.dto.hotel.HotelRegisterRequest;
 import com.hotelagency.dto.hotel.HotelRegisterResponse;
 import com.hotelagency.dto.hotel.HotelResponse;
@@ -287,6 +289,9 @@ public class HotelService {
     @Transactional
     public HotelResponse update(Long id, HotelUpdateRequest request, User requester) {
         Hotel hotel = getOwnedHotel(id, requester);
+        if (hotel.getStatus() != HotelStatus.ACTIVE) {
+            throw new AccessDeniedException("Hotel profile can only be updated while the hotel is active");
+        }
 
         hotel.setName(request.name());
         hotel.setDescription(request.description());
@@ -299,6 +304,23 @@ public class HotelService {
         hotel.setContactPerson(request.contactPerson());
 
         return HotelResponse.from(hotel);
+    }
+
+    /**
+     * Agency-admin-only private notes for a hotel. The caller must already be an
+     * AGENCY_ADMIN (enforced in the controller); hotel admins, staff and the public
+     * site never receive this data.
+     */
+    public HotelNotesResponse getNotes(Long id) {
+        Hotel hotel = getHotelOrThrow(id);
+        return HotelNotesResponse.from(hotel);
+    }
+
+    @Transactional
+    public HotelNotesResponse updateNotes(Long id, HotelNotesUpdateRequest request) {
+        Hotel hotel = getHotelOrThrow(id);
+        hotel.setAdminNotes(request.adminNotes());
+        return HotelNotesResponse.from(hotel);
     }
 
     @Transactional

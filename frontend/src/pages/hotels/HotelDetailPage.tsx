@@ -6,22 +6,25 @@ import {
   deactivateHotel,
   deleteHotel,
   getHotel,
+  getHotelNotes,
   listRoomTypes,
   reactivateHotel,
   rejectHotel,
+  updateHotelNotes,
 } from '../../api/hotels'
 import type { ApiErrorResponse } from '../../auth/types'
-import type { RoomTypeResponse } from '../../api/types'
+import type { HotelNotesResponse, RoomTypeResponse } from '../../api/types'
 import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { StatusBadge } from '../../components/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
 import { useT } from '../../i18n/useT'
 import { HotelRoomImagesModal } from './HotelRoomImagesModal'
+import './HotelDetailPage.css'
 import '../../components/crud.css'
 
 export function HotelDetailPage() {
-  const { t } = useT()
+  const { t, lang } = useT()
   const { hotelId } = useParams<{ hotelId: string }>()
   const id = Number(hotelId)
   const { user } = useAuth()
@@ -33,9 +36,18 @@ export function HotelDetailPage() {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [viewingImagesFor, setViewingImagesFor] = useState<RoomTypeResponse | null>(null)
+  const [noteDraft, setNoteDraft] = useState<string | null>(null)
+  const [savedNotes, setSavedNotes] = useState<HotelNotesResponse | null>(null)
+  const [noteSaving, setNoteSaving] = useState(false)
+  const [noteSaved, setNoteSaved] = useState(false)
+  const [noteError, setNoteError] = useState<string | null>(null)
 
   const hotel = useAsync(() => getHotel(id), [id, refreshKey])
   const roomTypes = useAsync(() => listRoomTypes(id), [id, refreshKey])
+  const notes = useAsync(() => (isAdmin ? getHotelNotes(id) : Promise.resolve(null)), [id, isAdmin])
+
+  const currentNotes = savedNotes ?? notes.data
+  const noteValue = noteDraft ?? currentNotes?.adminNotes ?? ''
 
   const runAction = async (action: () => Promise<unknown>) => {
     setError(null)
@@ -71,6 +83,45 @@ export function HotelDetailPage() {
         setError(t('hotels.actionFailed'))
       }
       setBusy(false)
+    }
+  }
+
+  const handleSaveNote = async () => {
+    setNoteError(null)
+    setNoteSaving(true)
+    try {
+      const trimmed = noteValue.trim()
+      const saved = await updateHotelNotes(id, trimmed === '' ? null : trimmed)
+      setSavedNotes(saved)
+      setNoteDraft(null)
+      setNoteSaved(true)
+      setTimeout(() => setNoteSaved(false), 2500)
+    } catch (err) {
+      if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
+        setNoteError(err.response.data.message)
+      } else {
+        setNoteError(t('hotels.actionFailed'))
+      }
+    } finally {
+      setNoteSaving(false)
+    }
+  }
+
+  const handleDeleteNote = async () => {
+    setNoteError(null)
+    setNoteSaving(true)
+    try {
+      const saved = await updateHotelNotes(id, null)
+      setSavedNotes(saved)
+      setNoteDraft(null)
+    } catch (err) {
+      if (axios.isAxiosError<ApiErrorResponse>(err) && err.response) {
+        setNoteError(err.response.data.message)
+      } else {
+        setNoteError(t('hotels.actionFailed'))
+      }
+    } finally {
+      setNoteSaving(false)
     }
   }
 
@@ -166,6 +217,54 @@ export function HotelDetailPage() {
             {t('common.delete')}
           </button>
         </div>
+      )}
+
+      {isAdmin && (
+        <section className="hotel-notes">
+          <label className="hotel-notes__label" htmlFor="hotel-admin-notes">
+            {t('hotelDetail.notesTitle')}
+          </label>
+          <textarea
+            id="hotel-admin-notes"
+            className="hotel-notes__textarea"
+            value={noteValue}
+            maxLength={4000}
+            rows={5}
+            placeholder={t('hotelDetail.notesPlaceholder')}
+            disabled={notes.loading || noteSaving}
+            onChange={(e) => {
+              setNoteDraft(e.target.value)
+              setNoteSaved(false)
+            }}
+          />
+          {noteError && <p className="form-error">{noteError}</p>}
+          {noteSaved && <p className="form-success">{t('hotelDetail.notesSaved')}</p>}
+          <div className="hotel-notes__actions">
+            <button
+              type="button"
+              className="btn btn--small"
+            disabled={noteSaving || notes.loading || noteValue.trim() === (currentNotes?.adminNotes ?? '')}
+            onClick={handleSaveNote}
+            >
+              {t('common.save')}
+            </button>
+            {currentNotes?.adminNotes && (
+              <button
+                type="button"
+                className="btn btn--small btn--danger"
+                disabled={noteSaving || notes.loading}
+                onClick={handleDeleteNote}
+              >
+                {t('hotelDetail.notesDeleteButton')}
+              </button>
+            )}
+            {currentNotes?.updatedAt && (
+              <span className="hotel-notes__updated">
+                {t('hotelDetail.notesUpdatedAt', { date: new Date(currentNotes.updatedAt).toLocaleString(lang) })}
+              </span>
+            )}
+          </div>
+        </section>
       )}
 
       <div className="page-header">

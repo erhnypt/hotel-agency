@@ -1,5 +1,5 @@
 import { apiClient } from './client'
-import type { HotelResponse, HotelUpdateRequest, RoomTypeResponse } from './types'
+import type { HotelNotesResponse, HotelResponse, HotelUpdateRequest, RoomTypeResponse } from './types'
 
 export async function listHotels(): Promise<HotelResponse[]> {
   const response = await apiClient.get<HotelResponse[]>('/hotels')
@@ -48,4 +48,14 @@ export async function reactivateHotel(id: number): Promise<HotelResponse> {
 
 export async function deleteHotel(id: number): Promise<void> {
   await apiClient.delete(`/hotels/${id}`)
+}
+
+export async function getHotelNotes(id: number): Promise<HotelNotesResponse> {
+  const response = await apiClient.get<HotelNotesResponse>(`/hotels/${id}/notes`)
+  return response.data
+}
+
+export async function updateHotelNotes(id: number, adminNotes: string | null): Promise<HotelNotesResponse> {
+  const response = await apiClient.put<HotelNotesResponse>(`/hotels/${id}/notes`, { adminNotes })
+  return response.data
 }

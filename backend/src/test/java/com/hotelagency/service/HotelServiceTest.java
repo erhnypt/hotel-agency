@@ -6,6 +6,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import com.hotelagency.dto.hotel.HotelNotesResponse;
+import com.hotelagency.dto.hotel.HotelNotesUpdateRequest;
 import com.hotelagency.dto.hotel.HotelRegisterRequest;
 import com.hotelagency.dto.hotel.HotelRegisterResponse;
 import com.hotelagency.dto.hotel.HotelUpdateRequest;
@@ -513,6 +515,52 @@ class HotelServiceTest {
                 ArgumentCaptor.forClass(com.hotelagency.entity.HotelSetupReminderLog.class);
         verify(hotelSetupReminderLogRepository).save(logCaptor.capture());
         assertThat(logCaptor.getValue().getRecipients()).contains("owner@hotel.test");
+    }
+
+    @Test
+    void getNotesReturnsAdminNotes() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        hotel.setAdminNotes("Özel not");
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+
+        HotelNotesResponse response = hotelService.getNotes(1L);
+
+        assertThat(response.adminNotes()).isEqualTo("Özel not");
+        assertThat(response.hotelId()).isEqualTo(1L);
+    }
+
+    @Test
+    void updateNotesSetsAdminNotes() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+
+        HotelNotesResponse response = hotelService.updateNotes(1L, new HotelNotesUpdateRequest("Yeni not"));
+
+        assertThat(hotel.getAdminNotes()).isEqualTo("Yeni not");
+        assertThat(response.adminNotes()).isEqualTo("Yeni not");
+    }
+
+    @Test
+    void updateNotesAcceptsNullToClearNotes() {
+        Hotel hotel = new Hotel();
+        hotel.setId(1L);
+        hotel.setAdminNotes("Eski not");
+        when(hotelRepository.findById(1L)).thenReturn(Optional.of(hotel));
+
+        HotelNotesResponse response = hotelService.updateNotes(1L, new HotelNotesUpdateRequest(null));
+
+        assertThat(hotel.getAdminNotes()).isNull();
+        assertThat(response.adminNotes()).isNull();
+    }
+
+    @Test
+    void getNotesRejectsUnknownHotel() {
+        when(hotelRepository.findById(99L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> hotelService.getNotes(99L))
+                .isInstanceOf(ResourceNotFoundException.class);
     }
 
     @Test

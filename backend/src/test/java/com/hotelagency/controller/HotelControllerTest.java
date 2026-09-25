@@ -6,12 +6,15 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.hotelagency.dto.auth.AuthResponse;
 import com.hotelagency.dto.auth.UserSummary;
+import com.hotelagency.dto.hotel.HotelNotesResponse;
+import com.hotelagency.dto.hotel.HotelNotesUpdateRequest;
 import com.hotelagency.dto.hotel.HotelRegisterRequest;
 import com.hotelagency.dto.hotel.HotelRegisterResponse;
 import com.hotelagency.dto.hotel.HotelResponse;
@@ -170,6 +173,47 @@ class HotelControllerTest {
     @WithMockUser(roles = "AGENCY_STAFF")
     void deleteAsAgencyStaffReturns403() throws Exception {
         mockMvc.perform(delete("/api/hotels/1"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "AGENCY_ADMIN")
+    void getNotesAsAgencyAdminReturns200() throws Exception {
+        when(hotelService.getNotes(eq(1L)))
+                .thenReturn(new HotelNotesResponse(1L, "Kasım ayında fiyat pazarlığı yapıldı", Instant.now()));
+
+        mockMvc.perform(get("/api/hotels/1/notes"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.hotelId").value(1))
+                .andExpect(jsonPath("$.adminNotes").value("Kasım ayında fiyat pazarlığı yapıldı"));
+    }
+
+    @Test
+    @WithMockUser(roles = "AGENCY_ADMIN")
+    void updateNotesAsAgencyAdminReturns200() throws Exception {
+        when(hotelService.updateNotes(eq(1L), any(HotelNotesUpdateRequest.class)))
+                .thenReturn(new HotelNotesResponse(1L, "Yeni not", Instant.now()));
+
+        mockMvc.perform(put("/api/hotels/1/notes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new HotelNotesUpdateRequest("Yeni not"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.adminNotes").value("Yeni not"));
+    }
+
+    @Test
+    @WithMockCustomUser(role = RoleName.HOTEL_ADMIN)
+    void getNotesAsHotelAdminReturns403() throws Exception {
+        mockMvc.perform(get("/api/hotels/1/notes"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(roles = "AGENCY_STAFF")
+    void updateNotesAsAgencyStaffReturns403() throws Exception {
+        mockMvc.perform(put("/api/hotels/1/notes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"adminNotes\":\"deneme\"}"))
                 .andExpect(status().isForbidden());
     }
 }

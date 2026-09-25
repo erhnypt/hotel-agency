@@ -83,6 +83,12 @@ export interface HotelResponse {
   updatedAt: string
 }
 
+export interface HotelNotesResponse {
+  hotelId: number
+  adminNotes: string | null
+  updatedAt: string
+}
+
 export interface HotelUpdateRequest {
   name: string
   description?: string | null

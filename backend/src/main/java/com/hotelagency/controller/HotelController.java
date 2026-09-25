@@ -1,5 +1,7 @@
 package com.hotelagency.controller;
 
+import com.hotelagency.dto.hotel.HotelNotesResponse;
+import com.hotelagency.dto.hotel.HotelNotesUpdateRequest;
 import com.hotelagency.dto.hotel.HotelRegisterRequest;
 import com.hotelagency.dto.hotel.HotelRegisterResponse;
 import com.hotelagency.dto.hotel.HotelResponse;
@@ -75,6 +77,20 @@ public class HotelController {
             @Valid @RequestBody HotelUpdateRequest request,
             @AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(hotelService.update(id, request, principal.getUser()));
+    }
+
+    @GetMapping("/{id}/notes")
+    @PreAuthorize("hasRole('AGENCY_ADMIN')")
+    public ResponseEntity<HotelNotesResponse> getNotes(@PathVariable Long id) {
+        return ResponseEntity.ok(hotelService.getNotes(id));
+    }
+
+    @PutMapping("/{id}/notes")
+    @PreAuthorize("hasRole('AGENCY_ADMIN')")
+    public ResponseEntity<HotelNotesResponse> updateNotes(
+            @PathVariable Long id,
+            @Valid @RequestBody HotelNotesUpdateRequest request) {
+        return ResponseEntity.ok(hotelService.updateNotes(id, request));
     }
 
     @PostMapping("/{id}/approve")

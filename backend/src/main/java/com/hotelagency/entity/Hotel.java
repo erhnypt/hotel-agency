@@ -46,6 +46,10 @@ public class Hotel {
     @Column(name = "website")
     private String website;
 
+    /** Private scratch notes, visible only to AGENCY_ADMIN — never returned to hotel admins or staff. */
+    @Column(name = "admin_notes")
+    private String adminNotes;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private HotelStatus status = HotelStatus.PENDING;
