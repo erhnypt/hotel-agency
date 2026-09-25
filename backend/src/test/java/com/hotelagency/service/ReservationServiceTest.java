@@ -14,6 +14,7 @@ import com.hotelagency.dto.reservation.ReservationCreateRequest;
 import com.hotelagency.dto.reservation.ReservationResponse;
 import com.hotelagency.entity.Customer;
 import com.hotelagency.entity.Hotel;
+import com.hotelagency.entity.HotelStatus;
 import com.hotelagency.entity.Reservation;
 import com.hotelagency.entity.ReservationStatus;
 import com.hotelagency.entity.Role;
@@ -75,6 +76,7 @@ class ReservationServiceTest {
 
         hotel = new Hotel();
         hotel.setId(1L);
+        hotel.setStatus(HotelStatus.ACTIVE);
 
         roomType = new RoomType();
         roomType.setId(2L);
@@ -110,6 +112,7 @@ class ReservationServiceTest {
     }
 
     private void stubBookable() {
+        hotel.setStatus(HotelStatus.ACTIVE);
         when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
         when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
         when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(0L);
@@ -120,6 +123,29 @@ class ReservationServiceTest {
             }
             return r;
         });
+    }
+
+    @Test
+    void createRejectsWhenHotelIsNotActive() {
+        hotel.setStatus(HotelStatus.INACTIVE);
+        when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
+
+        assertThatThrownBy(() -> reservationService.create(sampleRequest(), staff))
+                .isInstanceOf(InvalidReservationException.class);
+
+        verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    void searchAvailableRoomsRejectsWhenHotelIsNotActive() {
+        hotel.setStatus(HotelStatus.PENDING);
+        when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
+        LocalDate date = LocalDate.of(2026, 9, 10);
+
+        assertThatThrownBy(() -> reservationService.searchAvailableRooms(1L, date, date.plusDays(1), 2, staff))
+                .isInstanceOf(InvalidReservationException.class);
+
+        verify(roomTypeRepository, never()).findByHotelId(any());
     }
 
     @Test

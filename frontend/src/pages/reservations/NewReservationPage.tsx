@@ -10,7 +10,7 @@ import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
 import { useAsync } from '../../hooks/useAsync'
 import { useT } from '../../i18n/useT'
-import type { AvailableRoomResponse } from '../../api/types'
+import type { AvailableRoomResponse, HotelStatus } from '../../api/types'
 import { detectBrand, digitsOnly } from '../../lib/card'
 import '../../components/crud.css'
 import './NewReservationPage.css'
@@ -20,6 +20,7 @@ export function NewReservationPage() {
   const navigate = useNavigate()
   const { user } = useAuth()
   const hotels = useAsync(listHotels, [])
+  const activeHotels = hotels.data?.filter((h) => h.status === 'ACTIVE' satisfies HotelStatus) ?? []
   const customers = useAsync(listCustomers, [])
 
   const [hotelId, setHotelId] = useState('')
@@ -170,7 +171,7 @@ export function NewReservationPage() {
             <option value="" disabled>
               {t('newReservation.selectPlaceholder')}
             </option>
-            {hotels.data?.map((hotel) => (
+            {activeHotels.map((hotel) => (
               <option key={hotel.id} value={hotel.id}>
                 {hotel.name}
               </option>

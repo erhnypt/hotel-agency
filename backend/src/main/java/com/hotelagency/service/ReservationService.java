@@ -6,6 +6,7 @@ import com.hotelagency.dto.reservation.ReservationCreateRequest;
 import com.hotelagency.dto.reservation.ReservationResponse;
 import com.hotelagency.entity.Customer;
 import com.hotelagency.entity.Hotel;
+import com.hotelagency.entity.HotelStatus;
 import com.hotelagency.entity.Reservation;
 import com.hotelagency.entity.ReservationStatus;
 import com.hotelagency.entity.ReservationStatusHistory;
@@ -58,6 +59,7 @@ public class ReservationService {
         }
 
         Hotel hotel = hotelService.getViewableHotel(request.hotelId(), requester);
+        assertHotelBookable(hotel);
         RoomType roomType = roomTypeRepository.findById(request.roomTypeId())
                 .orElseThrow(() -> new ResourceNotFoundException("Room type not found: " + request.roomTypeId()));
         if (!roomType.getHotel().getId().equals(hotel.getId())) {
@@ -119,7 +121,7 @@ public class ReservationService {
             throw new InvalidReservationException("Check-out date must be after check-in date");
         }
 
-        hotelService.getViewableHotel(hotelId, requester);
+        assertHotelBookable(hotelService.getViewableHotel(hotelId, requester));
         List<LocalDate> nights = datesBetween(checkIn, checkOut);
 
         return roomTypeRepository.findByHotelId(hotelId).stream()
@@ -307,6 +309,13 @@ public class ReservationService {
     private void assertHotelOwnership(Reservation reservation, User requester) {
         if (!reservation.getHotel().getId().equals(hotelService.requireOwnHotelId(requester))) {
             throw new AccessDeniedException("You do not have access to this reservation");
+        }
+    }
+
+    /** Reservations can only be made against hotels that are currently active. */
+    private void assertHotelBookable(Hotel hotel) {
+        if (hotel.getStatus() != HotelStatus.ACTIVE) {
+            throw new InvalidReservationException("Reservations can only be created for active hotels");
         }
     }
 
