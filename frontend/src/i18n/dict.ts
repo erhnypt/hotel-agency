@@ -224,11 +224,14 @@ const tr: Dict = {
   'services.addButton': 'Yeni Hizmet',
   'services.confirmDelete': '"{name}" hizmetini silmek istediğinize emin misiniz?',
   'services.empty': 'Henüz hizmet yok.',
+  'services.currencyMismatchHint': 'Oda para biriminden ({roomCurrency}) farklı hizmetler rezervasyonda seçilemez.',
 
   'serviceForm.saveError': 'Kaydedilemedi. Lütfen tekrar deneyin.',
   'serviceForm.editTitle': 'Hizmeti Düzenle',
   'serviceForm.createTitle': 'Yeni Hizmet',
   'serviceForm.namePlaceholder': 'ör. Spa & Masaj',
+  'serviceForm.currencyDefaultHint': 'Oda para birimi ({roomCurrency}) varsayılan seçildi.',
+  'serviceForm.currencyMismatchWarning': 'Bu hizmet oda para birimiyle ({roomCurrency}) uyumsuz; rezervasyonlarda seçilemez.',
 
   'settings.passwordMismatch': 'Yeni şifreler eşleşmiyor.',
   'settings.updateSuccess': 'Bilgiler başarıyla güncellendi.',
@@ -798,11 +801,14 @@ const en: Dict = {
   'services.addButton': 'Add Service',
   'services.confirmDelete': 'Are you sure you want to delete "{name}"?',
   'services.empty': 'No services yet.',
+  'services.currencyMismatchHint': 'Services in a different currency than room currency ({roomCurrency}) cannot be booked.',
 
   'serviceForm.saveError': "Couldn't save. Please try again.",
   'serviceForm.editTitle': 'Edit Service',
   'serviceForm.createTitle': 'New Service',
   'serviceForm.namePlaceholder': 'e.g. Spa & Massage',
+  'serviceForm.currencyDefaultHint': 'Defaulted to the room currency ({roomCurrency}).',
+  'serviceForm.currencyMismatchWarning': 'This service does not match the room currency ({roomCurrency}) and cannot be booked.',
 
   'settings.passwordMismatch': "New passwords don't match.",
   'settings.updateSuccess': 'Information updated successfully.',
@@ -1367,11 +1373,14 @@ const ru: Dict = {
   'services.addButton': 'Новая услуга',
   'services.confirmDelete': 'Вы уверены, что хотите удалить услугу «{name}»?',
   'services.empty': 'Пока нет услуг.',
+  'services.currencyMismatchHint': 'Услуги в валюте, отличной от валюты номеров ({roomCurrency}), нельзя забронировать.',
 
   'serviceForm.saveError': 'Не удалось сохранить. Попробуйте снова.',
   'serviceForm.editTitle': 'Редактировать услугу',
   'serviceForm.createTitle': 'Новая услуга',
   'serviceForm.namePlaceholder': 'напр. Спа и массаж',
+  'serviceForm.currencyDefaultHint': 'Валюта номеров ({roomCurrency}) выбрана по умолчанию.',
+  'serviceForm.currencyMismatchWarning': 'Эта услуга не совпадает с валютой номеров ({roomCurrency}) и недоступна для бронирования.',
 
   'settings.passwordMismatch': 'Новые пароли не совпадают.',
   'settings.updateSuccess': 'Информация успешно обновлена.',
@@ -1936,11 +1945,14 @@ const de: Dict = {
   'services.addButton': 'Neue Dienstleistung',
   'services.confirmDelete': 'Möchten Sie die Dienstleistung „{name}" wirklich löschen?',
   'services.empty': 'Noch keine Dienstleistungen.',
+  'services.currencyMismatchHint': 'Dienstleistungen in einer anderen Währung als der Zimmerwährung ({roomCurrency}) können nicht gebucht werden.',
 
   'serviceForm.saveError': 'Speichern fehlgeschlagen. Bitte erneut versuchen.',
   'serviceForm.editTitle': 'Dienstleistung bearbeiten',
   'serviceForm.createTitle': 'Neue Dienstleistung',
   'serviceForm.namePlaceholder': 'z. B. Spa & Massage',
+  'serviceForm.currencyDefaultHint': 'Zimmerwährung ({roomCurrency}) als Standard übernommen.',
+  'serviceForm.currencyMismatchWarning': 'Diese Dienstleistung entspricht nicht der Zimmerwährung ({roomCurrency}) und kann nicht gebucht werden.',
 
   'settings.passwordMismatch': 'Die neuen Passwörter stimmen nicht überein.',
   'settings.updateSuccess': 'Informationen erfolgreich aktualisiert.',
@@ -2505,11 +2517,14 @@ const es: Dict = {
   'services.addButton': 'Nuevo servicio',
   'services.confirmDelete': '¿Seguro que deseas eliminar el servicio "{name}"?',
   'services.empty': 'Aún no hay servicios.',
+  'services.currencyMismatchHint': 'Los servicios en una moneda distinta a la de las habitaciones ({roomCurrency}) no se pueden reservar.',
 
   'serviceForm.saveError': 'No se pudo guardar. Inténtalo de nuevo.',
   'serviceForm.editTitle': 'Editar servicio',
   'serviceForm.createTitle': 'Nuevo servicio',
   'serviceForm.namePlaceholder': 'p. ej. Spa y masaje',
+  'serviceForm.currencyDefaultHint': 'Se usó la moneda de las habitaciones ({roomCurrency}) por defecto.',
+  'serviceForm.currencyMismatchWarning': 'Este servicio no coincide con la moneda de las habitaciones ({roomCurrency}) y no se puede reservar.',
 
   'settings.passwordMismatch': 'Las contraseñas nuevas no coinciden.',
   'settings.updateSuccess': 'Información actualizada correctamente.',
@@ -3073,11 +3088,14 @@ const ar: Dict = {
   'services.addButton': 'خدمة جديدة',
   'services.confirmDelete': 'هل أنت متأكد من حذف خدمة "{name}"؟',
   'services.empty': 'لا توجد خدمات بعد.',
+  'services.currencyMismatchHint': 'الخدمات بعملة مختلفة عن عملة الغرف ({roomCurrency}) لا يمكن حجزها.',
 
   'serviceForm.saveError': 'تعذّر الحفظ. يرجى المحاولة مرة أخرى.',
   'serviceForm.editTitle': 'تعديل الخدمة',
   'serviceForm.createTitle': 'خدمة جديدة',
   'serviceForm.namePlaceholder': 'مثال: سبا ومساج',
+  'serviceForm.currencyDefaultHint': 'تم تعيين عملة الغرف ({roomCurrency}) كافتراضي.',
+  'serviceForm.currencyMismatchWarning': 'هذه الخدمة لا تطابق عملة الغرف ({roomCurrency}) ولا يمكن حجزها.',
 
   'settings.passwordMismatch': 'كلمتا المرور الجديدتان غير متطابقتين.',
   'settings.updateSuccess': 'تم تحديث المعلومات بنجاح.',

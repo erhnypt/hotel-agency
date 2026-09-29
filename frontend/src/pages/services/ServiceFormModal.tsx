@@ -8,10 +8,13 @@ import '../../components/crud.css'
 
 export function ServiceFormModal({
   service,
+  roomCurrency,
   onClose,
   onSave,
 }: {
   service: ServiceResponse | null
+  /** The hotel's room currency; services should be defined in it to be bookable. */
+  roomCurrency: string | null
   onClose: () => void
   onSave: (request: ServiceRequest) => Promise<void>
 }) {
@@ -19,9 +22,11 @@ export function ServiceFormModal({
   const [name, setName] = useState(service?.name ?? '')
   const [description, setDescription] = useState(service?.description ?? '')
   const [price, setPrice] = useState(service ? String(service.price) : '')
-  const [currency, setCurrency] = useState(service?.currency ?? 'TRY')
+  const [currency, setCurrency] = useState(service?.currency ?? roomCurrency ?? 'TRY')
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
+
+  const mismatchesRoomCurrency = roomCurrency != null && currency !== roomCurrency
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -74,6 +79,12 @@ export function ServiceFormModal({
             <option value="USD">USD</option>
           </select>
         </label>
+        {!service && roomCurrency != null && currency === roomCurrency && (
+          <p className="form-hint">{t('serviceForm.currencyDefaultHint', { roomCurrency })}</p>
+        )}
+        {mismatchesRoomCurrency && (
+          <p className="form-error">{t('serviceForm.currencyMismatchWarning', { roomCurrency })}</p>
+        )}
 
         {error && <p className="form-error">{error}</p>}
 

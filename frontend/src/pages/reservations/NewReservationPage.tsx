@@ -165,7 +165,10 @@ export function NewReservationPage() {
     customerMode === 'existing' ? customerId !== '' : newFirstName !== '' && newLastName !== '' && newPhone !== ''
 
   const selectedRoom = availableRooms?.find((room) => room.roomTypeId === selectedRoomTypeId) ?? null
-  const selectedServices = (services.data ?? []).filter((service) => selectedServiceIds.includes(service.id))
+  const bookableServices = (services.data ?? []).filter(
+    (service) => !selectedRoom || service.currency === selectedRoom.currency,
+  )
+  const selectedServices = bookableServices.filter((service) => selectedServiceIds.includes(service.id))
   const servicesTotal = selectedServices.reduce((sum, service) => sum + service.price, 0)
   const totalPreview = (selectedRoom?.totalPrice ?? 0) + servicesTotal
 
@@ -220,7 +223,15 @@ export function NewReservationPage() {
               className={
                 'room-option' + (selectedRoomTypeId === room.roomTypeId ? ' room-option--selected' : '')
               }
-              onClick={() => setSelectedRoomTypeId(room.roomTypeId)}
+              onClick={() => {
+                setSelectedRoomTypeId(room.roomTypeId)
+                // Drop any pre-selected services that don't match the newly selected room's currency.
+                setSelectedServiceIds((ids) =>
+                  ids.filter((id) =>
+                    (services.data ?? []).some((s) => s.id === id && s.currency === room.currency),
+                  ),
+                )
+              }}
             >
               <div className="room-option__name">{room.name}</div>
               <div className="room-option__meta">
@@ -236,12 +247,12 @@ export function NewReservationPage() {
 
       {selectedRoomTypeId && (
         <form onSubmit={handleSubmit} className="reservation-customer-form">
-          {(services.data?.length ?? 0) > 0 && (
+          {bookableServices.length > 0 && (
             <section className="reservation-services">
               <h3>{t('newReservation.servicesTitle')}</h3>
               <p className="reservation-services__hint">{t('newReservation.servicesHint')}</p>
               <div className="reservation-services__list">
-                {services.data!.map((service) => {
+                {bookableServices.map((service) => {
                   const checked = selectedServiceIds.includes(service.id)
                   return (
                     <label

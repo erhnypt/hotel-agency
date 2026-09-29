@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { getMyHotel } from '../../api/hotels'
+import { getMyHotel, listRoomTypes } from '../../api/hotels'
 import { createService, deleteService, listServices, updateService } from '../../api/services'
 import type { ServiceRequest, ServiceResponse } from '../../api/types'
 import { ErrorState, LoadingState } from '../../components/PageState'
@@ -19,6 +19,11 @@ export function ServicesPage() {
     () => (hotel.data ? listServices(hotel.data.id) : Promise.resolve([])),
     [hotel.data?.id, refreshKey],
   )
+  const roomTypes = useAsync(
+    () => (hotel.data ? listRoomTypes(hotel.data.id) : Promise.resolve([])),
+    [hotel.data?.id],
+  )
+  const roomCurrency = roomTypes.data?.find((roomType) => roomType.currency)?.currency ?? null
 
   const refresh = () => setRefreshKey((key) => key + 1)
 
@@ -56,6 +61,10 @@ export function ServicesPage() {
       {services.loading && <LoadingState />}
       {services.error && <ErrorState message={services.error} />}
 
+      {services.data && roomCurrency && services.data.length > 0 && (
+        <p className="form-hint">{t('services.currencyMismatchHint', { roomCurrency })}</p>
+      )}
+
       {services.data && (
         <div className="data-table-wrapper"><table className="data-table">
           <thead>
@@ -73,6 +82,12 @@ export function ServicesPage() {
                 <td>{service.description ?? '—'}</td>
                 <td>
                   {service.price} {service.currency}
+                  {roomCurrency && service.currency !== roomCurrency && (
+                    <>
+                      {' '}
+                      <span className="data-table__muted">⚠</span>
+                    </>
+                  )}
                 </td>
                 <td>
                   <div className="data-table__actions">
@@ -102,10 +117,20 @@ export function ServicesPage() {
       )}
 
       {showCreateModal && (
-        <ServiceFormModal service={null} onClose={() => setShowCreateModal(false)} onSave={handleCreate} />
+        <ServiceFormModal
+          service={null}
+          roomCurrency={roomCurrency}
+          onClose={() => setShowCreateModal(false)}
+          onSave={handleCreate}
+        />
       )}
       {editingService && (
-        <ServiceFormModal service={editingService} onClose={() => setEditingService(null)} onSave={handleUpdate} />
+        <ServiceFormModal
+          service={editingService}
+          roomCurrency={roomCurrency}
+          onClose={() => setEditingService(null)}
+          onSave={handleUpdate}
+        />
       )}
     </div>
   )
