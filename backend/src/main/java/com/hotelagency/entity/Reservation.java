@@ -70,6 +70,9 @@ public class Reservation {
     @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY)
     private List<ReservedService> services = new ArrayList<>();
 
+    @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY)
+    private List<ReservedRoom> rooms = new ArrayList<>();
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

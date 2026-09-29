@@ -140,7 +140,16 @@ export function ReservationsPage() {
           {items.map((r) => (
             <tr key={r.id}>
               <td>{r.reservationNumber}</td>
-              <td>{r.roomTypeName}</td>
+              <td>
+                {r.rooms.length > 1
+                  ? r.rooms.map((room) => (
+                      <span key={room.id}>
+                        {room.name} ×{room.quantity}
+                        <br />
+                      </span>
+                    ))
+                  : r.roomTypeName}
+              </td>
               <td className="data-table__wrap">
                 {r.services.length === 0
                   ? '—'

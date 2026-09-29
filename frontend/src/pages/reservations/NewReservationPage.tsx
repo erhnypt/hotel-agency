@@ -33,7 +33,8 @@ export function NewReservationPage() {
   const [searching, setSearching] = useState(false)
   const [searchError, setSearchError] = useState<string | null>(null)
   const [availableRooms, setAvailableRooms] = useState<AvailableRoomResponse[] | null>(null)
-  const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<number | null>(null)
+  /** roomTypeId -> quantity; supports booking several room types in one reservation. */
+  const [selectedRooms, setSelectedRooms] = useState<Record<number, number>>({})
   const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>([])
 
   const [customerMode, setCustomerMode] = useState<'existing' | 'new'>('existing')
@@ -59,7 +60,7 @@ export function NewReservationPage() {
     event.preventDefault()
     setSearchError(null)
     setAvailableRooms(null)
-    setSelectedRoomTypeId(null)
+    setSelectedRooms({})
     setSelectedServiceIds([])
     setSearching(true)
     try {
@@ -82,7 +83,7 @@ export function NewReservationPage() {
     setCheckOut('')
     setGuests('2')
     setAvailableRooms(null)
-    setSelectedRoomTypeId(null)
+    setSelectedRooms({})
     setSelectedServiceIds([])
     setCustomerMode('existing')
     setCustomerId('')
@@ -99,16 +100,20 @@ export function NewReservationPage() {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
-    if (!selectedRoomTypeId) return
+    if (Object.keys(selectedRooms).length === 0) return
     setSubmitError(null)
     setSubmitting(true)
     try {
       const response = await createReservation({
         hotelId: Number(hotelId),
-        roomTypeId: selectedRoomTypeId,
+        roomTypeId: Number(Object.keys(selectedRooms)[0]),
         checkIn,
         checkOut,
         guests: Number(guests),
+        rooms: Object.entries(selectedRooms).map(([roomTypeId, quantity]) => ({
+          roomTypeId: Number(roomTypeId),
+          quantity,
+        })),
         serviceIds: selectedServiceIds,
         customerId: customerMode === 'existing' ? Number(customerId) : null,
         newCustomer:
@@ -164,13 +169,18 @@ export function NewReservationPage() {
   const selectedCustomerValid =
     customerMode === 'existing' ? customerId !== '' : newFirstName !== '' && newLastName !== '' && newPhone !== ''
 
-  const selectedRoom = availableRooms?.find((room) => room.roomTypeId === selectedRoomTypeId) ?? null
+  const selectedRoomIds = Object.keys(selectedRooms).map(Number)
+  const selectedCurrency =
+    availableRooms?.find((room) => selectedRoomIds.includes(room.roomTypeId))?.currency ?? null
   const bookableServices = (services.data ?? []).filter(
-    (service) => !selectedRoom || service.currency === selectedRoom.currency,
+    (service) => !selectedCurrency || service.currency === selectedCurrency,
   )
   const selectedServices = bookableServices.filter((service) => selectedServiceIds.includes(service.id))
   const servicesTotal = selectedServices.reduce((sum, service) => sum + service.price, 0)
-  const totalPreview = (selectedRoom?.totalPrice ?? 0) + servicesTotal
+  const roomsTotal = (availableRooms ?? [])
+    .filter((room) => selectedRoomIds.includes(room.roomTypeId))
+    .reduce((sum, room) => sum + room.totalPrice * (selectedRooms[room.roomTypeId] ?? 0), 0)
+  const totalPreview = roomsTotal + servicesTotal
 
   return (
     <div>
@@ -216,37 +226,90 @@ export function NewReservationPage() {
           {availableRooms.length === 0 && (
             <p className="page-state">{t('newReservation.noRoomsFound')}</p>
           )}
-          {availableRooms.map((room) => (
-            <button
-              type="button"
-              key={room.roomTypeId}
-              className={
-                'room-option' + (selectedRoomTypeId === room.roomTypeId ? ' room-option--selected' : '')
-              }
-              onClick={() => {
-                setSelectedRoomTypeId(room.roomTypeId)
-                // Drop any pre-selected services that don't match the newly selected room's currency.
-                setSelectedServiceIds((ids) =>
-                  ids.filter((id) =>
-                    (services.data ?? []).some((s) => s.id === id && s.currency === room.currency),
-                  ),
-                )
-              }}
-            >
-              <div className="room-option__name">{room.name}</div>
-              <div className="room-option__meta">
-                {t('newReservation.roomCapacityLabel', { capacity: room.capacity })} · {room.bedType}
-              </div>
-              <div className="room-option__price">
-                {room.totalPrice} {room.currency}
-              </div>
-            </button>
-          ))}
+          {availableRooms.map((room) => {
+            const quantity = selectedRooms[room.roomTypeId] ?? 0
+            const currencyChanged =
+              selectedCurrency != null && quantity === 0 && room.currency !== selectedCurrency && selectedRoomIds.length > 0
+            return (
+              <button
+                type="button"
+                key={room.roomTypeId}
+                className={
+                  'room-option' + (quantity > 0 ? ' room-option--selected' : '') + (currencyChanged ? ' room-option--disabled' : '')
+                }
+                disabled={currencyChanged}
+                title={currencyChanged ? t('newReservation.currencyMixError') : undefined}
+                onClick={() => {
+                  setSelectedRooms((rooms) => {
+                    const next = { ...rooms }
+                    if (quantity > 0) {
+                      delete next[room.roomTypeId]
+                    } else {
+                      next[room.roomTypeId] = 1
+                    }
+                    return next
+                  })
+                  setSelectedServiceIds([])
+                }}
+              >
+                <div className="room-option__name">{room.name}</div>
+                <div className="room-option__meta">
+                  {t('newReservation.roomCapacityLabel', { capacity: room.capacity })} · {room.bedType}
+                </div>
+                <div className="room-option__price">
+                  {room.totalPrice} {room.currency}
+                </div>
+              </button>
+            )
+          })}
         </div>
       )}
 
-      {selectedRoomTypeId && (
+      {selectedRoomIds.length > 0 && (
         <form onSubmit={handleSubmit} className="reservation-customer-form">
+          <div className="reservation-rooms__selected">
+            {availableRooms
+              ?.filter((room) => selectedRoomIds.includes(room.roomTypeId))
+              .map((room) => (
+                <div key={room.roomTypeId} className="reservation-rooms__row">
+                  <span className="reservation-rooms__name">{room.name}</span>
+                  <div className="reservation-rooms__qty">
+                    <button
+                      type="button"
+                      className="btn btn--small"
+                      aria-label={`- ${room.name}`}
+                      disabled={selectedRooms[room.roomTypeId] <= 1}
+                      onClick={() =>
+                        setSelectedRooms((rooms) => ({
+                          ...rooms,
+                          [room.roomTypeId]: rooms[room.roomTypeId] - 1,
+                        }))
+                      }
+                    >
+                      −
+                    </button>
+                    <span className="reservation-rooms__count">{selectedRooms[room.roomTypeId]}</span>
+                    <button
+                      type="button"
+                      className="btn btn--small"
+                      aria-label={`+ ${room.name}`}
+                      onClick={() =>
+                        setSelectedRooms((rooms) => ({
+                          ...rooms,
+                          [room.roomTypeId]: rooms[room.roomTypeId] + 1,
+                        }))
+                      }
+                    >
+                      +
+                    </button>
+                  </div>
+                  <span className="reservation-rooms__price">
+                    {room.totalPrice * selectedRooms[room.roomTypeId]} {room.currency}
+                  </span>
+                </div>
+              ))}
+          </div>
+
           {bookableServices.length > 0 && (
             <section className="reservation-services">
               <h3>{t('newReservation.servicesTitle')}</h3>
@@ -279,7 +342,7 @@ export function NewReservationPage() {
                 })}
               </div>
               <p className="reservation-total">
-                {t('newReservation.totalPreview', { total: totalPreview, currency: selectedRoom?.currency ?? '' })}
+                {t('newReservation.totalPreview', { total: totalPreview, currency: selectedCurrency ?? '' })}
               </p>
             </section>
           )}

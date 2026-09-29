@@ -2,6 +2,7 @@ package com.hotelagency.service;
 
 import com.hotelagency.entity.Customer;
 import com.hotelagency.entity.Reservation;
+import com.hotelagency.entity.ReservedRoom;
 import com.hotelagency.entity.ReservedService;
 import com.hotelagency.entity.RoomType;
 import com.lowagie.text.Document;
@@ -154,18 +155,7 @@ public class InvoiceService {
         RoomType roomType = reservation.getRoomType();
         long nights = ChronoUnit.DAYS.between(reservation.getCheckIn(), reservation.getCheckOut());
         String currency = reservation.getCurrency();
-        BigDecimal servicesTotal = reservation.getServices().stream()
-                .map(ReservedService::getUnitPrice)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-        BigDecimal roomTotal = money(reservation.getTotalPrice()).subtract(money(servicesTotal));
         BigDecimal tax = money(BigDecimal.ZERO);
-
-        String product = roomType.getName()
-                + " — "
-                + DATE_FMT.format(reservation.getCheckIn())
-                + " to "
-                + DATE_FMT.format(reservation.getCheckOut())
-                + " (" + nights + (nights == 1 ? " night" : " nights") + ")";
 
         PdfPTable table = new PdfPTable(new float[] {4f, 1.4f, 1.6f, 1.2f, 1.6f});
         table.setWidthPercentage(100);
@@ -179,11 +169,43 @@ public class InvoiceService {
             table.addCell(cell);
         }
 
-        addBodyCell(table, product, Element.ALIGN_LEFT);
-        addBodyCell(table, "1", Element.ALIGN_CENTER);
-        addBodyCell(table, formatMoney(roomTotal, currency), Element.ALIGN_RIGHT);
-        addBodyCell(table, formatMoney(tax, currency), Element.ALIGN_RIGHT);
-        addBodyCell(table, formatMoney(roomTotal, currency), Element.ALIGN_RIGHT);
+        // One line per booked room type (a reservation may hold several),
+        // falling back to the reservation's primary room when no lines exist.
+        if (reservation.getRooms().isEmpty()) {
+            BigDecimal roomTotal = money(reservation.getTotalPrice()).subtract(
+                    money(reservation.getServices().stream()
+                            .map(ReservedService::getUnitPrice)
+                            .reduce(BigDecimal.ZERO, BigDecimal::add)));
+            String product = roomType.getName()
+                    + " — "
+                    + DATE_FMT.format(reservation.getCheckIn())
+                    + " to "
+                    + DATE_FMT.format(reservation.getCheckOut())
+                    + " (" + nights + (nights == 1 ? " night" : " nights") + ")";
+            addBodyCell(table, product, Element.ALIGN_LEFT);
+            addBodyCell(table, "1", Element.ALIGN_CENTER);
+            addBodyCell(table, formatMoney(roomTotal, currency), Element.ALIGN_RIGHT);
+            addBodyCell(table, formatMoney(tax, currency), Element.ALIGN_RIGHT);
+            addBodyCell(table, formatMoney(roomTotal, currency), Element.ALIGN_RIGHT);
+        } else {
+            String staySuffix = " — "
+                    + DATE_FMT.format(reservation.getCheckIn())
+                    + " to "
+                    + DATE_FMT.format(reservation.getCheckOut())
+                    + " (" + nights + (nights == 1 ? " night" : " nights") + ")";
+            for (ReservedRoom room : reservation.getRooms().stream()
+                    .sorted(java.util.Comparator.comparing(ReservedRoom::getRoomTypeName))
+                    .toList()) {
+                BigDecimal lineTotal = money(room.getNightlyPrice())
+                        .multiply(BigDecimal.valueOf(room.getQuantity()))
+                        .multiply(BigDecimal.valueOf(nights));
+                addBodyCell(table, room.getRoomTypeName() + staySuffix, Element.ALIGN_LEFT);
+                addBodyCell(table, String.valueOf(room.getQuantity()), Element.ALIGN_CENTER);
+                addBodyCell(table, formatMoney(money(room.getNightlyPrice()), currency), Element.ALIGN_RIGHT);
+                addBodyCell(table, formatMoney(tax, currency), Element.ALIGN_RIGHT);
+                addBodyCell(table, formatMoney(lineTotal, currency), Element.ALIGN_RIGHT);
+            }
+        }
 
         for (ReservedService service : sortedServices(reservation)) {
             addBodyCell(table, service.getServiceName(), Element.ALIGN_LEFT);

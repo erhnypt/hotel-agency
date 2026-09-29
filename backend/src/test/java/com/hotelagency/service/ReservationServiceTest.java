@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.hotelagency.dto.customer.CustomerRequest;
+import com.hotelagency.dto.reservation.ReservedRoomRequest;
 import com.hotelagency.entity.Amenity;
 import com.hotelagency.dto.reservation.AvailableRoomResponse;
 import com.hotelagency.dto.reservation.ReservationCreateRequest;
@@ -26,6 +27,7 @@ import com.hotelagency.exception.InvalidReservationException;
 import com.hotelagency.repository.AmenityRepository;
 import com.hotelagency.repository.CustomerRepository;
 import com.hotelagency.repository.ReservationRepository;
+import com.hotelagency.repository.ReservedRoomRepository;
 import com.hotelagency.repository.ReservedServiceRepository;
 import com.hotelagency.repository.ReservationStatusHistoryRepository;
 import com.hotelagency.repository.RoomTypeRepository;
@@ -45,6 +47,8 @@ class ReservationServiceTest {
 
     @Mock
     private ReservationRepository reservationRepository;
+    @Mock
+    private ReservedRoomRepository reservedRoomRepository;
     @Mock
     private ReservedServiceRepository reservedServiceRepository;
     @Mock
@@ -77,9 +81,9 @@ class ReservationServiceTest {
     @BeforeEach
     void setUp() {
         reservationService = new ReservationService(
-                reservationRepository, reservedServiceRepository, amenityRepository, historyRepository,
-                roomTypeRepository, customerRepository, customerService, hotelService, invoiceService,
-                emailService, cardViewLogService);
+                reservationRepository, reservedRoomRepository, reservedServiceRepository, amenityRepository,
+                historyRepository, roomTypeRepository, customerRepository, customerService, hotelService,
+                invoiceService, emailService, cardViewLogService);
 
         hotel = new Hotel();
         hotel.setId(1L);
@@ -115,14 +119,15 @@ class ReservationServiceTest {
 
     private ReservationCreateRequest sampleRequest() {
         return new ReservationCreateRequest(
-                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, null);
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, null, null);
     }
 
     private void stubBookable() {
         hotel.setStatus(HotelStatus.ACTIVE);
         when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
         when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
-        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(0L);
+        when(reservationRepository.sumBookedQuantitiesByRoomType(any(), any(), any(), any())).thenReturn(List.of());
+        when(reservedRoomRepository.sumBookedQuantities(any(), any(), any(), any())).thenReturn(List.of());
         when(reservationRepository.save(any())).thenAnswer(inv -> {
             Reservation r = inv.getArgument(0);
             if (r.getId() == null) {
@@ -175,7 +180,7 @@ class ReservationServiceTest {
         when(customerService.createEntity(newCustomer)).thenReturn(customer);
 
         ReservationCreateRequest request = new ReservationCreateRequest(
-                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, null, newCustomer, null);
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, null, newCustomer, null, null);
 
         reservationService.create(request, staff);
 
@@ -186,7 +191,7 @@ class ReservationServiceTest {
     @Test
     void createRejectsWhenCheckOutNotAfterCheckIn() {
         ReservationCreateRequest request = new ReservationCreateRequest(
-                1L, 2L, LocalDate.of(2026, 9, 15), LocalDate.of(2026, 9, 15), 2, 3L, null, null);
+                1L, 2L, LocalDate.of(2026, 9, 15), LocalDate.of(2026, 9, 15), 2, 3L, null, null, null);
 
         assertThatThrownBy(() -> reservationService.create(request, staff))
                 .isInstanceOf(InvalidReservationException.class);
@@ -222,9 +227,27 @@ class ReservationServiceTest {
         roomType.setNumberOfRooms(1);
         when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
         when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
-        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(1L);
+        when(reservationRepository.sumBookedQuantitiesByRoomType(any(), any(), any(), any()))
+                .thenReturn(List.<Object[]>of(new Object[] { 2L, 1L }));
 
         assertThatThrownBy(() -> reservationService.create(sampleRequest(), staff))
+                .isInstanceOf(InvalidReservationException.class);
+
+        verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    void createRejectsWhenRequestedQuantityExceedsAvailability() {
+        when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
+        when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
+        when(reservationRepository.sumBookedQuantitiesByRoomType(any(), any(), any(), any())).thenReturn(List.of());
+        when(reservedRoomRepository.sumBookedQuantities(any(), any(), any(), any())).thenReturn(List.of());
+        // 5 rooms exist, so requesting 6 must be rejected.
+        ReservationCreateRequest request = new ReservationCreateRequest(
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2,
+                3L, null, List.of(new ReservedRoomRequest(2L, 6)), null);
+
+        assertThatThrownBy(() -> reservationService.create(request, staff))
                 .isInstanceOf(InvalidReservationException.class);
 
         verify(reservationRepository, never()).save(any());
@@ -235,12 +258,39 @@ class ReservationServiceTest {
         roomType.setBasePrice(null);
         when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
         when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
-        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(0L);
 
         assertThatThrownBy(() -> reservationService.create(sampleRequest(), staff))
                 .isInstanceOf(InvalidReservationException.class);
 
         verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    void createBooksMultipleRoomTypesWithQuantities() {
+        stubBookable();
+        RoomType standard = new RoomType();
+        standard.setId(6L);
+        standard.setHotel(hotel);
+        standard.setName("Standard");
+        standard.setCapacity(2);
+        standard.setNumberOfRooms(4);
+        standard.setBasePrice(new BigDecimal("80.00"));
+        standard.setCurrency("EUR");
+        when(roomTypeRepository.findById(6L)).thenReturn(Optional.of(standard));
+        when(customerRepository.findById(3L)).thenReturn(Optional.of(customer));
+
+        ReservationCreateRequest request = new ReservationCreateRequest(
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 12), 4,
+                3L, null, List.of(new ReservedRoomRequest(2L, 1), new ReservedRoomRequest(6L, 2)), null);
+
+        ReservationResponse response = reservationService.create(request, staff);
+
+        // Deluxe 120 x1 + Standard 80 x2 = 280 per night x 2 nights = 560
+        assertThat(response.totalPrice()).isEqualByComparingTo("560.00");
+        assertThat(response.rooms()).hasSize(2);
+        assertThat(response.rooms().get(1).name()).isEqualTo("Standard");
+        assertThat(response.rooms().get(1).quantity()).isEqualTo(2);
+        assertThat(response.rooms().get(1).lineTotal()).isEqualByComparingTo("320.00");
     }
 
     @Test
@@ -256,7 +306,7 @@ class ReservationServiceTest {
         when(customerRepository.findById(3L)).thenReturn(Optional.of(customer));
 
         ReservationCreateRequest request = new ReservationCreateRequest(
-                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, List.of(7L));
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, null, List.of(7L));
 
         ReservationResponse response = reservationService.create(request, staff);
 
@@ -281,7 +331,7 @@ class ReservationServiceTest {
         when(amenityRepository.findAllById(any())).thenReturn(List.of(foreignService));
 
         ReservationCreateRequest request = new ReservationCreateRequest(
-                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, List.of(8L));
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, null, List.of(8L));
 
         assertThatThrownBy(() -> reservationService.create(request, staff))
                 .isInstanceOf(InvalidReservationException.class);
@@ -302,7 +352,7 @@ class ReservationServiceTest {
         when(amenityRepository.findAllById(any())).thenReturn(List.of(dollarService));
 
         ReservationCreateRequest request = new ReservationCreateRequest(
-                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, List.of(9L));
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, null, List.of(9L));
 
         assertThatThrownBy(() -> reservationService.create(request, staff))
                 .isInstanceOf(InvalidReservationException.class);
@@ -452,7 +502,8 @@ class ReservationServiceTest {
 
         when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
         when(roomTypeRepository.findByHotelId(1L)).thenReturn(List.of(roomType, tooSmall));
-        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(0L);
+        when(reservationRepository.sumBookedQuantitiesByRoomType(any(), any(), any(), any())).thenReturn(List.of());
+        when(reservedRoomRepository.sumBookedQuantities(any(), any(), any(), any())).thenReturn(List.of());
         LocalDate date = LocalDate.of(2026, 9, 10);
 
         List<AvailableRoomResponse> result = reservationService.searchAvailableRooms(
@@ -469,7 +520,8 @@ class ReservationServiceTest {
 
         when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
         when(roomTypeRepository.findByHotelId(1L)).thenReturn(List.of(roomType));
-        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(0L);
+        when(reservationRepository.sumBookedQuantitiesByRoomType(any(), any(), any(), any())).thenReturn(List.of());
+        when(reservedRoomRepository.sumBookedQuantities(any(), any(), any(), any())).thenReturn(List.of());
         LocalDate date = LocalDate.of(2026, 9, 10);
 
         List<AvailableRoomResponse> result = reservationService.searchAvailableRooms(
@@ -484,7 +536,9 @@ class ReservationServiceTest {
 
         when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
         when(roomTypeRepository.findByHotelId(1L)).thenReturn(List.of(roomType));
-        when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(2L);
+        when(reservationRepository.sumBookedQuantitiesByRoomType(any(), any(), any(), any()))
+                .thenReturn(List.<Object[]>of(new Object[] { 2L, 2L }));
+        when(reservedRoomRepository.sumBookedQuantities(any(), any(), any(), any())).thenReturn(List.of());
         LocalDate date = LocalDate.of(2026, 9, 10);
 
         List<AvailableRoomResponse> result = reservationService.searchAvailableRooms(

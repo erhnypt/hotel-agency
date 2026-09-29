@@ -220,6 +220,21 @@ export interface CustomerRequest {
   cardNote?: string | null
 }
 
+export interface ReservedRoomRequest {
+  roomTypeId: number
+  quantity: number
+}
+
+export interface ReservedRoomResponse {
+  id: number
+  roomTypeId: number
+  name: string
+  quantity: number
+  nightlyPrice: number
+  lineTotal: number
+  currency: string
+}
+
 export interface ReservationCreateRequest {
   hotelId: number
   roomTypeId: number
@@ -228,6 +243,8 @@ export interface ReservationCreateRequest {
   guests: number
   customerId?: number | null
   newCustomer?: CustomerRequest | null
+  /** Room lines to book; supports several room types (with quantities) in one reservation. */
+  rooms?: ReservedRoomRequest[] | null
   /** Optional hotel services (amenities) to book together with the stay. */
   serviceIds?: number[] | null
 }
@@ -309,6 +326,8 @@ export interface ReservationResponse {
   paid: boolean
   paidAt: string | null
   createdByUserId: number
+  /** Room lines booked (room type + quantity, snapshotted nightly price). */
+  rooms: ReservedRoomResponse[]
   /** Hotel services booked together with the stay (snapshotted name/price). */
   services: ReservedServiceResponse[]
   createdAt: string

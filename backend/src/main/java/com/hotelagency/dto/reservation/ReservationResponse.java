@@ -25,6 +25,7 @@ public record ReservationResponse(
         boolean paid,
         Instant paidAt,
         Long createdByUserId,
+        List<ReservedRoomResponse> rooms,
         List<ReservedServiceResponse> services,
         Instant createdAt,
         Instant updatedAt) {
@@ -35,6 +36,8 @@ public record ReservationResponse(
 
     /** When {@code maskCard} is true, the customer's card number/expiry/CVV are masked — used for hotels. */
     public static ReservationResponse from(Reservation reservation, boolean maskCard) {
+        long nights = java.time.temporal.ChronoUnit.DAYS.between(
+                reservation.getCheckIn(), reservation.getCheckOut());
         return new ReservationResponse(
                 reservation.getId(),
                 reservation.getReservationNumber(),
@@ -52,6 +55,7 @@ public record ReservationResponse(
                 reservation.isPaid(),
                 reservation.getPaidAt(),
                 reservation.getCreatedBy().getId(),
+                reservation.getRooms().stream().map(room -> ReservedRoomResponse.from(room, nights)).toList(),
                 reservation.getServices().stream().map(ReservedServiceResponse::from).toList(),
                 reservation.getCreatedAt(),
                 reservation.getUpdatedAt());

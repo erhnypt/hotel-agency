@@ -316,6 +316,8 @@ const tr: Dict = {
   'newReservation.servicesTitle': 'Hizmetler (opsiyonel)',
   'newReservation.servicesHint': 'Seçilen hizmetler toplam fiyata eklenir.',
   'newReservation.totalPreview': 'Toplam: {total} {currency}',
+  'newReservation.roomsTitle': 'Seçilen Odalar',
+  'newReservation.currencyMixError': 'Farklı para birimindeki odalar aynı rezervasyonda seçilemez.',
 
   'nav.dashboard': 'Panel',
   'nav.home': 'Ana sayfa',
@@ -893,6 +895,8 @@ const en: Dict = {
   'newReservation.servicesTitle': 'Services (optional)',
   'newReservation.servicesHint': 'Selected services are added to the total price.',
   'newReservation.totalPreview': 'Total: {total} {currency}',
+  'newReservation.roomsTitle': 'Selected Rooms',
+  'newReservation.currencyMixError': 'Rooms in different currencies cannot be combined in one reservation.',
 
   'nav.dashboard': 'Dashboard',
   'nav.home': 'Home',
@@ -1465,6 +1469,8 @@ const ru: Dict = {
   'newReservation.servicesTitle': 'Услуги (необязательно)',
   'newReservation.servicesHint': 'Выбранные услуги добавляются к итоговой цене.',
   'newReservation.totalPreview': 'Итого: {total} {currency}',
+  'newReservation.roomsTitle': 'Выбранные номера',
+  'newReservation.currencyMixError': 'Номера в разных валютах нельзя объединять в одном бронировании.',
 
   'nav.dashboard': 'Панель',
   'nav.home': 'Главная',
@@ -2037,6 +2043,8 @@ const de: Dict = {
   'newReservation.servicesTitle': 'Dienstleistungen (optional)',
   'newReservation.servicesHint': 'Ausgewählte Dienstleistungen werden zum Gesamtpreis addiert.',
   'newReservation.totalPreview': 'Gesamt: {total} {currency}',
+  'newReservation.roomsTitle': 'Ausgewählte Zimmer',
+  'newReservation.currencyMixError': 'Zimmer in unterschiedlichen Währungen können nicht kombiniert werden.',
 
   'nav.dashboard': 'Übersicht',
   'nav.home': 'Startseite',
@@ -2609,6 +2617,8 @@ const es: Dict = {
   'newReservation.servicesTitle': 'Servicios (opcional)',
   'newReservation.servicesHint': 'Los servicios seleccionados se añaden al precio total.',
   'newReservation.totalPreview': 'Total: {total} {currency}',
+  'newReservation.roomsTitle': 'Habitaciones seleccionadas',
+  'newReservation.currencyMixError': 'No se pueden combinar habitaciones en distintas monedas en una reserva.',
 
   'nav.dashboard': 'Panel',
   'nav.home': 'Inicio',
@@ -3179,6 +3189,8 @@ const ar: Dict = {
   'newReservation.servicesTitle': 'الخدمات (اختياري)',
   'newReservation.servicesHint': 'تُضاف الخدمات المحددة إلى السعر الإجمالي.',
   'newReservation.totalPreview': 'الإجمالي: {total} {currency}',
+  'newReservation.roomsTitle': 'الغرف المحددة',
+  'newReservation.currencyMixError': 'لا يمكن دمج غرف بعملات مختلفة في حجز واحد.',
 
   'nav.dashboard': 'لوحة التحكم',
   'nav.home': 'الرئيسية',

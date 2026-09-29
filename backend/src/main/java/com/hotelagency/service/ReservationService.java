@@ -15,11 +15,14 @@ import com.hotelagency.entity.RoomType;
 import com.hotelagency.entity.User;
 import com.hotelagency.exception.InvalidReservationException;
 import com.hotelagency.exception.ResourceNotFoundException;
+import com.hotelagency.dto.reservation.ReservedRoomRequest;
 import com.hotelagency.entity.Amenity;
+import com.hotelagency.entity.ReservedRoom;
 import com.hotelagency.entity.ReservedService;
 import com.hotelagency.repository.AmenityRepository;
 import com.hotelagency.repository.CustomerRepository;
 import com.hotelagency.repository.ReservationRepository;
+import com.hotelagency.repository.ReservedRoomRepository;
 import com.hotelagency.repository.ReservedServiceRepository;
 import com.hotelagency.repository.ReservationStatusHistoryRepository;
 import com.hotelagency.repository.RoomTypeRepository;
@@ -27,9 +30,12 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Optional;
+import java.util.Map;
 import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
@@ -48,6 +54,7 @@ public class ReservationService {
             List.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED);
 
     private final ReservationRepository reservationRepository;
+    private final ReservedRoomRepository reservedRoomRepository;
     private final ReservedServiceRepository reservedServiceRepository;
     private final AmenityRepository amenityRepository;
     private final ReservationStatusHistoryRepository historyRepository;
@@ -67,36 +74,76 @@ public class ReservationService {
 
         Hotel hotel = hotelService.getViewableHotel(request.hotelId(), requester);
         assertHotelBookable(hotel);
-        RoomType roomType = roomTypeRepository.findById(request.roomTypeId())
-                .orElseThrow(() -> new ResourceNotFoundException("Room type not found: " + request.roomTypeId()));
-        if (!roomType.getHotel().getId().equals(hotel.getId())) {
-            throw new InvalidReservationException("Room type does not belong to the selected hotel");
+        Map<Long, Integer> requestedRooms = resolveRequestedRooms(request);
+
+        // Load and validate every requested room type up front so the reservation's
+        // currency is known before anything is written.
+        Map<Long, RoomType> roomTypes = new LinkedHashMap<>();
+        for (Long roomTypeId : requestedRooms.keySet()) {
+            RoomType roomType = roomTypeRepository.findById(roomTypeId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Room type not found: " + roomTypeId));
+            if (!roomType.getHotel().getId().equals(hotel.getId())) {
+                throw new InvalidReservationException("Room type does not belong to the selected hotel");
+            }
+            if (roomType.getBasePrice() == null) {
+                throw new InvalidReservationException("Nightly price is not set for room type: " + roomType.getName());
+            }
+            roomTypes.put(roomTypeId, roomType);
         }
-        if (roomType.getCapacity() < request.guests()) {
+        String currency = roomTypes.values().iterator().next().getCurrency();
+        for (RoomType roomType : roomTypes.values()) {
+            if (!roomType.getCurrency().equals(currency)) {
+                throw new InvalidReservationException(
+                        "All rooms in a reservation must share the same currency: " + roomType.getName());
+            }
+        }
+
+        int totalCapacity = 0;
+        for (Map.Entry<Long, Integer> entry : requestedRooms.entrySet()) {
+            totalCapacity += roomTypes.get(entry.getKey()).getCapacity() * entry.getValue();
+        }
+        if (totalCapacity < request.guests()) {
             throw new InvalidReservationException(
-                    "Room type capacity is insufficient for " + request.guests() + " guests");
+                    "Selected rooms do not have enough capacity for " + request.guests() + " guests");
         }
+        assertRoomsAvailable(roomTypes, requestedRooms, request.checkIn(), request.checkOut());
 
-        assertRoomFree(roomType, request.checkIn(), request.checkOut());
-        List<LocalDate> nights = datesBetween(request.checkIn(), request.checkOut());
-        PriceQuote quote = quotePrice(roomType, nights)
-                .orElseThrow(() -> new InvalidReservationException("Nightly price is not set for this room type"));
-
-        List<ReservedService> bookedServices = resolveBookedServices(request, hotel, quote.currency());
+        List<ReservedService> bookedServices = resolveBookedServices(request, hotel, currency);
         Customer customer = resolveCustomer(request);
 
         Reservation reservation = new Reservation();
         reservation.setHotel(hotel);
-        reservation.setRoomType(roomType);
+        reservation.setRoomType(roomTypes.get(requestedRooms.keySet().iterator().next()));
         reservation.setCustomer(customer);
         reservation.setCreatedBy(requester);
         reservation.setCheckIn(request.checkIn());
         reservation.setCheckOut(request.checkOut());
         reservation.setGuests(request.guests());
-        reservation.setTotalPrice(quote.total().add(servicesTotal(bookedServices)));
-        reservation.setCurrency(quote.currency());
+        reservation.setCurrency(currency);
         reservation.setStatus(ReservationStatus.PENDING);
+        reservation.setTotalPrice(BigDecimal.ZERO);
         reservationRepository.save(reservation);
+
+        List<ReservedRoom> roomLines = new java.util.ArrayList<>();
+        for (Map.Entry<Long, Integer> entry : requestedRooms.entrySet()) {
+            RoomType roomType = roomTypes.get(entry.getKey());
+            ReservedRoom line = new ReservedRoom();
+            line.setReservation(reservation);
+            line.setRoomType(roomType);
+            line.setRoomTypeName(roomType.getName());
+            line.setNightlyPrice(roomType.getBasePrice());
+            line.setQuantity(entry.getValue());
+            line.setCurrency(currency);
+            roomLines.add(line);
+            reservation.getRooms().add(line);
+        }
+        reservedRoomRepository.saveAll(roomLines);
+
+        BigDecimal roomsTotal = roomLines.stream()
+                .map(line -> line.getNightlyPrice().multiply(BigDecimal.valueOf(line.getQuantity())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .multiply(BigDecimal.valueOf(datesBetween(request.checkIn(), request.checkOut()).size()));
+        reservation.setTotalPrice(roomsTotal.add(servicesTotal(bookedServices)));
 
         for (ReservedService bookedService : bookedServices) {
             bookedService.setReservation(reservation);
@@ -137,20 +184,22 @@ public class ReservationService {
 
         assertHotelBookable(hotelService.getViewableHotel(hotelId, requester));
         List<LocalDate> nights = datesBetween(checkIn, checkOut);
+        List<RoomType> roomTypes = roomTypeRepository.findByHotelId(hotelId);
+        Map<Long, Long> booked = bookedQuantities(
+                roomTypes.stream().map(RoomType::getId).toList(), checkIn, checkOut);
 
-        return roomTypeRepository.findByHotelId(hotelId).stream()
+        return roomTypes.stream()
                 .filter(roomType -> roomType.getCapacity() >= guests)
-                .filter(roomType -> isRoomFree(roomType, checkIn, checkOut))
-                .flatMap(roomType -> quotePrice(roomType, nights)
-                        .map(quote -> new AvailableRoomResponse(
-                                roomType.getId(),
-                                roomType.getName(),
-                                roomType.getDescription(),
-                                roomType.getCapacity(),
-                                roomType.getBedType(),
-                                quote.total(),
-                                quote.currency()))
-                        .stream())
+                .filter(roomType -> roomType.getBasePrice() != null)
+                .filter(roomType -> roomType.getNumberOfRooms() - booked.getOrDefault(roomType.getId(), 0L) >= 1)
+                .map(roomType -> new AvailableRoomResponse(
+                        roomType.getId(),
+                        roomType.getName(),
+                        roomType.getDescription(),
+                        roomType.getCapacity(),
+                        roomType.getBedType(),
+                        roomType.getBasePrice().multiply(BigDecimal.valueOf(nights.size())),
+                        roomType.getCurrency()))
                 .toList();
     }
 
@@ -255,6 +304,7 @@ public class ReservationService {
         }
 
         historyRepository.deleteByReservationId(id);
+        reservedRoomRepository.deleteByReservationId(id);
         reservedServiceRepository.deleteByReservationId(id);
         cardViewLogService.deleteByReservationId(id);
         reservationRepository.delete(reservation);
@@ -371,26 +421,56 @@ public class ReservationService {
         }
     }
 
-    private void assertRoomFree(RoomType roomType, LocalDate checkIn, LocalDate checkOut) {
-        if (!isRoomFree(roomType, checkIn, checkOut)) {
-            throw new InvalidReservationException(
-                    "No rooms of this type are available for the selected dates");
+    /**
+     * Normalizes the requested room lines into roomTypeId -> quantity. Falls back
+     * to the legacy single-room field (quantity 1) when {@code rooms} is empty.
+     */
+    private Map<Long, Integer> resolveRequestedRooms(ReservationCreateRequest request) {
+        if (request.rooms() == null || request.rooms().isEmpty()) {
+            return new LinkedHashMap<>(Map.of(request.roomTypeId(), 1));
+        }
+        Map<Long, Integer> quantities = new LinkedHashMap<>();
+        for (ReservedRoomRequest roomRequest : request.rooms()) {
+            quantities.merge(roomRequest.roomTypeId(), roomRequest.quantity(), Integer::sum);
+        }
+        return quantities;
+    }
+
+    /**
+     * Availability across several room lines: booked quantity per room type over
+     * the stay window must leave at least the requested number of rooms free.
+     * Both line-based (reservation_rooms) and legacy single-room reservations count.
+     */
+    private void assertRoomsAvailable(
+            Map<Long, RoomType> roomTypes, Map<Long, Integer> requestedQuantities,
+            LocalDate checkIn, LocalDate checkOut) {
+        Map<Long, Long> booked = bookedQuantities(roomTypes.keySet(), checkIn, checkOut);
+        for (Map.Entry<Long, Integer> entry : requestedQuantities.entrySet()) {
+            RoomType roomType = roomTypes.get(entry.getKey());
+            long free = roomType.getNumberOfRooms() - booked.getOrDefault(entry.getKey(), 0L);
+            if (free < entry.getValue()) {
+                throw new InvalidReservationException(
+                        "Not enough rooms of type " + roomType.getName() + " available for the selected dates");
+            }
         }
     }
 
-    /** A room type is free when its total room count exceeds the overlapping active reservations. */
-    private boolean isRoomFree(RoomType roomType, LocalDate checkIn, LocalDate checkOut) {
-        long booked = reservationRepository.countOverlapping(
-                roomType.getId(), checkIn, checkOut, ACTIVE_STATUSES);
-        return roomType.getNumberOfRooms() - booked >= 1;
-    }
-
-    private Optional<PriceQuote> quotePrice(RoomType roomType, List<LocalDate> nights) {
-        if (roomType.getBasePrice() == null) {
-            return Optional.empty();
+    /**
+     * Total booked room quantity per room type over a stay window, combining both
+     * line-based (reservation_rooms) and legacy single-room reservations.
+     */
+    private Map<Long, Long> bookedQuantities(
+            Collection<Long> roomTypeIds, LocalDate checkIn, LocalDate checkOut) {
+        Map<Long, Long> booked = new HashMap<>();
+        for (Object[] row : reservationRepository.sumBookedQuantitiesByRoomType(
+                roomTypeIds, checkIn, checkOut, ACTIVE_STATUSES)) {
+            booked.merge((Long) row[0], (Long) row[1], Long::sum);
         }
-        BigDecimal total = roomType.getBasePrice().multiply(BigDecimal.valueOf(nights.size()));
-        return Optional.of(new PriceQuote(total, roomType.getCurrency()));
+        for (Object[] row : reservedRoomRepository.sumBookedQuantities(
+                roomTypeIds, checkIn, checkOut, ACTIVE_STATUSES)) {
+            booked.merge((Long) row[0], (Long) row[1], Long::sum);
+        }
+        return booked;
     }
 
     private void recordHistory(Reservation reservation, ReservationStatus status) {
@@ -406,6 +486,4 @@ public class ReservationService {
                 .orElseThrow(() -> new ResourceNotFoundException("Reservation not found: " + id));
     }
 
-    private record PriceQuote(BigDecimal total, String currency) {
-    }
 }

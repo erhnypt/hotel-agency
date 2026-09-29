@@ -33,4 +33,22 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("checkIn") LocalDate checkIn,
             @Param("checkOut") LocalDate checkOut,
             @Param("statuses") Collection<ReservationStatus> statuses);
+
+    /**
+     * Booked room quantity per room type from legacy single-room reservations
+     * (each overlapping reservation holds exactly one room of its room type).
+     */
+    @Query("""
+            select r.roomType.id, count(r) from Reservation r
+            where r.roomType.id in :roomTypeIds
+              and r.status in :statuses
+              and r.checkIn < :checkOut
+              and r.checkOut > :checkIn
+            group by r.roomType.id
+            """)
+    List<Object[]> sumBookedQuantitiesByRoomType(
+            @Param("roomTypeIds") Collection<Long> roomTypeIds,
+            @Param("checkIn") LocalDate checkIn,
+            @Param("checkOut") LocalDate checkOut,
+            @Param("statuses") Collection<ReservationStatus> statuses);
 }
