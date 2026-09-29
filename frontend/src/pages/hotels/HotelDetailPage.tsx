@@ -16,6 +16,7 @@ import type { ApiErrorResponse } from '../../auth/types'
 import type { HotelNotesResponse, RoomTypeResponse } from '../../api/types'
 import { useAuth } from '../../auth/useAuth'
 import { ErrorState, LoadingState } from '../../components/PageState'
+import { listServices } from '../../api/services'
 import { StatusBadge } from '../../components/StatusBadge'
 import { useAsync } from '../../hooks/useAsync'
 import { useT } from '../../i18n/useT'
@@ -44,6 +45,7 @@ export function HotelDetailPage() {
 
   const hotel = useAsync(() => getHotel(id), [id, refreshKey])
   const roomTypes = useAsync(() => listRoomTypes(id), [id, refreshKey])
+  const services = useAsync(() => listServices(id), [id, refreshKey])
   const notes = useAsync(() => (isAdmin ? getHotelNotes(id) : Promise.resolve(null)), [id, isAdmin])
 
   const currentNotes = savedNotes ?? notes.data
@@ -313,6 +315,45 @@ export function HotelDetailPage() {
                 <tr>
                   <td colSpan={7} className="data-table__empty">
                     {t('hotelDetail.noRoomTypes')}
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
+
+      <div className="page-header">
+        <h2>{t('services.title')}</h2>
+      </div>
+
+      {services.loading && <LoadingState />}
+      {services.error && <ErrorState message={services.error} />}
+
+      {services.data && (
+        <div className="data-table-wrapper">
+          <table className="data-table">
+            <thead>
+              <tr>
+                <th>{t('common.name')}</th>
+                <th>{t('common.description')}</th>
+                <th>{t('common.price')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {services.data.map((service) => (
+                <tr key={service.id}>
+                  <td>{service.name}</td>
+                  <td>{service.description ?? '—'}</td>
+                  <td>
+                    {service.price} {service.currency}
+                  </td>
+                </tr>
+              ))}
+              {services.data.length === 0 && (
+                <tr>
+                  <td colSpan={3} className="data-table__empty">
+                    {t('services.empty')}
                   </td>
                 </tr>
               )}
