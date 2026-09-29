@@ -51,6 +51,57 @@
   border-top: 1px solid var(--border);
 }
 
+.reservation-services {
+  margin: 20px 0 8px;
+}
+
+.reservation-services__hint {
+  font-size: 13px;
+  color: var(--text);
+  margin: 4px 0 10px;
+}
+
+.reservation-services__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+
+.reservation-services__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border-strong);
+  border-radius: var(--radius);
+  background: var(--bg-panel);
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.reservation-services__item input {
+  accent-color: var(--signal);
+}
+
+.reservation-services__item--selected {
+  border-color: var(--signal);
+  background: var(--signal-bg);
+}
+
+.reservation-services__price {
+  margin-left: auto;
+  font-family: var(--mono);
+  white-space: nowrap;
+  color: var(--signal);
+}
+
+.reservation-total {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-h);
+  margin: 12px 0 4px;
+}
+
 .customer-mode-toggle {
   display: flex;
   gap: 8px;

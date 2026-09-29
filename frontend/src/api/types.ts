@@ -228,6 +228,8 @@ export interface ReservationCreateRequest {
   guests: number
   customerId?: number | null
   newCustomer?: CustomerRequest | null
+  /** Optional hotel services (amenities) to book together with the stay. */
+  serviceIds?: number[] | null
 }
 
 export interface PublicHotelResponse {
@@ -282,6 +284,14 @@ export interface BookingRequestResponse {
   updatedAt: string
 }
 
+export interface ReservedServiceResponse {
+  id: number
+  serviceId: number
+  name: string
+  unitPrice: number
+  currency: string
+}
+
 export interface ReservationResponse {
   id: number
   reservationNumber: string
@@ -299,6 +309,8 @@ export interface ReservationResponse {
   paid: boolean
   paidAt: string | null
   createdByUserId: number
+  /** Hotel services booked together with the stay (snapshotted name/price). */
+  services: ReservedServiceResponse[]
   createdAt: string
   updatedAt: string
 }

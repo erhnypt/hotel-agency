@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.hotelagency.dto.customer.CustomerRequest;
+import com.hotelagency.entity.Amenity;
 import com.hotelagency.dto.reservation.AvailableRoomResponse;
 import com.hotelagency.dto.reservation.ReservationCreateRequest;
 import com.hotelagency.dto.reservation.ReservationResponse;
@@ -22,8 +23,10 @@ import com.hotelagency.entity.RoleName;
 import com.hotelagency.entity.RoomType;
 import com.hotelagency.entity.User;
 import com.hotelagency.exception.InvalidReservationException;
+import com.hotelagency.repository.AmenityRepository;
 import com.hotelagency.repository.CustomerRepository;
 import com.hotelagency.repository.ReservationRepository;
+import com.hotelagency.repository.ReservedServiceRepository;
 import com.hotelagency.repository.ReservationStatusHistoryRepository;
 import com.hotelagency.repository.RoomTypeRepository;
 import java.math.BigDecimal;
@@ -43,6 +46,8 @@ class ReservationServiceTest {
     @Mock
     private ReservationRepository reservationRepository;
     @Mock
+    private ReservedServiceRepository reservedServiceRepository;
+    @Mock
     private ReservationStatusHistoryRepository historyRepository;
     @Mock
     private RoomTypeRepository roomTypeRepository;
@@ -58,6 +63,8 @@ class ReservationServiceTest {
     private EmailService emailService;
     @Mock
     private CardViewLogService cardViewLogService;
+    @Mock
+    private AmenityRepository amenityRepository;
 
     private ReservationService reservationService;
 
@@ -70,9 +77,9 @@ class ReservationServiceTest {
     @BeforeEach
     void setUp() {
         reservationService = new ReservationService(
-                reservationRepository, historyRepository, roomTypeRepository,
-                customerRepository, customerService, hotelService, invoiceService, emailService,
-                cardViewLogService);
+                reservationRepository, reservedServiceRepository, amenityRepository, historyRepository,
+                roomTypeRepository, customerRepository, customerService, hotelService, invoiceService,
+                emailService, cardViewLogService);
 
         hotel = new Hotel();
         hotel.setId(1L);
@@ -108,7 +115,7 @@ class ReservationServiceTest {
 
     private ReservationCreateRequest sampleRequest() {
         return new ReservationCreateRequest(
-                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null);
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, null);
     }
 
     private void stubBookable() {
@@ -168,7 +175,7 @@ class ReservationServiceTest {
         when(customerService.createEntity(newCustomer)).thenReturn(customer);
 
         ReservationCreateRequest request = new ReservationCreateRequest(
-                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, null, newCustomer);
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, null, newCustomer, null);
 
         reservationService.create(request, staff);
 
@@ -179,7 +186,7 @@ class ReservationServiceTest {
     @Test
     void createRejectsWhenCheckOutNotAfterCheckIn() {
         ReservationCreateRequest request = new ReservationCreateRequest(
-                1L, 2L, LocalDate.of(2026, 9, 15), LocalDate.of(2026, 9, 15), 2, 3L, null);
+                1L, 2L, LocalDate.of(2026, 9, 15), LocalDate.of(2026, 9, 15), 2, 3L, null, null);
 
         assertThatThrownBy(() -> reservationService.create(request, staff))
                 .isInstanceOf(InvalidReservationException.class);
@@ -231,6 +238,73 @@ class ReservationServiceTest {
         when(reservationRepository.countOverlapping(eq(2L), any(), any(), any())).thenReturn(0L);
 
         assertThatThrownBy(() -> reservationService.create(sampleRequest(), staff))
+                .isInstanceOf(InvalidReservationException.class);
+
+        verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    void createBooksServicesAndAddsTheirPriceToTotal() {
+        stubBookable();
+        Amenity service = new Amenity();
+        service.setId(7L);
+        service.setHotel(hotel);
+        service.setName("Airport Transfer");
+        service.setPrice(new BigDecimal("40.00"));
+        service.setCurrency("EUR");
+        when(amenityRepository.findAllById(any())).thenReturn(List.of(service));
+        when(customerRepository.findById(3L)).thenReturn(Optional.of(customer));
+
+        ReservationCreateRequest request = new ReservationCreateRequest(
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, List.of(7L));
+
+        ReservationResponse response = reservationService.create(request, staff);
+
+        assertThat(response.totalPrice()).isEqualByComparingTo("640.00");
+        assertThat(response.services()).hasSize(1);
+        assertThat(response.services().get(0).name()).isEqualTo("Airport Transfer");
+        assertThat(response.services().get(0).unitPrice()).isEqualByComparingTo("40.00");
+    }
+
+    @Test
+    void createRejectsServiceFromAnotherHotel() {
+        when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
+        when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
+        Hotel otherHotel = new Hotel();
+        otherHotel.setId(50L);
+        Amenity foreignService = new Amenity();
+        foreignService.setId(8L);
+        foreignService.setHotel(otherHotel);
+        foreignService.setName("Foreign Service");
+        foreignService.setPrice(new BigDecimal("10.00"));
+        foreignService.setCurrency("EUR");
+        when(amenityRepository.findAllById(any())).thenReturn(List.of(foreignService));
+
+        ReservationCreateRequest request = new ReservationCreateRequest(
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, List.of(8L));
+
+        assertThatThrownBy(() -> reservationService.create(request, staff))
+                .isInstanceOf(InvalidReservationException.class);
+
+        verify(reservationRepository, never()).save(any());
+    }
+
+    @Test
+    void createRejectsServiceWithMismatchedCurrency() {
+        when(hotelService.getViewableHotel(1L, staff)).thenReturn(hotel);
+        when(roomTypeRepository.findById(2L)).thenReturn(Optional.of(roomType));
+        Amenity dollarService = new Amenity();
+        dollarService.setId(9L);
+        dollarService.setHotel(hotel);
+        dollarService.setName("Spa");
+        dollarService.setPrice(new BigDecimal("25.00"));
+        dollarService.setCurrency("USD");
+        when(amenityRepository.findAllById(any())).thenReturn(List.of(dollarService));
+
+        ReservationCreateRequest request = new ReservationCreateRequest(
+                1L, 2L, LocalDate.of(2026, 9, 10), LocalDate.of(2026, 9, 15), 2, 3L, null, List.of(9L));
+
+        assertThatThrownBy(() -> reservationService.create(request, staff))
                 .isInstanceOf(InvalidReservationException.class);
 
         verify(reservationRepository, never()).save(any());

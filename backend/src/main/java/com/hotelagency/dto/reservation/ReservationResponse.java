@@ -6,6 +6,7 @@ import com.hotelagency.entity.ReservationStatus;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.List;
 
 public record ReservationResponse(
         Long id,
@@ -24,6 +25,7 @@ public record ReservationResponse(
         boolean paid,
         Instant paidAt,
         Long createdByUserId,
+        List<ReservedServiceResponse> services,
         Instant createdAt,
         Instant updatedAt) {
 
@@ -50,6 +52,7 @@ public record ReservationResponse(
                 reservation.isPaid(),
                 reservation.getPaidAt(),
                 reservation.getCreatedBy().getId(),
+                reservation.getServices().stream().map(ReservedServiceResponse::from).toList(),
                 reservation.getCreatedAt(),
                 reservation.getUpdatedAt());
     }

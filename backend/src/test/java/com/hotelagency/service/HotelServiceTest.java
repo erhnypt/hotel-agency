@@ -25,6 +25,7 @@ import com.hotelagency.repository.HotelSetupReminderLogRepository;
 import com.hotelagency.repository.HotelUserRepository;
 import com.hotelagency.repository.PasswordResetTokenRepository;
 import com.hotelagency.repository.ReservationRepository;
+import com.hotelagency.repository.ReservedServiceRepository;
 import com.hotelagency.repository.RoleRepository;
 import com.hotelagency.repository.RoomImageRepository;
 import com.hotelagency.repository.RoomTypeRepository;
@@ -72,6 +73,8 @@ class HotelServiceTest {
     @Mock
     private ReservationRepository reservationRepository;
     @Mock
+    private ReservedServiceRepository reservedServiceRepository;
+    @Mock
     private PasswordResetTokenRepository passwordResetTokenRepository;
 
     private HotelService hotelService;
@@ -87,7 +90,7 @@ class HotelServiceTest {
                 hotelRepository, hotelUserRepository, userRepository, roleRepository,
                 passwordEncoder, jwtService, emailService, hotelSetupReminderLogRepository, roomTypeRepository,
                 roomImageRepository, amenityRepository, supportMessageRepository, reservationRepository,
-                passwordResetTokenRepository);
+                reservedServiceRepository, passwordResetTokenRepository);
 
         hotelAdminRole = new Role(RoleName.HOTEL_ADMIN);
         hotelAdminRole.setId(3L);

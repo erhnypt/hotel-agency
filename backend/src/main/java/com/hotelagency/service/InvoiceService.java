@@ -2,6 +2,7 @@ package com.hotelagency.service;
 
 import com.hotelagency.entity.Customer;
 import com.hotelagency.entity.Reservation;
+import com.hotelagency.entity.ReservedService;
 import com.hotelagency.entity.RoomType;
 import com.lowagie.text.Document;
 import com.lowagie.text.Element;
@@ -20,6 +21,7 @@ import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import org.springframework.stereotype.Service;
 
 /**
@@ -152,7 +154,10 @@ public class InvoiceService {
         RoomType roomType = reservation.getRoomType();
         long nights = ChronoUnit.DAYS.between(reservation.getCheckIn(), reservation.getCheckOut());
         String currency = reservation.getCurrency();
-        BigDecimal total = money(reservation.getTotalPrice());
+        BigDecimal servicesTotal = reservation.getServices().stream()
+                .map(ReservedService::getUnitPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        BigDecimal roomTotal = money(reservation.getTotalPrice()).subtract(money(servicesTotal));
         BigDecimal tax = money(BigDecimal.ZERO);
 
         String product = roomType.getName()
@@ -176,11 +181,26 @@ public class InvoiceService {
 
         addBodyCell(table, product, Element.ALIGN_LEFT);
         addBodyCell(table, "1", Element.ALIGN_CENTER);
-        addBodyCell(table, formatMoney(total, currency), Element.ALIGN_RIGHT);
+        addBodyCell(table, formatMoney(roomTotal, currency), Element.ALIGN_RIGHT);
         addBodyCell(table, formatMoney(tax, currency), Element.ALIGN_RIGHT);
-        addBodyCell(table, formatMoney(total, currency), Element.ALIGN_RIGHT);
+        addBodyCell(table, formatMoney(roomTotal, currency), Element.ALIGN_RIGHT);
+
+        for (ReservedService service : sortedServices(reservation)) {
+            addBodyCell(table, service.getServiceName(), Element.ALIGN_LEFT);
+            addBodyCell(table, "1", Element.ALIGN_CENTER);
+            addBodyCell(table, formatMoney(money(service.getUnitPrice()), currency), Element.ALIGN_RIGHT);
+            addBodyCell(table, formatMoney(tax, currency), Element.ALIGN_RIGHT);
+            addBodyCell(table, formatMoney(money(service.getUnitPrice()), currency), Element.ALIGN_RIGHT);
+        }
 
         document.add(table);
+    }
+
+    private static List<ReservedService> sortedServices(Reservation reservation) {
+        return reservation.getServices().stream()
+                .sorted(java.util.Comparator.comparing(
+                        ReservedService::getServiceName, String.CASE_INSENSITIVE_ORDER))
+                .toList();
     }
 
     private void addBodyCell(PdfPTable table, String text, int alignment) {

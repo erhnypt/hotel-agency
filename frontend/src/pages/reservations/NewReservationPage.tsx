@@ -3,6 +3,7 @@ import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { listCustomers } from '../../api/customers'
 import { listHotels } from '../../api/hotels'
+import { listServices } from '../../api/services'
 import { createReservation, searchAvailableRooms } from '../../api/reservations'
 import type { ApiErrorResponse } from '../../auth/types'
 import { roleHomePath } from '../../auth/roleHome'
@@ -24,6 +25,7 @@ export function NewReservationPage() {
   const customers = useAsync(listCustomers, [])
 
   const [hotelId, setHotelId] = useState('')
+  const services = useAsync(() => (hotelId ? listServices(Number(hotelId)) : Promise.resolve([])), [hotelId])
   const [checkIn, setCheckIn] = useState('')
   const [checkOut, setCheckOut] = useState('')
   const [guests, setGuests] = useState('2')
@@ -32,6 +34,7 @@ export function NewReservationPage() {
   const [searchError, setSearchError] = useState<string | null>(null)
   const [availableRooms, setAvailableRooms] = useState<AvailableRoomResponse[] | null>(null)
   const [selectedRoomTypeId, setSelectedRoomTypeId] = useState<number | null>(null)
+  const [selectedServiceIds, setSelectedServiceIds] = useState<number[]>([])
 
   const [customerMode, setCustomerMode] = useState<'existing' | 'new'>('existing')
   const [customerId, setCustomerId] = useState('')
@@ -57,6 +60,7 @@ export function NewReservationPage() {
     setSearchError(null)
     setAvailableRooms(null)
     setSelectedRoomTypeId(null)
+    setSelectedServiceIds([])
     setSearching(true)
     try {
       const rooms = await searchAvailableRooms(Number(hotelId), checkIn, checkOut, Number(guests))
@@ -79,6 +83,7 @@ export function NewReservationPage() {
     setGuests('2')
     setAvailableRooms(null)
     setSelectedRoomTypeId(null)
+    setSelectedServiceIds([])
     setCustomerMode('existing')
     setCustomerId('')
     setNewCardHolder('')
@@ -104,6 +109,7 @@ export function NewReservationPage() {
         checkIn,
         checkOut,
         guests: Number(guests),
+        serviceIds: selectedServiceIds,
         customerId: customerMode === 'existing' ? Number(customerId) : null,
         newCustomer:
           customerMode === 'new'
@@ -157,6 +163,11 @@ export function NewReservationPage() {
 
   const selectedCustomerValid =
     customerMode === 'existing' ? customerId !== '' : newFirstName !== '' && newLastName !== '' && newPhone !== ''
+
+  const selectedRoom = availableRooms?.find((room) => room.roomTypeId === selectedRoomTypeId) ?? null
+  const selectedServices = (services.data ?? []).filter((service) => selectedServiceIds.includes(service.id))
+  const servicesTotal = selectedServices.reduce((sum, service) => sum + service.price, 0)
+  const totalPreview = (selectedRoom?.totalPrice ?? 0) + servicesTotal
 
   return (
     <div>
@@ -225,6 +236,43 @@ export function NewReservationPage() {
 
       {selectedRoomTypeId && (
         <form onSubmit={handleSubmit} className="reservation-customer-form">
+          {(services.data?.length ?? 0) > 0 && (
+            <section className="reservation-services">
+              <h3>{t('newReservation.servicesTitle')}</h3>
+              <p className="reservation-services__hint">{t('newReservation.servicesHint')}</p>
+              <div className="reservation-services__list">
+                {services.data!.map((service) => {
+                  const checked = selectedServiceIds.includes(service.id)
+                  return (
+                    <label
+                      key={service.id}
+                      className={
+                        'reservation-services__item' + (checked ? ' reservation-services__item--selected' : '')
+                      }
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() =>
+                          setSelectedServiceIds((ids) =>
+                            checked ? ids.filter((id) => id !== service.id) : [...ids, service.id],
+                          )
+                        }
+                      />
+                      <span>{service.name}</span>
+                      <span className="reservation-services__price">
+                        {service.price} {service.currency}
+                      </span>
+                    </label>
+                  )
+                })}
+              </div>
+              <p className="reservation-total">
+                {t('newReservation.totalPreview', { total: totalPreview, currency: selectedRoom?.currency ?? '' })}
+              </p>
+            </section>
+          )}
+
           <div className="page-header">
             <h2>{t('newReservation.customerSectionTitle')}</h2>
           </div>

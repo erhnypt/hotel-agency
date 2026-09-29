@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -64,6 +66,9 @@ public class Reservation {
 
     @Column(name = "paid_at")
     private Instant paidAt;
+
+    @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY)
+    private List<ReservedService> services = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)

@@ -15,8 +15,12 @@ import com.hotelagency.entity.RoomType;
 import com.hotelagency.entity.User;
 import com.hotelagency.exception.InvalidReservationException;
 import com.hotelagency.exception.ResourceNotFoundException;
+import com.hotelagency.entity.Amenity;
+import com.hotelagency.entity.ReservedService;
+import com.hotelagency.repository.AmenityRepository;
 import com.hotelagency.repository.CustomerRepository;
 import com.hotelagency.repository.ReservationRepository;
+import com.hotelagency.repository.ReservedServiceRepository;
 import com.hotelagency.repository.ReservationStatusHistoryRepository;
 import com.hotelagency.repository.RoomTypeRepository;
 import java.math.BigDecimal;
@@ -26,6 +30,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
@@ -43,6 +48,8 @@ public class ReservationService {
             List.of(ReservationStatus.PENDING, ReservationStatus.CONFIRMED);
 
     private final ReservationRepository reservationRepository;
+    private final ReservedServiceRepository reservedServiceRepository;
+    private final AmenityRepository amenityRepository;
     private final ReservationStatusHistoryRepository historyRepository;
     private final RoomTypeRepository roomTypeRepository;
     private final CustomerRepository customerRepository;
@@ -75,6 +82,7 @@ public class ReservationService {
         PriceQuote quote = quotePrice(roomType, nights)
                 .orElseThrow(() -> new InvalidReservationException("Nightly price is not set for this room type"));
 
+        List<ReservedService> bookedServices = resolveBookedServices(request, hotel, quote.currency());
         Customer customer = resolveCustomer(request);
 
         Reservation reservation = new Reservation();
@@ -85,10 +93,16 @@ public class ReservationService {
         reservation.setCheckIn(request.checkIn());
         reservation.setCheckOut(request.checkOut());
         reservation.setGuests(request.guests());
-        reservation.setTotalPrice(quote.total());
+        reservation.setTotalPrice(quote.total().add(servicesTotal(bookedServices)));
         reservation.setCurrency(quote.currency());
         reservation.setStatus(ReservationStatus.PENDING);
         reservationRepository.save(reservation);
+
+        for (ReservedService bookedService : bookedServices) {
+            bookedService.setReservation(reservation);
+            reservation.getServices().add(bookedService);
+        }
+        reservedServiceRepository.saveAll(bookedServices);
 
         reservation.setReservationNumber("RES-" + (RESERVATION_NUMBER_OFFSET + reservation.getId()));
         reservationRepository.save(reservation);
@@ -241,6 +255,7 @@ public class ReservationService {
         }
 
         historyRepository.deleteByReservationId(id);
+        reservedServiceRepository.deleteByReservationId(id);
         cardViewLogService.deleteByReservationId(id);
         reservationRepository.delete(reservation);
     }
@@ -283,6 +298,43 @@ public class ReservationService {
     }
 
     public record InvoiceFile(byte[] bytes, String filename) {
+    }
+
+    /**
+     * Loads and validates the requested optional hotel services: each must exist,
+     * belong to the reservation's hotel, and share the room's quote currency.
+     * Service name and price are snapshotted onto the reservation row.
+     */
+    private List<ReservedService> resolveBookedServices(ReservationCreateRequest request, Hotel hotel, String currency) {
+        if (request.serviceIds() == null || request.serviceIds().isEmpty()) {
+            return List.of();
+        }
+        Set<Long> serviceIds = new LinkedHashSet<>(request.serviceIds());
+        List<Amenity> amenities = amenityRepository.findAllById(serviceIds);
+        if (amenities.size() != serviceIds.size()) {
+            throw new InvalidReservationException("One or more selected services do not exist");
+        }
+        return amenities.stream().map(amenity -> {
+            if (!amenity.getHotel().getId().equals(hotel.getId())) {
+                throw new InvalidReservationException("Service does not belong to the selected hotel: " + amenity.getName());
+            }
+            if (!amenity.getCurrency().equals(currency)) {
+                throw new InvalidReservationException(
+                        "Service currency does not match the room currency: " + amenity.getName());
+            }
+            ReservedService reservedService = new ReservedService();
+            reservedService.setService(amenity);
+            reservedService.setServiceName(amenity.getName());
+            reservedService.setUnitPrice(amenity.getPrice());
+            reservedService.setCurrency(amenity.getCurrency());
+            return reservedService;
+        }).toList();
+    }
+
+    private BigDecimal servicesTotal(List<ReservedService> bookedServices) {
+        return bookedServices.stream()
+                .map(ReservedService::getUnitPrice)
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     private Customer resolveCustomer(ReservationCreateRequest request) {

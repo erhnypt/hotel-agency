@@ -124,6 +124,7 @@ export function ReservationsPage() {
           <tr>
             <th>{t('board.colNo')}</th>
             <th>{t('common.roomType')}</th>
+            <th>{t('reservations.columnServices')}</th>
             <th>{t('reservations.columnCustomer')}</th>
             <th>{t('reservations.columnCard')}</th>
             <th>{t('common.checkIn')}</th>
@@ -140,6 +141,20 @@ export function ReservationsPage() {
             <tr key={r.id}>
               <td>{r.reservationNumber}</td>
               <td>{r.roomTypeName}</td>
+              <td className="data-table__wrap">
+                {r.services.length === 0
+                  ? '—'
+                  : r.services.map((service) => (
+                      <span key={service.id}>
+                        {service.name}
+                        <br />
+                        <span className="data-table__muted">
+                          {service.unitPrice} {service.currency}
+                        </span>
+                        <br />
+                      </span>
+                    ))}
+              </td>
               <td>
                 {r.customer.firstName} {r.customer.lastName}
               </td>
@@ -289,7 +304,7 @@ export function ReservationsPage() {
           ))}
           {items.length === 0 && (
             <tr>
-              <td colSpan={11} className="data-table__empty">
+              <td colSpan={12} className="data-table__empty">
                 {emptyMessage}
               </td>
             </tr>

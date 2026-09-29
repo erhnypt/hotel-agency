@@ -29,6 +29,7 @@ import com.hotelagency.repository.HotelSetupReminderLogRepository;
 import com.hotelagency.repository.HotelUserRepository;
 import com.hotelagency.repository.PasswordResetTokenRepository;
 import com.hotelagency.repository.ReservationRepository;
+import com.hotelagency.repository.ReservedServiceRepository;
 import com.hotelagency.repository.RoleRepository;
 import com.hotelagency.repository.RoomImageRepository;
 import com.hotelagency.repository.RoomTypeRepository;
@@ -66,6 +67,7 @@ public class HotelService {
     private final AmenityRepository amenityRepository;
     private final SupportMessageRepository supportMessageRepository;
     private final ReservationRepository reservationRepository;
+    private final ReservedServiceRepository reservedServiceRepository;
     private final PasswordResetTokenRepository passwordResetTokenRepository;
 
     /**
@@ -369,7 +371,7 @@ public class HotelService {
     @Transactional
     public void delete(Long id) {
         Hotel hotel = getHotelOrThrow(id);
-        if (reservationRepository.existsByHotelId(id)) {
+        if (reservationRepository.existsByHotelId(id) || !reservedServiceRepository.findReservationIdsByHotelId(id).isEmpty()) {
             throw new IllegalArgumentException(
                     "Rezervasyon geçmişi olan bir otel kalıcı olarak silinemez. Bunun yerine oteli pasife alabilirsiniz.");
         }

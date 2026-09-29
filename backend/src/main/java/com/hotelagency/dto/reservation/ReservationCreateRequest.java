@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
+import java.util.List;
 
 public record ReservationCreateRequest(
         @NotNull Long hotelId,
@@ -13,5 +14,7 @@ public record ReservationCreateRequest(
         @NotNull LocalDate checkOut,
         @NotNull @Min(1) Integer guests,
         Long customerId,
-        @Valid CustomerRequest newCustomer) {
+        @Valid CustomerRequest newCustomer,
+        /** Optional hotel services (amenities) to book together with the stay. */
+        List<Long> serviceIds) {
 }
