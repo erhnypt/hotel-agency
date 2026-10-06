@@ -486,6 +486,18 @@ class ReservationServiceTest {
     }
 
     @Test
+    void hotelActionResponsesNeverCarryTheCard() {
+        Reservation reservation = openReservation();
+        reservation.setStatus(ReservationStatus.CANCELLED);
+        hotelOwnsReservation(reservation);
+
+        ReservationResponse response = reservationService.unmarkPaid(1L, hotelAdmin);
+
+        assertThat(response.customer().cardNumber()).isNull();
+        assertThat(response.customer().cardNote()).isNull();
+    }
+
+    @Test
     void setCardVisibleToHotelFlipsTheSwitch() {
         Reservation reservation = openReservation();
         when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));

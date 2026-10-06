@@ -256,7 +256,7 @@ public class ReservationService {
         recordHistory(reservation, ReservationStatus.CONFIRMED);
         notifyReservationConfirmed(reservation);
 
-        return ReservationResponse.from(reservation);
+        return ReservationResponse.from(reservation, true);
     }
 
     private void notifyReservationConfirmed(Reservation reservation) {
@@ -282,7 +282,7 @@ public class ReservationService {
         reservation.setStatus(ReservationStatus.REJECTED);
         recordHistory(reservation, ReservationStatus.REJECTED);
 
-        return ReservationResponse.from(reservation);
+        return ReservationResponse.from(reservation, true);
     }
 
     @Transactional
@@ -332,7 +332,7 @@ public class ReservationService {
         reservation.setPaid(true);
         reservation.setPaidAt(Instant.now());
 
-        return ReservationResponse.from(reservation);
+        return ReservationResponse.from(reservation, true);
     }
 
     @Transactional
@@ -343,7 +343,7 @@ public class ReservationService {
         reservation.setPaid(false);
         reservation.setPaidAt(null);
 
-        return ReservationResponse.from(reservation);
+        return ReservationResponse.from(reservation, true);
     }
 
     @Transactional(readOnly = true)
