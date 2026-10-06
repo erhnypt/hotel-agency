@@ -326,6 +326,8 @@ export interface ReservationResponse {
   paid: boolean
   paidAt: string | null
   createdByUserId: number
+  cardVisibleToHotel: boolean
+  cardAvailableToHotel: boolean
   /** Room lines booked (room type + quantity, snapshotted nightly price). */
   rooms: ReservedRoomResponse[]
   /** Hotel services booked together with the stay (snapshotted name/price). */

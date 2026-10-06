@@ -8,6 +8,7 @@ import {
   listReservations,
   markReservationPaid,
   rejectReservation,
+  setReservationCardVisibility,
   unmarkReservationPaid,
 } from '../../api/reservations'
 import type { ReservationResponse, ReservationStatus } from '../../api/types'
@@ -170,7 +171,7 @@ export function ReservationsPage() {
               <td>
                 {user?.role === 'HOTEL_ADMIN' ? (
                   <>
-                    {r.customer.cardNumber ? (
+                    {r.cardAvailableToHotel && r.customer.cardNumber ? (
                       <>
                         {r.customer.cardBrand ? `${r.customer.cardBrand} ` : ''}
                         {r.customer.cardNumber}
@@ -183,6 +184,8 @@ export function ReservationsPage() {
                           {t('reservations.showCardDetailsButton')}
                         </button>
                       </>
+                    ) : r.customer.cardNumber === null && !r.cardAvailableToHotel ? (
+                      <span className="data-table__muted">{t('reservations.cardLockedForHotel')}</span>
                     ) : (
                       '—'
                     )}
@@ -204,6 +207,12 @@ export function ReservationsPage() {
                         <span className="data-table__muted">
                           {t('reservations.cardCvvValue', { value: r.customer.cardNote })}
                         </span>
+                      </>
+                    )}
+                    {user?.role === 'AGENCY_ADMIN' && !r.cardVisibleToHotel && (
+                      <>
+                        <br />
+                        <span className="data-table__muted">{t('reservations.cardHiddenFromHotelBadge')}</span>
                       </>
                     )}
                   </>
@@ -285,6 +294,21 @@ export function ReservationsPage() {
                       </button>
                     </>
                   )}
+                  {user?.role === 'AGENCY_ADMIN' &&
+                    r.customer.cardNumber &&
+                    (r.status === 'PENDING' || r.status === 'CONFIRMED') &&
+                    !r.paid && (
+                      <button
+                        type="button"
+                        className="btn btn--small"
+                        disabled={busyId === r.id}
+                        onClick={() => handleAction(r.id, (id) => setReservationCardVisibility(id, !r.cardVisibleToHotel))}
+                      >
+                        {r.cardVisibleToHotel
+                          ? t('reservations.hideCardFromHotelButton')
+                          : t('reservations.showCardToHotelButton')}
+                      </button>
+                    )}
                   {(user?.role === 'AGENCY_STAFF' || user?.role === 'AGENCY_ADMIN') &&
                     r.createdByUserId === user?.id &&
                     (r.status === 'PENDING' || r.status === 'CONFIRMED') && (

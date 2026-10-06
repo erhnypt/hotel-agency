@@ -229,8 +229,19 @@ public class ReservationService {
     public CardDetailsResponse revealCard(Long id, User requester) {
         Reservation reservation = getReservationOrThrow(id);
         assertHotelOwnership(reservation, requester);
+        if (!reservation.isCardAvailableToHotel()) {
+            throw new AccessDeniedException("Card details are not available for this reservation");
+        }
         cardViewLogService.record(reservation, requester);
         return CardDetailsResponse.from(reservation.getCustomer());
+    }
+
+    /** Agency admin switch: allow or block the hotel from seeing this reservation's card. */
+    @Transactional
+    public ReservationResponse setCardVisibleToHotel(Long id, boolean visible) {
+        Reservation reservation = getReservationOrThrow(id);
+        reservation.setCardVisibleToHotel(visible);
+        return ReservationResponse.from(reservation);
     }
 
     @Transactional

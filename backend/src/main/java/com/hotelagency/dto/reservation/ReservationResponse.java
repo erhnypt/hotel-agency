@@ -25,6 +25,8 @@ public record ReservationResponse(
         boolean paid,
         Instant paidAt,
         Long createdByUserId,
+        boolean cardVisibleToHotel,
+        boolean cardAvailableToHotel,
         List<ReservedRoomResponse> rooms,
         List<ReservedServiceResponse> services,
         Instant createdAt,
@@ -45,7 +47,7 @@ public record ReservationResponse(
                 reservation.getHotel().getName(),
                 reservation.getRoomType().getId(),
                 reservation.getRoomType().getName(),
-                maskCard ? CustomerResponse.masked(reservation.getCustomer()) : CustomerResponse.from(reservation.getCustomer()),
+                customerFor(reservation, maskCard),
                 reservation.getCheckIn(),
                 reservation.getCheckOut(),
                 reservation.getGuests(),
@@ -55,9 +57,20 @@ public record ReservationResponse(
                 reservation.isPaid(),
                 reservation.getPaidAt(),
                 reservation.getCreatedBy().getId(),
+                reservation.isCardVisibleToHotel(),
+                reservation.isCardAvailableToHotel(),
                 reservation.getRooms().stream().map(room -> ReservedRoomResponse.from(room, nights)).toList(),
                 reservation.getServices().stream().map(ReservedServiceResponse::from).toList(),
                 reservation.getCreatedAt(),
                 reservation.getUpdatedAt());
+    }
+
+    private static CustomerResponse customerFor(Reservation reservation, boolean maskCard) {
+        if (!maskCard) {
+            return CustomerResponse.from(reservation.getCustomer());
+        }
+        return reservation.isCardAvailableToHotel()
+                ? CustomerResponse.masked(reservation.getCustomer())
+                : CustomerResponse.withoutCard(reservation.getCustomer());
     }
 }

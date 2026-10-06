@@ -41,6 +41,11 @@ export async function revealReservationCard(id: number): Promise<CardDetailsResp
   return response.data
 }
 
+export async function setReservationCardVisibility(id: number, visible: boolean): Promise<ReservationResponse> {
+  const response = await apiClient.post<ReservationResponse>(`/reservations/${id}/card-visibility`, { visible })
+  return response.data
+}
+
 export async function deleteReservation(id: number): Promise<void> {
   await apiClient.delete(`/reservations/${id}`)
 }

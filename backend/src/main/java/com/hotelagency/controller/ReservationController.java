@@ -1,6 +1,7 @@
 package com.hotelagency.controller;
 
 import com.hotelagency.dto.reservation.CardDetailsResponse;
+import com.hotelagency.dto.reservation.CardVisibilityRequest;
 import com.hotelagency.dto.reservation.ReservationCreateRequest;
 import com.hotelagency.dto.reservation.ReservationResponse;
 import com.hotelagency.security.CustomUserDetails;
@@ -94,6 +95,13 @@ public class ReservationController {
     public ResponseEntity<CardDetailsResponse> revealCard(
             @PathVariable Long id, @AuthenticationPrincipal CustomUserDetails principal) {
         return ResponseEntity.ok(reservationService.revealCard(id, principal.getUser()));
+    }
+
+    @PostMapping("/{id}/card-visibility")
+    @PreAuthorize("hasRole('AGENCY_ADMIN')")
+    public ResponseEntity<ReservationResponse> setCardVisibility(
+            @PathVariable Long id, @Valid @RequestBody CardVisibilityRequest request) {
+        return ResponseEntity.ok(reservationService.setCardVisibleToHotel(id, request.visible()));
     }
 
     @GetMapping("/{id}/invoice")

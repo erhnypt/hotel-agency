@@ -67,6 +67,10 @@ public class Reservation {
     @Column(name = "paid_at")
     private Instant paidAt;
 
+    /** Agency-admin switch: when false the hotel can never see this reservation's card, even while it is active. */
+    @Column(name = "card_visible_to_hotel", nullable = false)
+    private boolean cardVisibleToHotel = true;
+
     @OneToMany(mappedBy = "reservation", fetch = FetchType.LAZY)
     private List<ReservedService> services = new ArrayList<>();
 
@@ -80,4 +84,13 @@ public class Reservation {
     @UpdateTimestamp
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    /**
+     * The hotel may see the card only while the reservation is still open (pending/confirmed, unpaid, not yet
+     * checked out) and the agency admin hasn't switched access off.
+     */
+    public boolean isCardAvailableToHotel() {
+        boolean open = status == ReservationStatus.PENDING || status == ReservationStatus.CONFIRMED;
+        return cardVisibleToHotel && open && !paid && !checkOut.isBefore(LocalDate.now());
+    }
 }

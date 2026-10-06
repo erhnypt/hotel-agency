@@ -59,6 +59,26 @@ public record CustomerResponse(
                 customer.getUpdatedAt());
     }
 
+    /** Same as {@link #from} but with every card field removed — used when the hotel may no longer see the card. */
+    public static CustomerResponse withoutCard(Customer customer) {
+        return new CustomerResponse(
+                customer.getId(),
+                customer.getFirstName(),
+                customer.getLastName(),
+                customer.getPhone(),
+                customer.getEmail(),
+                customer.getPassportNumber(),
+                customer.getNationality(),
+                customer.getNotes(),
+                null,
+                null,
+                null,
+                null,
+                null,
+                customer.getCreatedAt(),
+                customer.getUpdatedAt());
+    }
+
     private static String maskCardNumber(String number) {
         if (number == null || number.isBlank()) {
             return null;

@@ -409,6 +409,91 @@ class ReservationServiceTest {
                 .isInstanceOf(AccessDeniedException.class);
     }
 
+    private Reservation openReservation() {
+        Reservation reservation = fullReservation();
+        reservation.setCheckOut(LocalDate.now().plusDays(3));
+        customer.setCardNumber("4242424242424242");
+        customer.setCardExpiry("12/29");
+        customer.setCardNote("123");
+        return reservation;
+    }
+
+    private void hotelOwnsReservation(Reservation reservation) {
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+        when(hotelService.requireOwnHotelId(hotelAdmin)).thenReturn(1L);
+    }
+
+    @Test
+    void revealCardWorksWhileReservationIsOpen() {
+        Reservation reservation = openReservation();
+        hotelOwnsReservation(reservation);
+
+        assertThat(reservationService.revealCard(1L, hotelAdmin).cardNumber()).isEqualTo("4242424242424242");
+        verify(cardViewLogService).record(reservation, hotelAdmin);
+    }
+
+    @Test
+    void revealCardIsDeniedWhenAdminSwitchedItOff() {
+        Reservation reservation = openReservation();
+        reservation.setCardVisibleToHotel(false);
+        hotelOwnsReservation(reservation);
+
+        assertThatThrownBy(() -> reservationService.revealCard(1L, hotelAdmin))
+                .isInstanceOf(AccessDeniedException.class);
+        verify(cardViewLogService, never()).record(any(), any());
+    }
+
+    @Test
+    void revealCardIsDeniedOnceReservationIsPaidCancelledOrRejected() {
+        for (ReservationStatus closed : List.of(ReservationStatus.CANCELLED, ReservationStatus.REJECTED)) {
+            Reservation reservation = openReservation();
+            reservation.setStatus(closed);
+            hotelOwnsReservation(reservation);
+            assertThatThrownBy(() -> reservationService.revealCard(1L, hotelAdmin))
+                    .isInstanceOf(AccessDeniedException.class);
+        }
+
+        Reservation paid = openReservation();
+        paid.setStatus(ReservationStatus.CONFIRMED);
+        paid.setPaid(true);
+        hotelOwnsReservation(paid);
+        assertThatThrownBy(() -> reservationService.revealCard(1L, hotelAdmin))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void revealCardIsDeniedAfterCheckOut() {
+        Reservation reservation = openReservation();
+        reservation.setCheckOut(LocalDate.now().minusDays(1));
+        hotelOwnsReservation(reservation);
+
+        assertThatThrownBy(() -> reservationService.revealCard(1L, hotelAdmin))
+                .isInstanceOf(AccessDeniedException.class);
+    }
+
+    @Test
+    void hotelListHidesCardEntirelyWhenAccessIsOff() {
+        Reservation reservation = openReservation();
+        reservation.setCardVisibleToHotel(false);
+        when(hotelService.requireOwnHotelId(hotelAdmin)).thenReturn(1L);
+        when(reservationRepository.findByHotelId(1L)).thenReturn(List.of(reservation));
+
+        ReservationResponse response = reservationService.findAll(hotelAdmin).get(0);
+
+        assertThat(response.cardAvailableToHotel()).isFalse();
+        assertThat(response.customer().cardNumber()).isNull();
+        assertThat(response.customer().cardNote()).isNull();
+    }
+
+    @Test
+    void setCardVisibleToHotelFlipsTheSwitch() {
+        Reservation reservation = openReservation();
+        when(reservationRepository.findById(1L)).thenReturn(Optional.of(reservation));
+
+        assertThat(reservationService.setCardVisibleToHotel(1L, false).cardVisibleToHotel()).isFalse();
+        assertThat(reservationService.setCardVisibleToHotel(1L, true).cardAvailableToHotel()).isTrue();
+    }
+
     @Test
     void findByIdRejectsHotelAdminForAnotherHotel() {
         Reservation reservation = fullReservation();
