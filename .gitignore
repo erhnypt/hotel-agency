@@ -30,3 +30,32 @@ testlogin.md
 
 # Raw datasets — large, not versioned. See scripts/build-hotel-catalog.mjs for the source.
 data/*.csv
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+
+# --- push_all ---
+.env
+.env.*
+!.env.example
+.claude.json
+.mcp.json
+.claude/worktrees/
+node_modules/
+.next/
+dist/
+build/
+.venv/
+venv/
+__pycache__/
+.pytest_cache/
+*.tsbuildinfo
+test-results/
+playwright-report/
+*.session
+.DS_Store

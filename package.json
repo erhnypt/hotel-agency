@@ -1,0 +1,25 @@
+{
+  "name": "hotelacency",
+  "version": "1.0.0",
+  "description": "Okul projesi: bir otel acentesi ile acenteye kayıtlı oteller arasındaki rezervasyon sürecini yöneten bir sistem.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/erhnypt/hotel-agency.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/erhnypt/hotel-agency/issues"
+  },
+  "homepage": "https://github.com/erhnypt/hotel-agency#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^22.20.3"
+  }
+}
